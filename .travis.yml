@@ -1,0 +1,8 @@
+language: csharp
+solution: Castle.DynamicLinqQueryBuilder.Tests.sln
+install:
+- nuget restore Castle.DynamicLinqQueryBuilder.Tests.sln
+- nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+- xbuild /p:Configuration=Release Castle.DynamicLinqQueryBuilder.Tests.sln
+- mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Castle.DynamicLinqQueryBuilder.Tests/bin/Release/Castle.DynamicLinqQueryBuilder.Tests.dll
