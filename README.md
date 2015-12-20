@@ -1,2 +1,2 @@
 # Dynamic Linq Query Builder
-[![Build Status](https://travis-ci.org/castle-it/dynamic-linq-query-builder.svg)](https://travis-ci.org/castle-it/dynamic-linq-query-builder)
+[![Build status](https://ci.appveyor.com/api/projects/status/xylgqn0smrd63lnl/branch/master?svg=true)](https://ci.appveyor.com/project/tghamm/dynamic-linq-query-builder/branch/master) [![Coverage Status](https://coveralls.io/repos/castle-it/dynamic-linq-query-builder/badge.svg?branch=master&service=github)](https://coveralls.io/github/castle-it/dynamic-linq-query-builder?branch=master)
