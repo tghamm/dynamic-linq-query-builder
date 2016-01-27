@@ -2,28 +2,28 @@
 <package >
   <metadata>
     <id>Castle.DynamicLinqQueryBuilder</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <title>Dynamic Linq Query Builder</title>
     <authors>Grant Hamm</authors>
     <owners>Castle Worldwide, Inc</owners>
     <description>
-      A long description of the package. This shows up in the right pane of the Add Package Dialog as well as in the Package Manager Console when listing packages using the Get-Package command.
+      A simple dynamic expression-tree query builder.  You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter.
     </description>
     <releaseNotes>
     </releaseNotes>
     <summary>
-      A short description of the package. If specified, this shows up in the middle pane of the Add Package Dialog. If not specified, a truncated version of the description is used instead.
+      A simple dynamic expression-tree query builder.  You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter.
     </summary>
     <language>en-US</language>
     <projectUrl>https://nuget.org/packages/Castle.DynamicLinqQueryBuilder.Nuget</projectUrl>
     <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
-    <copyright>Copyright Castle Worldwide, Inc. 2015</copyright>
+    <copyright>Copyright Castle Worldwide, Inc. 2016</copyright>
     <dependencies>
     </dependencies>
     <references></references>
-    <tags>jquery-query-builder generic query generator linq</tags>
+    <tags>jquery-query-builder generic query generator linq javascript </tags>
   </metadata>
   <files>
     <file src="lib\" target="lib" />
