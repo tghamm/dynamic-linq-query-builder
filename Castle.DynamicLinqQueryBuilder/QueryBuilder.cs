@@ -381,7 +381,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Equals(Type type, string value, Expression propertyExp)
         {
-            var someValue = GetConstants(type, value, false).First();
+            Expression someValue = GetConstants(type, value, false).First();
 
             Expression exOut;
             if (type == typeof(string))
@@ -389,6 +389,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 var nullCheck = GetNullCheckExpression(propertyExp);
 
                 exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                someValue = Expression.Call(someValue, typeof (string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
             else

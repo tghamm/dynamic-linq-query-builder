@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Castle.DynamicLinqQueryBuilder</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Dynamic Linq Query Builder</title>
     <authors>Grant Hamm</authors>
     <owners>Castle Worldwide, Inc</owners>
@@ -15,7 +15,7 @@
       A simple dynamic expression-tree query builder.  You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter.
     </summary>
     <language>en-US</language>
-    <projectUrl>https://nuget.org/packages/Castle.DynamicLinqQueryBuilder.Nuget</projectUrl>
+    <projectUrl>https://github.com/castle-it/dynamic-linq-query-builder</projectUrl>
     <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>

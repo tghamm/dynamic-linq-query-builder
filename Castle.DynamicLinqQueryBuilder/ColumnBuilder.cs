@@ -21,7 +21,7 @@ namespace Castle.DynamicLinqQueryBuilder
         {
             List<ColumnDefinition> itemBankColumnDefinitions = new List<ColumnDefinition>();
 
-
+            var id = 1;
             foreach (var prop in dataType.GetProperties())
             {
                 if (prop.GetCustomAttribute(typeof (IgnoreDataMemberAttribute)) != null) continue;
@@ -40,6 +40,14 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     type = "integer";
                 }
+                else if ((prop.PropertyType == typeof(DateTime)) || (prop.PropertyType == typeof(DateTime?)))
+                {
+                    type = "date";
+                }
+                else if ((prop.PropertyType == typeof(string)))
+                {
+                    type = "string";
+                }
 
                 switch (type)
                 {
@@ -49,11 +57,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             Label = title,
                             Field = name,
                             Type = type,
-                            PrettyOutputTransformer = o =>
-                            {
-                                if (o == null) return null;
-                                return Convert.ToDouble(o);
-                            }
+                            Id = id.ToString()
                         });
                         break;
                     case "integer":
@@ -62,14 +66,30 @@ namespace Castle.DynamicLinqQueryBuilder
                             Label = title,
                             Field = name,
                             Type = type,
-                            PrettyOutputTransformer = o =>
-                            {
-                                if (o == null) return null;
-                                return Convert.ToInt32(o);
-                            }
+                            Id = id.ToString()
+                        });
+                        break;
+                    case "string":
+                        itemBankColumnDefinitions.Add(new ColumnDefinition()
+                        {
+                            Label = title,
+                            Field = name,
+                            Type = type,
+                            Id = id.ToString()
+                        });
+                        break;
+                    case "date":
+                        itemBankColumnDefinitions.Add(new ColumnDefinition()
+                        {
+                            Label = title,
+                            Field = name,
+                            Type = type,
+                            Id = id.ToString()
                         });
                         break;
                 }
+
+                id++;
             }
             return itemBankColumnDefinitions;
         }

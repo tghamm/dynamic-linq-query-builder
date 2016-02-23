@@ -1,0 +1,119 @@
+﻿@using Castle.DynamicLinqQueryBuilder.Samples.Sample
+@{
+    ViewBag.Title = "Home Page";
+}
+@section scripts
+{
+    <script type="text/javascript">
+    $(function() {
+        // Handler for .ready() called.
+        var tableData = [];
+
+        var filterDefinition = @Html.Raw(ViewBag.FilterDefinition);
+        var customFilters = {
+            condition: 'AND',
+            rules: []
+        };
+        var jqueryQueryBuilder = $('#jquery-query-builder');
+        var jqueryQueryBuilderDom = jqueryQueryBuilder.queryBuilder({
+            plugins: ['bt-tooltip-errors', 'filter-description'],
+            //allow_groups: 0,
+            allow_empty: true,
+            filters: filterDefinition,
+            rules: customFilters,
+            icons: {
+                add_group: 'fa fa-plus-square',
+                add_rule: 'fa fa-plus-circle',
+                remove_group: 'fa fa-minus-square',
+                remove_rule: 'fa fa-minus-circle',
+                error: 'fa fa-exclamation-triangle',
+                sortable: 'fa fa-exclamation-triangle'
+            }
+        });
+        var getRules = function() {
+            try {
+                return jqueryQueryBuilder.queryBuilder('getRules');
+            } catch (ex) {
+                //console.log(ex);
+                return null;
+            }
+        }
+        var buildTable;
+        var filterData = function() {
+            
+            $.ajax({
+                type: 'POST',
+                url: "../Home/Index",
+                data: JSON.stringify(getRules()),
+                success: function (returnPayload) {
+                    tableData = returnPayload;
+                    buildTable();
+                    console && console.log ("request succeeded");
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console && console.log ("request failed");
+                },
+                dataType: "json",
+                contentType: "application/json",            
+                processData: false,
+                async: true
+            });
+        }
+
+        $('#applyFilter').on('click', function() {
+            filterData();
+        });
+        buildTable = function() {
+            var tbody = $('#data-table tbody'),
+                props = ["FirstName", "LastName", "Birthday", "Address", "City", "State", "ZipCode"];
+            tbody.empty();
+            $.each(tableData, function(i, reservation) {
+                var tr = $('<tr>');
+                $.each(props, function(i, prop) {
+                    $('<td>').html(reservation[prop]).appendTo(tr);  
+                });
+                tbody.append(tr);
+            });
+        };
+
+        filterData();
+
+    });
+
+
+
+</script>
+}
+
+<div class="jumbotron">
+    <h1>Dnamyic Linq Query Builder Sample</h1>
+    <p class="lead">Dynamically filter object collections based on complex queries at runtime.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Build Filters</h2>
+        <div id="jquery-query-builder"></div>
+        <button id="applyFilter">Apply Filter</button>
+    </div>
+    <div class="col-md-8">
+        <h2>User Data</h2>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Birthday</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Zip Code</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+    
+</div>

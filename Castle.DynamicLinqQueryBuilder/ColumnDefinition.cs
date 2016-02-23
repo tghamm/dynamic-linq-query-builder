@@ -107,5 +107,14 @@ namespace Castle.DynamicLinqQueryBuilder
         /// </value>
         [IgnoreDataMember]
         public Func<object, object> PrettyOutputTransformer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
+        /// <value>
+        /// The identifier.
+        /// </value>
+        [DataMember]
+        public string Id { get; set; }
     }
 }
