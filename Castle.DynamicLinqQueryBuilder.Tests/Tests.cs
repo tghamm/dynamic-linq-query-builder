@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -2851,6 +2852,37 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
 
             });
+        }
+
+        #endregion
+
+        #region Column Definition Builder
+
+        public class ColumnBuilderTestClass
+        {
+            public int Age { get; set; }
+            public int? FavoriteNumber { get; set; }
+            public string Name { get; set; }
+            public DateTime Birthday { get; set; }
+            public DateTime? FavoriteBirthday { get; set; }
+            public double DollarsInWallet { get; set; }
+            public double? DesiredDollarsInWallet { get; set; }
+            public string camelCaseField { get; set; }
+            [IgnoreDataMember]
+            public int IgnoreField { get; set; }
+        }
+
+        [Test]
+        public void ColumnBuilderTest()
+        {
+            var result = typeof (ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType();
+
+            Assert.IsTrue(result.Count == 8);
+
+            result = typeof(ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType(true);
+
+            Assert.IsTrue(result.Count == 8);
+
         }
 
         #endregion

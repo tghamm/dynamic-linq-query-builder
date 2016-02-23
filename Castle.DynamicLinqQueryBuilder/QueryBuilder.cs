@@ -34,7 +34,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <param name="queryable">The queryable.</param>
         /// <param name="filterRule">The filter rule.</param>
         /// <returns>Filtered IQueryable</returns>
-        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule)
+        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule) 
         {
             string parsedQuery;
             return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery);
@@ -99,18 +99,12 @@ namespace Castle.DynamicLinqQueryBuilder
 
             if (rule.Rules != null && rule.Rules.Any())
             {
-                var expressions = new List<Expression>();
+                var expressions =
+                    rule.Rules.Select(childRule => BuildExpressionTree(pe, childRule))
+                        .Where(expression => expression != null)
+                        .ToList();
 
-                foreach (var childRule in rule.Rules)
-                {
-                    var expression = BuildExpressionTree(pe, childRule);
-                    if (expression != null)
-                    {
-                        expressions.Add(expression);
-                    }
-                }
-
-                Expression expressionTree = expressions.First();
+                var expressionTree = expressions.First();
 
                 var counter = 1;
                 while (counter < expressions.Count)
@@ -123,7 +117,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 return expressionTree;
             }
-            else if (rule.Field != null)
+            if (rule.Field != null)
             {
                 Type type;
 
@@ -146,7 +140,7 @@ namespace Castle.DynamicLinqQueryBuilder
                         type = typeof(bool);
                         break;
                     default:
-                        throw new Exception(string.Format("Unexpected data type {0}", rule.Type));
+                        throw new Exception($"Unexpected data type {rule.Type}");
                 }
 
                 var propertyExp = Expression.Property(pe, rule.Field);
@@ -213,7 +207,7 @@ namespace Castle.DynamicLinqQueryBuilder
                         expression = IsNotNull(propertyExp);
                         break;
                     default:
-                        throw new Exception(string.Format("Unknown expression operator: {0}", rule.Operator));
+                        throw new Exception($"Unknown expression operator: {rule.Operator}");
                 }
 
                 return expression;
@@ -228,7 +222,7 @@ namespace Castle.DynamicLinqQueryBuilder
         {
             if (isCollection)
             {
-                TypeConverter tc = TypeDescriptor.GetConverter(type);
+                var tc = TypeDescriptor.GetConverter(type);
                 var vals =
                     value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                         .Where(p => !string.IsNullOrWhiteSpace(p))
@@ -238,7 +232,7 @@ namespace Castle.DynamicLinqQueryBuilder
             }
             else
             {
-                TypeConverter tc = TypeDescriptor.GetConverter(type);
+                var tc = TypeDescriptor.GetConverter(type);
                 return new List<ConstantExpression>()
                 {
                     Expression.Constant(tc.ConvertFromString(value.Trim()))
@@ -251,7 +245,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression GetNullCheckExpression(Expression propertyExp)
         {
-            bool isNullable = !propertyExp.Type.IsValueType || Nullable.GetUnderlyingType(propertyExp.Type) != null;
+            var isNullable = !propertyExp.Type.IsValueType || Nullable.GetUnderlyingType(propertyExp.Type) != null;
 
             if (isNullable)
             {
@@ -259,19 +253,15 @@ namespace Castle.DynamicLinqQueryBuilder
                     Expression.Constant(propertyExp.Type.GetDefaultValue(), propertyExp.Type));
 
             }
-            else
-            {
-                return Expression.Equal(Expression.Constant(true, typeof(bool)),
-                    Expression.Constant(true, typeof(bool)));
-            }
-
+            return Expression.Equal(Expression.Constant(true, typeof(bool)),
+                Expression.Constant(true, typeof(bool)));
         }
 
 
 
         private static Expression IsNull(Expression propertyExp)
         {
-            bool isNullable = !propertyExp.Type.IsValueType || Nullable.GetUnderlyingType(propertyExp.Type) != null;
+            var isNullable = !propertyExp.Type.IsValueType || Nullable.GetUnderlyingType(propertyExp.Type) != null;
 
             if (isNullable)
             {
@@ -281,11 +271,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 return exOut;
             }
-            else
-            {
-                return Expression.Equal(Expression.Constant(true, typeof(bool)),
-                    Expression.Constant(false, typeof(bool)));
-            }
+            return Expression.Equal(Expression.Constant(true, typeof(bool)),
+                Expression.Constant(false, typeof(bool)));
         }
 
         private static Expression IsNotNull(Expression propertyExp)
@@ -329,7 +316,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            MethodInfo method = propertyExp.Type.GetMethod("Contains", new[] { type });
+            var method = propertyExp.Type.GetMethod("Contains", new[] { type });
 
             Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
@@ -349,7 +336,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            MethodInfo method = propertyExp.Type.GetMethod("EndsWith", new[] { type });
+            var method = propertyExp.Type.GetMethod("EndsWith", new[] { type });
 
             Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
@@ -369,7 +356,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            MethodInfo method = propertyExp.Type.GetMethod("StartsWith", new[] { type });
+            var method = propertyExp.Type.GetMethod("StartsWith", new[] { type });
 
             Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
@@ -394,7 +381,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Equals(Type type, string value, Expression propertyExp)
         {
-            var someValue = GetConstants(type, value, false).First();
+            Expression someValue = GetConstants(type, value, false).First();
 
             Expression exOut;
             if (type == typeof(string))
@@ -402,6 +389,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 var nullCheck = GetNullCheckExpression(propertyExp);
 
                 exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                someValue = Expression.Call(someValue, typeof (string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
             else
@@ -489,7 +477,7 @@ namespace Castle.DynamicLinqQueryBuilder
             if (IsGenericList(propertyExp.Type))
             {
                 var genericType = propertyExp.Type.GetGenericArguments().First();
-                MethodInfo method = propertyExp.Type.GetMethod("Contains", new[] { genericType });
+                var method = propertyExp.Type.GetMethod("Contains", new[] { genericType });
                 Expression exOut;
 
                 if (someValues.Count > 1)
@@ -531,7 +519,6 @@ namespace Castle.DynamicLinqQueryBuilder
                                     Expression.Convert(someValues[counter], propertyExp.Type)));
                             counter++;
                         }
-                        //exOut = Expression.Equal(exOut, someValues[0]);
                     }
                     else
                     {
@@ -578,7 +565,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static bool IsGenericList(this Type o)
         {
-            bool isGenericList = false;
+            var isGenericList = false;
 
             var oType = o;
 
@@ -588,7 +575,7 @@ namespace Castle.DynamicLinqQueryBuilder
             return isGenericList;
         }
 
-        public static object GetDefaultValue(this Type type)
+        private static object GetDefaultValue(this Type type)
         {
             return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
         }
