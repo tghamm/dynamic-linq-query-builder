@@ -2070,6 +2070,190 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         }
 
         [Test]
+        public void NotBetweenClause()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            //expect 1 entry to match for an integer comparison
+            var contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "integer",
+                        Value = "1,2"
+                    }
+                }
+            };
+            var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 1 || p.ContentTypeId > 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for an integer comparison
+            var nullableContentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "integer",
+                        Value = "1,2"
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 1 || p.NullableContentTypeId > 2 || p.NullableContentTypeId == null));
+
+
+
+
+
+            //expect 0 entries to match for a Date comparison
+            var lastModifiedFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                    }
+                }
+            };
+            var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2)) && (p >= DateTime.UtcNow.Date)));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2) && p >= DateTime.UtcNow.Date) || p == null ));
+
+
+            //expect 3 entries to match for a double field
+            var statValueFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "double",
+                        Value = "1.0,1.12"
+                    }
+                }
+            };
+            var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 1);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p <= 1.0) || (p >= 1.12)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "double",
+                        Value = "1.112,1.112"
+                    }
+                }
+            };
+            var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p != 1.112));
+
+        }
+
+        [Test]
         public void GreaterOrEqualClause()
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
