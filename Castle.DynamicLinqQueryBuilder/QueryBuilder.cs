@@ -164,6 +164,9 @@ namespace Castle.DynamicLinqQueryBuilder
                     case "between":
                         expression = Between(type, rule.Value, propertyExp);
                         break;
+                    case "not_between":
+                        expression = NotBetween(type, rule.Value, propertyExp);
+                        break;
                     case "less":
                         expression = LessThan(type, rule.Value, propertyExp);
                         break;
@@ -464,6 +467,11 @@ namespace Castle.DynamicLinqQueryBuilder
             return Expression.And(exBelow, exAbove);
 
 
+        }
+
+        private static Expression NotBetween(Type type, string value, Expression propertyExp)
+        {
+            return Expression.Not(Between(type, value, propertyExp));
         }
 
         private static Expression In(Type type, string value, Expression propertyExp)
