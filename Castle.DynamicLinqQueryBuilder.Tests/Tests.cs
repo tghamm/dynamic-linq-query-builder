@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -13,6 +14,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
     [TestFixture]
     public class Tests
     {
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            
+        }
+
         #region Expression Tree Builder
 
         public class ExpressionTreeBuilderTestClass
@@ -37,6 +44,34 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         }
 
+        private List<ExpressionTreeBuilderTestClass> GetDateExpressionTreeData()
+        {
+            var tData = new List<ExpressionTreeBuilderTestClass>();
+
+            var entry1 = new ExpressionTreeBuilderTestClass()
+            {
+                ContentTypeId = 1,
+                ContentTypeName = "Multiple-Choice",
+                Enemies = new List<int>(),
+                Flags = new List<string>(),
+                IsPossiblyNotSetBool = true,
+                IsSelected = true,
+                LastModified = DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal),
+                LastModifiedIfPresent = DateTime.UtcNow.Date,
+                LongerTextToFilter = "There is something interesting about this text",
+                NullableContentTypeId = 1,
+                PossiblyEmptyStatValue = null,
+                StatValue = 1.11,
+                IntList = new List<int>() { 1, 3, 5, 7 },
+                StrList = new List<string>() { "Str1", "Str2" },
+                DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
+                DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
+                IntNullList = new List<int?>() { 3, 4, 5, null }
+            };
+            tData.Add(entry1);
+
+            return tData;
+        }
 
         private List<ExpressionTreeBuilderTestClass> GetExpressionTreeData()
         {
@@ -132,6 +167,35 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             return tData;
+        }
+
+        [Test]
+        public void DateHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var startingQuery = GetDateExpressionTreeData().AsQueryable();
+            var contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = "2/23/2016"
+                    }
+                }
+            };
+
+            var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+            QueryBuilder.ParseDatesAsUtc = false;
         }
 
         [Test]
