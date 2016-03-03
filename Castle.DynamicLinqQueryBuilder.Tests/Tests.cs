@@ -64,7 +64,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 StatValue = 1.11,
                 IntList = new List<int>() { 1, 3, 5, 7 },
                 StrList = new List<string>() { "Str1", "Str2" },
-                DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
+                DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal), DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
                 IntNullList = new List<int?>() { 3, 4, 5, null }
             };
@@ -195,6 +195,75 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = ""
+                    }
+                }
+            };
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                var contentIdFilteredListNull1 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            });
+            
+            
+            contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "DateList",
+                        Id = "DateList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "date",
+                        Value = "2/23/2016"
+                    }
+                }
+            };
+
+            var contentIdFilteredList2 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 1);
+
+            contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "DateList",
+                        Id = "DateList",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "date",
+                        Value = ""
+                    }
+                }
+            };
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                var contentIdFilteredListNull2 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+
+            });
+            
             QueryBuilder.ParseDatesAsUtc = false;
         }
 
