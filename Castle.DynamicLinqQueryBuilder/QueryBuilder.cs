@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,6 +14,13 @@ namespace Castle.DynamicLinqQueryBuilder
     /// </summary>
     public static class QueryBuilder
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether incoming dates in the filter should be parsed as UTC.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [parse dates as UTC]; otherwise, <c>false</c>.
+        /// </value>
+        public static bool ParseDatesAsUtc { get; set; }
 
         /// <summary>
         /// Gets the filtered collection after applying the provided filter rules.
@@ -223,24 +231,59 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static List<ConstantExpression> GetConstants(Type type, string value, bool isCollection)
         {
-            if (isCollection)
+            if (type == typeof (DateTime) && ParseDatesAsUtc)
             {
-                var tc = TypeDescriptor.GetConverter(type);
-                var vals =
-                    value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-                        .Where(p => !string.IsNullOrWhiteSpace(p))
-                        .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
-                            Expression.Constant(p, type));
-                return vals.ToList();
+                DateTime tDate;
+                if (isCollection)
+                {
+                    var vals =
+                        value.Split(new[] {",", "[", "]", "\r\n"}, StringSplitOptions.RemoveEmptyEntries)
+                            .Where(p => !string.IsNullOrWhiteSpace(p))
+                            .Select(
+                                p =>
+                                    DateTime.TryParse(p.Trim(), CultureInfo.InvariantCulture,
+                                        DateTimeStyles.AssumeUniversal, out tDate)
+                                        ? (DateTime?)
+                                            tDate
+                                        : null).Select(p =>
+                                            Expression.Constant(p, type));
+                    return vals.ToList();
+                }
+                else
+                {
+                    return new List<ConstantExpression>()
+                    {
+                        Expression.Constant(DateTime.TryParse(value.Trim(), CultureInfo.InvariantCulture,
+                            DateTimeStyles.AssumeUniversal, out tDate)
+                            ? (DateTime?)
+                                tDate
+                            : null)
+                    };
+                }
             }
             else
             {
-                var tc = TypeDescriptor.GetConverter(type);
-                return new List<ConstantExpression>()
+                if (isCollection)
+                {
+                    var tc = TypeDescriptor.GetConverter(type);
+                    var vals =
+                        value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                            .Where(p => !string.IsNullOrWhiteSpace(p))
+                            .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
+                                Expression.Constant(p, type));
+                    return vals.ToList();
+                }
+                else
+                {
+                    var tc = TypeDescriptor.GetConverter(type);
+                    return new List<ConstantExpression>()
                 {
                     Expression.Constant(tc.ConvertFromString(value.Trim()))
                 };
+                }
             }
+
+            
 
         }
 
