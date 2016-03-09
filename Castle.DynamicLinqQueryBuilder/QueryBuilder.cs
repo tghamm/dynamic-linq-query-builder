@@ -242,7 +242,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             .Select(
                                 p =>
                                     DateTime.TryParse(p.Trim(), CultureInfo.InvariantCulture,
-                                        DateTimeStyles.AssumeUniversal, out tDate)
+                                        DateTimeStyles.AdjustToUniversal, out tDate)
                                         ? (DateTime?)
                                             tDate
                                         : null).Select(p =>
@@ -254,7 +254,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     return new List<ConstantExpression>()
                     {
                         Expression.Constant(DateTime.TryParse(value.Trim(), CultureInfo.InvariantCulture,
-                            DateTimeStyles.AssumeUniversal, out tDate)
+                            DateTimeStyles.AdjustToUniversal, out tDate)
                             ? (DateTime?)
                                 tDate
                             : null)
