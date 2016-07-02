@@ -3,9 +3,9 @@
 
 `dynamic-linq-query-builder` is a small library that allows any `.Net` framework class collection to be filtered dynamically at runtime.  
 
-Features (v1.0.4)
+Features (v1.0.5)
 --
-* Generates an `IQueryable` from any collection
+* Generates an `IQueryable` from any collection and filter combination
 * Capable of complex, grouped queries against as many fields as you want
 * Supports a number of operators for each type
   * in
