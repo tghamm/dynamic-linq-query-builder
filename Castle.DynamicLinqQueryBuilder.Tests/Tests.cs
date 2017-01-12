@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+
 using NUnit.Framework;
 
 namespace Castle.DynamicLinqQueryBuilder.Tests
@@ -3167,10 +3168,41 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 contentIdFilter.Rules.First().Type = "integer";
                 contentIdFilter.Rules.First().Operator = "NOT_AN_OPERATOR";
                 startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
             });
         }
 
+        private class IndexedClass
+        {
+            int this[string someIndex]
+            {
+                get
+                {
+                    return 2;
+                }
+            }
+        }
+
+        [Test]
+        public void IndexedExpression_Test()
+        {
+            var rule = new FilterRule
+            {
+                Condition = "and",
+                Field = "ContentTypeId",
+                Id = "ContentTypeId",
+                Input = "NA",
+                Operator = "equal",
+                Type = "integer",
+                Value = "2"
+            };
+
+            var result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            Assert.IsTrue(result.Any());
+
+            rule.Value = "3";
+            result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            Assert.IsFalse(result.Any());
+        }
         #endregion
 
         #region Column Definition Builder
