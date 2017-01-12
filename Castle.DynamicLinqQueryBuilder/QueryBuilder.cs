@@ -28,11 +28,13 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <typeparam name="T">The generic type.</typeparam>
         /// <param name="queryable">The queryable.</param>
         /// <param name="filterRule">The filter rule.</param>
+        /// <param name="useIndexedProperty">Whether or not to use indexed property</param>
+        /// <param name="indexedPropertyName">The indexable property to use</param>
         /// <returns>Filtered IQueryable</returns>
-        public static IQueryable<T> BuildQuery<T>(this IEnumerable<T> queryable, FilterRule filterRule)
+        public static IQueryable<T> BuildQuery<T>(this IEnumerable<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
             string parsedQuery;
-            return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery);
+            return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery, useIndexedProperty, indexedPropertyName);
         }
 
         /// <summary>
@@ -41,11 +43,13 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <typeparam name="T">The generic type.</typeparam>
         /// <param name="queryable">The queryable.</param>
         /// <param name="filterRule">The filter rule.</param>
+        /// <param name="useIndexedProperty">Whether or not to use indexed property</param>
+        /// <param name="indexedPropertyName">The indexable property to use</param>
         /// <returns>Filtered IQueryable</returns>
-        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule) 
+        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null) 
         {
             string parsedQuery;
-            return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery);
+            return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery, useIndexedProperty, indexedPropertyName);
         }
 
         /// <summary>
@@ -54,11 +58,13 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <typeparam name="T">The generic type.</typeparam>
         /// <param name="queryable">The queryable.</param>
         /// <param name="filterRule">The filter rule.</param>
+        /// <param name="useIndexedProperty">Whether or not to use indexed property</param>
+        /// <param name="indexedPropertyName">The indexable property to use</param>
         /// <returns>Filtered IQueryable</returns>
-        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule)
+        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
             string parsedQuery;
-            return BuildQuery(queryable, filterRule, out parsedQuery);
+            return BuildQuery(queryable, filterRule, out parsedQuery, useIndexedProperty, indexedPropertyName);
         }
 
         /// <summary>
@@ -69,8 +75,10 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <param name="queryable">The queryable.</param>
         /// <param name="filterRule">The filter rule.</param>
         /// <param name="parsedQuery">The parsed query.</param>
+        /// <param name="useIndexedProperty">Whether or not to use indexed property</param>
+        /// <param name="indexedPropertyName">The indexable property to use</param>
         /// <returns>Filtered IQueryable.</returns>
-        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, out string parsedQuery)
+        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, out string parsedQuery, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
             if (filterRule == null)
             {
@@ -80,7 +88,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var pe = Expression.Parameter(typeof(T), "item");
 
-            var expressionTree = BuildExpressionTree(pe, filterRule);
+            var expressionTree = BuildExpressionTree(pe, filterRule, useIndexedProperty, indexedPropertyName);
             if (expressionTree == null)
             {
                 parsedQuery = "";
@@ -102,13 +110,13 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression BuildExpressionTree(ParameterExpression pe, FilterRule rule)
+        private static Expression BuildExpressionTree(ParameterExpression pe, FilterRule rule, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
 
             if (rule.Rules != null && rule.Rules.Any())
             {
                 var expressions =
-                    rule.Rules.Select(childRule => BuildExpressionTree(pe, childRule))
+                    rule.Rules.Select(childRule => BuildExpressionTree(pe, childRule, useIndexedProperty, indexedPropertyName))
                         .Where(expression => expression != null)
                         .ToList();
 
@@ -151,7 +159,15 @@ namespace Castle.DynamicLinqQueryBuilder
                         throw new Exception($"Unexpected data type {rule.Type}");
                 }
 
-                var propertyExp = Expression.Property(pe, rule.Field);
+                Expression propertyExp = null;
+                if (useIndexedProperty)
+                {
+                    propertyExp = Expression.Property(pe, indexedPropertyName, Expression.Constant(rule.Field));
+                }
+                else
+                {
+                    propertyExp = Expression.Property(pe, rule.Field);
+                }
 
                 Expression expression;
 
