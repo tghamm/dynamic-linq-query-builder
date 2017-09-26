@@ -3203,6 +3203,34 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         }
         #endregion
 
+        #region Predicate
+        [Test]
+        public void Predicate_Test()
+        {
+            var rule = new FilterRule
+            {
+                Condition = "and",
+                Field = "ContentTypeId",
+                Id = "ContentTypeId",
+                Input = "NA",
+                Operator = "equal",
+                Type = "integer",
+                Value = "2",
+            };
+
+
+            var predicate = rule.BuildPredicate<IndexedClass>(new BuildExpressionOptions { IndexedPropertyName = "Item", UseIndexedProperty = true});
+
+            var result = new[] {new IndexedClass()}.Where(predicate);
+            Assert.IsTrue(result.Any());
+
+            rule.Value = "3";
+            result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            Assert.IsFalse(result.Any());
+        }
+        #endregion
+
+
         #region Column Definition Builder
 
         public class ColumnBuilderTestClass

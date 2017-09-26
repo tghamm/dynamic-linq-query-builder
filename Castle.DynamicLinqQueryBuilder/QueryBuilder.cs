@@ -79,7 +79,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>Filtered IQueryable.</returns>
         public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, out string parsedQuery, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
-            return BuildQuery(queryable, filterRule, out parsedQuery, new BuildExpressionOptions { UseIndexedProperty = useIndexedProperty, IndexedPropertyName = indexedPropertyName });
+            return BuildQuery(queryable, filterRule, new BuildExpressionOptions { UseIndexedProperty = useIndexedProperty, IndexedPropertyName = indexedPropertyName }, out parsedQuery);
         }
 
         /// <summary>
@@ -93,9 +93,8 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>Filtered IQueryable.</returns>
         public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, BuildExpressionOptions options)
         {
-            return BuildQuery(queryable, filterRule, out string _, options);
+            return BuildQuery(queryable, filterRule, options, out string _);
         }
-
 
         /// <summary>
         /// Gets the filtered collection after applying the provided filter rules. 
@@ -133,9 +132,21 @@ namespace Castle.DynamicLinqQueryBuilder
         /// </summary>
         /// <typeparam name="T">The generic type of the input object to test.</typeparam>
         /// <param name="filterRule">The filter rule.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>A predicate function implementing the filter rule</returns>
+        public static Func<T, bool> BuildPredicate<T>(this FilterRule filterRule, BuildExpressionOptions options)
+        {
+            return BuildPredicate<T>(filterRule, options, out string _);
+        }
+
+        /// <summary>
+        /// Builds a predicate that returns whether an input test object passes the filter rule.
+        /// </summary>
+        /// <typeparam name="T">The generic type of the input object to test.</typeparam>
+        /// <param name="filterRule">The filter rule.</param>
         /// <param name="parsedQuery">The parsed query.</param>
         /// <param name="options">The options to use when building the expression</param>
-        /// <returns>A predicate function implementinf the filter rule</returns>
+        /// <returns>A predicate function implementing the filter rule</returns>
         public static Func<T, bool> BuildPredicate<T>(this FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
         {
             var expression = BuildExpressionLambda<T>(filterRule, options, out parsedQuery);
@@ -148,7 +159,15 @@ namespace Castle.DynamicLinqQueryBuilder
             return expression.Compile();
         }
 
-        private static Expression<Func<T, bool>> BuildExpressionLambda<T>(FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
+        /// <summary>
+        /// Builds an expression lambda for the filter rule.
+        /// </summary>
+        /// <typeparam name="T">The generic type of the input object to test.</typeparam>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="parsedQuery">The parsed query.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>An expression lambda that implements the filter rule</returns>
+        public static Expression<Func<T, bool>> BuildExpressionLambda<T>(this FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
         {
             if (filterRule == null)
             {
