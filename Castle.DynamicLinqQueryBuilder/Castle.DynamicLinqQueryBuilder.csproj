@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildExpressionOptions.cs" />
     <Compile Include="ColumnBuilder.cs" />
     <Compile Include="ColumnDefinition.cs" />
     <Compile Include="FilterRule.cs" />
