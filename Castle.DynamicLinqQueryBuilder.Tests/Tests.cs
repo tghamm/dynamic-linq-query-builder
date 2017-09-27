@@ -1011,10 +1011,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var contentTypeIdFilterList = startingQuery.BuildQuery(contentTypeIdFilter).ToList();
             Assert.IsTrue(contentTypeIdFilterList != null);
             Assert.IsTrue(contentTypeIdFilterList.Count == 0);
-            Assert.IsTrue(
-                contentTypeIdFilterList.Select(p => p.ContentTypeId)
-                    .All(p => p == null));
-
         }
 
         [Test]
@@ -1069,10 +1065,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var contentTypeIdFilterList = startingQuery.BuildQuery(contentTypeIdFilter).ToList();
             Assert.IsTrue(contentTypeIdFilterList != null);
             Assert.IsTrue(contentTypeIdFilterList.Count == 4);
-            Assert.IsTrue(
-                contentTypeIdFilterList.Select(p => p.ContentTypeId)
-                    .All(p => p != null));
-
         }
 
         [Test]
