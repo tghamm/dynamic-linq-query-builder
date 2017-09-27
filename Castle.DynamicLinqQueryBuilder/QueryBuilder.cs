@@ -63,7 +63,8 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>Filtered IQueryable</returns>
         public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
-            return BuildQuery(queryable, filterRule, out string _, useIndexedProperty, indexedPropertyName);
+            string parsedQuery;
+            return BuildQuery(queryable, filterRule, out parsedQuery, useIndexedProperty, indexedPropertyName);
         }
 
         /// <summary>
@@ -93,7 +94,8 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>Filtered IQueryable.</returns>
         public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, BuildExpressionOptions options)
         {
-            return BuildQuery(queryable, filterRule, options, out string _);
+            string parsedQuery;
+            return BuildQuery(queryable, filterRule, options, out parsedQuery);
         }
 
         /// <summary>
@@ -136,7 +138,8 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>A predicate function implementing the filter rule</returns>
         public static Func<T, bool> BuildPredicate<T>(this FilterRule filterRule, BuildExpressionOptions options)
         {
-            return BuildPredicate<T>(filterRule, options, out string _);
+            string parsedQuery;
+            return BuildPredicate<T>(filterRule, options, out parsedQuery);
         }
 
         /// <summary>
