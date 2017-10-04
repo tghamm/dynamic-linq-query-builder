@@ -65,5 +65,9 @@ namespace Castle.DynamicLinqQueryBuilder
         /// The value.
         /// </value>
         public string Value { get; set; }
+        /// <summary>
+        /// "Not" condition can be True or False
+        /// </summary>
+        public string Not { get; set; }
     }
 }

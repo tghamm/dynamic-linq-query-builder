@@ -131,6 +131,11 @@ namespace Castle.DynamicLinqQueryBuilder
                     counter++;
                 }
 
+                if (rule.Not != null && rule.Not.ToLower() == "true")
+                {
+                    return Expression.Not(expressionTree);
+                }
+
                 return expressionTree;
             }
             if (rule.Field != null)
