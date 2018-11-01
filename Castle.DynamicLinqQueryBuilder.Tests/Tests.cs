@@ -15,11 +15,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
     [TestFixture]
     public class Tests
     {
-        [TestFixtureSetUp]
-        public void Init()
-        {
-            
-        }
 
         #region Expression Tree Builder
 
@@ -137,7 +132,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 PossiblyEmptyStatValue = null,
                 StatValue = 1.13,
                 IntList = new List<int>() { 1, 3, 5, 7 },
-                StrList = new List<string>() { "Str1", },
+                StrList = new List<string>() { "Str1", "" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
                 IntNullList = new List<int?>() { 3, 4, 5, null }
@@ -623,7 +618,29 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 nullableIntListList.All(p => p.IntNullList.Contains(5)));
 
 
-
+            startingQuery = GetExpressionTreeData().AsQueryable();
+            var multipleWithBlankRule = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "StrList",
+                        Id = "StrList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = "[,Str2]"
+                    }
+                }
+            };
+            var multipleWithBlankList = startingQuery.BuildQuery(multipleWithBlankRule).ToList();
+            Assert.IsTrue(multipleWithBlankList != null);
+            Assert.IsTrue(multipleWithBlankList.Count == 4);
+            Assert.IsTrue(
+                multipleWithBlankList.All(p => p.StrList.Contains("") || p.StrList.Contains("Str2")));
         }
 
         [Test]

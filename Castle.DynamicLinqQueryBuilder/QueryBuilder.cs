@@ -282,12 +282,24 @@ namespace Castle.DynamicLinqQueryBuilder
                 if (isCollection)
                 {
                     var tc = TypeDescriptor.GetConverter(type);
-                    var vals =
-                        value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-                            .Where(p => !string.IsNullOrWhiteSpace(p))
-                            .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
-                                Expression.Constant(p, type));
-                    return vals.ToList();
+                    if (type == typeof(string))
+                    {
+                        var bracketSplit = value.Split(new[] { "[", "]" }, StringSplitOptions.RemoveEmptyEntries);
+                        var vals = 
+                                bracketSplit.SelectMany(v => v.Split(new[] { ",", "\r\n" }, StringSplitOptions.None))
+                                .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
+                                    Expression.Constant(p, type));
+                        return vals.Distinct().ToList();
+                    }
+                    else
+                    {
+                        var vals =
+                            value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                                .Where(p => !string.IsNullOrWhiteSpace(p))
+                                .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
+                                    Expression.Constant(p, type));
+                        return vals.ToList();
+                    }
                 }
                 else
                 {
