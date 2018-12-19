@@ -28,7 +28,7 @@ Features (v1.0.5)
   * is not empty
   * is null
   * is not null
-* Compatible with jQuery-QueryBuilder (see samples for an example)
+* Compatible with [jQuery QueryBuilder](https://querybuilder.js.org) (see samples for an example)
 
 Installation
 --
