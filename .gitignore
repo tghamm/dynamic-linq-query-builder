@@ -211,3 +211,5 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 Castle.DynamicLinqQueryBuilder.Nuget/lib/Castle.DynamicLinqQueryBuilder.xml
+# AxoCover
+.axoCover/

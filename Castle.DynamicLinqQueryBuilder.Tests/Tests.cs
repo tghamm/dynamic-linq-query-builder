@@ -15,12 +15,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
     [TestFixture]
     public class Tests
     {
-        [TestFixtureSetUp]
-        public void Init()
-        {
-            
-        }
-
         #region Expression Tree Builder
 
         public class ExpressionTreeBuilderTestClass
