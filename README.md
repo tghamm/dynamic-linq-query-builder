@@ -28,7 +28,7 @@ Features (v1.1.0)
   * is not empty
   * is null
   * is not null
-* Compatible with jQuery-QueryBuilder (see samples for an example)
+* Compatible with [jQuery QueryBuilder](https://querybuilder.js.org) (see samples for an example)
 
 * Targets .NET 4.5 and .NET Standard 2.0 (and by proxy, .NET Core 2.0)
 
