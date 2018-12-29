@@ -3214,6 +3214,39 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
             Assert.IsFalse(result.Any());
         }
+        [Test]
+        public void Build_Predicate_Null_Test()
+        {
+            FilterRule rule = null;
+            var predicate = rule.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions() {ParseDatesAsUtc = true},
+                out _);
+
+            var resData = GetExpressionTreeData();
+
+            var res = resData.Where(predicate).ToList();
+
+            Assert.IsTrue(res.Count == 4);
+
+        }
+
+        #endregion
+
+        #region Misc
+        [Test]
+        public void Build_Query_Null_Test()
+        {
+            FilterRule rule = null;
+
+
+            var data = GetExpressionTreeData();
+
+            var res = data.AsQueryable().BuildQuery(rule, new BuildExpressionOptions() { ParseDatesAsUtc = true })
+                .ToList();
+
+            Assert.IsTrue(res.Count == 4);
+
+
+        }
         #endregion
 
 
