@@ -1,6 +1,7 @@
 version: 1.0.{build}
 skip_tags: true
 configuration: Release
+image: Visual Studio 2017
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
@@ -17,7 +18,7 @@ build:
   verbosity: minimal
 test_script:
 - ps: >-
-    .\packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -register:user -target:nunit-console.exe -register:user "-targetargs:""Castle.DynamicLinqQueryBuilder.Tests\bin\$env:CONFIGURATION\Castle.DynamicLinqQueryBuilder.Tests.dll"" /noshadow" -filter:"+[Castle.DynamicLinqQueryBuilder]*" -excludebyattribute:*.ExcludeFromCodeCoverageAttribute -output:opencoverCoverage.xml
+    .\packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -register:user -target:nunit3-console.exe -register:user "-targetargs:""Castle.DynamicLinqQueryBuilder.Tests\bin\$env:CONFIGURATION\Castle.DynamicLinqQueryBuilder.Tests.dll""" -filter:"+[Castle.DynamicLinqQueryBuilder]*" -excludebyattribute:*.ExcludeFromCodeCoverageAttribute -output:opencoverCoverage.xml
 
     & new-variable -name coveralls -visibility public -value (Resolve-Path ".\packages\coveralls.net.*\tools\csmacnz.Coveralls.exe").ToString()
 
