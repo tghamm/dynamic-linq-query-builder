@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -3246,6 +3247,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(res.Count == 4);
 
 
+        }
+        [Test]
+        public void ComparePerformanceOfMethods_Test()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            //expect two entries to match for an integer comparison
+            var contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = "[1,2]"
+                    }
+                }
+            };
+            var sw1 = new Stopwatch();
+            sw1.Start();
+            for (var x = 0; x < 1000; x++)
+            {
+                var contentIdFilteredList =
+                    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            }
+            sw1.Stop();
+
+            var sw2 = new Stopwatch();
+            sw2.Start();
+            var predicate =
+                contentIdFilter.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions()
+                    {ParseDatesAsUtc = true});
+            for (var x = 0; x < 1000; x++)
+            {
+                var contentIdFilteredList =
+                    startingQuery.Where(predicate).ToList();
+            }
+            sw2.Stop();
         }
         #endregion
 
