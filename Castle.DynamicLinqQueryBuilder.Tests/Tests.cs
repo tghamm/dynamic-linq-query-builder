@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -15,7 +14,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
     [TestFixture]
     public class Tests
     {
-
         #region Expression Tree Builder
 
         public class ExpressionTreeBuilderTestClass
@@ -391,7 +389,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -424,7 +422,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -514,7 +512,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -748,7 +746,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -781,7 +779,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -871,7 +869,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1030,10 +1028,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var contentTypeIdFilterList = startingQuery.BuildQuery(contentTypeIdFilter).ToList();
             Assert.IsTrue(contentTypeIdFilterList != null);
             Assert.IsTrue(contentTypeIdFilterList.Count == 0);
-            Assert.IsTrue(
-                contentTypeIdFilterList.Select(p => p.ContentTypeId)
-                    .All(p => p == null));
-
         }
 
         [Test]
@@ -1088,10 +1082,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var contentTypeIdFilterList = startingQuery.BuildQuery(contentTypeIdFilter).ToList();
             Assert.IsTrue(contentTypeIdFilterList != null);
             Assert.IsTrue(contentTypeIdFilterList.Count == 4);
-            Assert.IsTrue(
-                contentTypeIdFilterList.Select(p => p.ContentTypeId)
-                    .All(p => p != null));
-
         }
 
         [Test]
@@ -1136,7 +1126,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_empty",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1242,7 +1232,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_empty",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1597,7 +1587,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1630,7 +1620,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1872,7 +1862,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1905,7 +1895,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2115,7 +2105,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2148,7 +2138,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2299,7 +2289,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2332,7 +2322,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy") + "," + DateTime.UtcNow.Date.ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2480,7 +2470,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2513,7 +2503,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2661,7 +2651,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2694,7 +2684,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2842,7 +2832,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2875,7 +2865,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -3023,7 +3013,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -3056,7 +3046,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("MM/dd/yyyy")
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -3221,6 +3211,112 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsFalse(result.Any());
         }
         #endregion
+
+        #region Predicate
+        [Test]
+        public void Predicate_Test()
+        {
+            var rule = new FilterRule
+            {
+                Condition = "and",
+                Field = "ContentTypeId",
+                Id = "ContentTypeId",
+                Input = "NA",
+                Operator = "equal",
+                Type = "integer",
+                Value = "2",
+            };
+
+
+            var predicate = rule.BuildPredicate<IndexedClass>(new BuildExpressionOptions { IndexedPropertyName = "Item", UseIndexedProperty = true});
+
+            var result = new[] {new IndexedClass()}.Where(predicate);
+            Assert.IsTrue(result.Any());
+
+            rule.Value = "3";
+            result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            Assert.IsFalse(result.Any());
+        }
+        [Test]
+        public void Build_Predicate_Null_Test()
+        {
+            FilterRule rule = null;
+            var predicate = rule.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions() {ParseDatesAsUtc = true},
+                out _);
+
+            var resData = GetExpressionTreeData();
+
+            var res = resData.Where(predicate).ToList();
+
+            Assert.IsTrue(res.Count == 4);
+
+        }
+
+        #endregion
+
+        #region Misc
+        [Test]
+        public void Build_Query_Null_Test()
+        {
+            FilterRule rule = null;
+
+
+            var data = GetExpressionTreeData();
+
+            var res = data.AsQueryable().BuildQuery(rule, new BuildExpressionOptions() { ParseDatesAsUtc = true })
+                .ToList();
+
+            Assert.IsTrue(res.Count == 4);
+
+
+        }
+        [Test]
+        public void ComparePerformanceOfMethods_Test()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            //expect two entries to match for an integer comparison
+            var contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = "[1,2]"
+                    }
+                }
+            };
+            var sw1 = new Stopwatch();
+            sw1.Start();
+            for (var x = 0; x < 1000; x++)
+            {
+                var contentIdFilteredList =
+                    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
+            }
+            sw1.Stop();
+
+            var sw2 = new Stopwatch();
+            sw2.Start();
+            var predicate =
+                contentIdFilter.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions()
+                    {ParseDatesAsUtc = true});
+            for (var x = 0; x < 1000; x++)
+            {
+                var contentIdFilteredList =
+                    startingQuery.Where(predicate).ToList();
+            }
+            sw2.Stop();
+        }
+        #endregion
+
 
         #region Column Definition Builder
 

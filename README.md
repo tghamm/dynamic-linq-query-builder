@@ -3,7 +3,7 @@
 
 `dynamic-linq-query-builder` is a small library that allows any `.Net` framework class collection to be filtered dynamically at runtime.  
 
-Features (v1.0.5)
+Features (v1.1.0)
 --
 * Generates an `IQueryable` from any collection and filter combination
 * Capable of complex, grouped queries against as many fields as you want
@@ -28,7 +28,9 @@ Features (v1.0.5)
   * is not empty
   * is null
   * is not null
-* Compatible with jQuery-QueryBuilder (see samples for an example)
+* Compatible with [jQuery QueryBuilder](https://querybuilder.js.org) (see samples for an example)
+
+* Targets .NET 4.5 and .NET Standard 2.0 (and by proxy, .NET Core 2.0)
 
 Installation
 --

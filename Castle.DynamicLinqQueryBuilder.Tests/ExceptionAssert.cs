@@ -18,7 +18,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             {
                 exceptionThrown = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
