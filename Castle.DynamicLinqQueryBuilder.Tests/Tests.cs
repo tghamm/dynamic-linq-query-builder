@@ -3329,7 +3329,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             public DateTime? FavoriteBirthday { get; set; }
             public double DollarsInWallet { get; set; }
             public double? DesiredDollarsInWallet { get; set; }
+#pragma warning disable IDE1006 // Naming Styles
             public string camelCaseField { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
             [IgnoreDataMember]
             public int IgnoreField { get; set; }
         }
