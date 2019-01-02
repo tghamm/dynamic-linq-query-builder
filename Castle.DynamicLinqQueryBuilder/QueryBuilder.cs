@@ -285,7 +285,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     var vals =
                         value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                             .Where(p => !string.IsNullOrWhiteSpace(p))
-                            .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
+                            .Select(p => tc.ConvertFromString(p.Trim().ToLower())).Select(p =>
                                 Expression.Constant(p, type));
                     return vals.ToList();
                 }
