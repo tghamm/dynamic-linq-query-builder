@@ -3,7 +3,7 @@
 
 `dynamic-linq-query-builder` is a small library that allows any `.Net` framework class collection to be filtered dynamically at runtime.  
 
-Features (v1.1.0)
+Features (v1.1.1)
 --
 * Generates an `IQueryable` from any collection and filter combination
 * Capable of complex, grouped queries against as many fields as you want
@@ -42,6 +42,8 @@ PM> Install-Package Castle.DynamicLinqQueryBuilder
 Getting Started
 --
 The easiest way to get started is to install the NuGet package and take a look at the MVC sample application included in the source code.  It contains a working example of both `dynamic-linq-query-builder` and `jQuery-QueryBuilder`.
+
+Additionally, see the [Wiki](https://github.com/castle-it/dynamic-linq-query-builder/wiki)
 
 Contributions
 --

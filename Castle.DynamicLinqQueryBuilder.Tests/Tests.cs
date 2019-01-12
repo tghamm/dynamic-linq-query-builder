@@ -3236,7 +3236,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 Value = "2"
             };
 
-            var result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            var result = new List<IndexedClass> {new IndexedClass()}.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions() {UseIndexedProperty = true, IndexedPropertyName = "Item"});
             Assert.IsTrue(result.Any());
 
             rule.Value = "3";
