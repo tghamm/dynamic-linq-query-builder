@@ -46,7 +46,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <param name="useIndexedProperty">Whether or not to use indexed property</param>
         /// <param name="indexedPropertyName">The indexable property to use</param>
         /// <returns>Filtered IQueryable</returns>
-        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null) 
+        public static IQueryable<T> BuildQuery<T>(this IList<T> queryable, FilterRule filterRule, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
             string parsedQuery;
             return BuildQuery(queryable.AsQueryable(), filterRule, out parsedQuery, useIndexedProperty, indexedPropertyName);
@@ -80,43 +80,126 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <returns>Filtered IQueryable.</returns>
         public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, out string parsedQuery, bool useIndexedProperty = false, string indexedPropertyName = null)
         {
-            if (filterRule == null)
+            return BuildQuery(queryable, filterRule, new BuildExpressionOptions { UseIndexedProperty = useIndexedProperty, IndexedPropertyName = indexedPropertyName }, out parsedQuery);
+        }
+
+        /// <summary>
+        /// Gets the filtered collection after applying the provided filter rules. 
+        /// Returns the string representation for diagnostic purposes.
+        /// </summary>
+        /// <typeparam name="T">The generic type.</typeparam>
+        /// <param name="queryable">The queryable.</param>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>Filtered IQueryable.</returns>
+        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, BuildExpressionOptions options)
+        {
+            string parsedQuery;
+            return BuildQuery(queryable, filterRule, options, out parsedQuery);
+        }
+
+        /// <summary>
+        /// Gets the filtered collection after applying the provided filter rules. 
+        /// Returns the string representation for diagnostic purposes.
+        /// </summary>
+        /// <typeparam name="T">The generic type.</typeparam>
+        /// <param name="queryable">The queryable.</param>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <param name="parsedQuery">The parsed query.</param>
+        /// <returns>Filtered IQueryable.</returns>
+        public static IQueryable<T> BuildQuery<T>(this IQueryable<T> queryable, FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
+        {
+            var expression = BuildExpressionLambda<T>(filterRule, options, out parsedQuery);
+
+            if (expression == null)
             {
-                parsedQuery = "";
                 return queryable;
             }
-
-            var pe = Expression.Parameter(typeof(T), "item");
-
-            var expressionTree = BuildExpressionTree(pe, filterRule, useIndexedProperty, indexedPropertyName);
-            if (expressionTree == null)
-            {
-                parsedQuery = "";
-                return queryable;
-            }
-
-            parsedQuery = expressionTree.ToString();
 
             var whereCallExpression = Expression.Call(
                 typeof(Queryable),
                 "Where",
                 new[] { queryable.ElementType },
                 queryable.Expression,
-                Expression.Lambda<Func<T, bool>>(expressionTree, pe));
+                expression);
 
             var filteredResults = queryable.Provider.CreateQuery<T>(whereCallExpression);
 
             return filteredResults;
+        }
+
+        /// <summary>
+        /// Builds a predicate that returns whether an input test object passes the filter rule.
+        /// </summary>
+        /// <typeparam name="T">The generic type of the input object to test.</typeparam>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>A predicate function implementing the filter rule</returns>
+        public static Func<T, bool> BuildPredicate<T>(this FilterRule filterRule, BuildExpressionOptions options)
+        {
+            string parsedQuery;
+            return BuildPredicate<T>(filterRule, options, out parsedQuery);
+        }
+
+        /// <summary>
+        /// Builds a predicate that returns whether an input test object passes the filter rule.
+        /// </summary>
+        /// <typeparam name="T">The generic type of the input object to test.</typeparam>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="parsedQuery">The parsed query.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>A predicate function implementing the filter rule</returns>
+        public static Func<T, bool> BuildPredicate<T>(this FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
+        {
+            var expression = BuildExpressionLambda<T>(filterRule, options, out parsedQuery);
+
+            if (expression == null)
+            {
+                return _ => true;
+            }
+
+            return expression.Compile();
+        }
+
+        /// <summary>
+        /// Builds an expression lambda for the filter rule.
+        /// </summary>
+        /// <typeparam name="T">The generic type of the input object to test.</typeparam>
+        /// <param name="filterRule">The filter rule.</param>
+        /// <param name="parsedQuery">The parsed query.</param>
+        /// <param name="options">The options to use when building the expression</param>
+        /// <returns>An expression lambda that implements the filter rule</returns>
+        public static Expression<Func<T, bool>> BuildExpressionLambda<T>(this FilterRule filterRule, BuildExpressionOptions options, out string parsedQuery)
+        {
+            if (filterRule == null)
+            {
+                parsedQuery = "";
+                return null;
+            }
+
+            var pe = Expression.Parameter(typeof(T), "item");
+
+            var expressionTree = BuildExpressionTree(pe, filterRule, options);
+            if (expressionTree == null)
+            {
+                parsedQuery = "";
+                return null;
+            }
+
+            parsedQuery = expressionTree.ToString();
+
+            return Expression.Lambda<Func<T, bool>>(expressionTree, pe);
 
         }
 
-        private static Expression BuildExpressionTree(ParameterExpression pe, FilterRule rule, bool useIndexedProperty = false, string indexedPropertyName = null)
+        private static Expression BuildExpressionTree(ParameterExpression pe, FilterRule rule, BuildExpressionOptions options)
         {
 
             if (rule.Rules != null && rule.Rules.Any())
             {
                 var expressions =
-                    rule.Rules.Select(childRule => BuildExpressionTree(pe, childRule, useIndexedProperty, indexedPropertyName))
+                    rule.Rules.Select(childRule => BuildExpressionTree(pe, childRule, options))
                         .Where(expression => expression != null)
                         .ToList();
 
@@ -160,9 +243,9 @@ namespace Castle.DynamicLinqQueryBuilder
                 }
 
                 Expression propertyExp = null;
-                if (useIndexedProperty)
+                if (options.UseIndexedProperty)
                 {
-                    propertyExp = Expression.Property(pe, indexedPropertyName, Expression.Constant(rule.Field));
+                    propertyExp = Expression.Property(pe, options.IndexedPropertyName, Expression.Constant(rule.Field));
                 }
                 else
                 {
@@ -174,34 +257,34 @@ namespace Castle.DynamicLinqQueryBuilder
                 switch (rule.Operator.ToLower())
                 {
                     case "in":
-                        expression = In(type, rule.Value, propertyExp);
+                        expression = In(type, rule.Value, propertyExp, options);
                         break;
                     case "not_in":
-                        expression = NotIn(type, rule.Value, propertyExp);
+                        expression = NotIn(type, rule.Value, propertyExp, options);
                         break;
                     case "equal":
-                        expression = Equals(type, rule.Value, propertyExp);
+                        expression = Equals(type, rule.Value, propertyExp, options);
                         break;
                     case "not_equal":
-                        expression = NotEquals(type, rule.Value, propertyExp);
+                        expression = NotEquals(type, rule.Value, propertyExp, options);
                         break;
                     case "between":
-                        expression = Between(type, rule.Value, propertyExp);
+                        expression = Between(type, rule.Value, propertyExp, options);
                         break;
                     case "not_between":
-                        expression = NotBetween(type, rule.Value, propertyExp);
+                        expression = NotBetween(type, rule.Value, propertyExp, options);
                         break;
                     case "less":
-                        expression = LessThan(type, rule.Value, propertyExp);
+                        expression = LessThan(type, rule.Value, propertyExp, options);
                         break;
                     case "less_or_equal":
-                        expression = LessThanOrEqual(type, rule.Value, propertyExp);
+                        expression = LessThanOrEqual(type, rule.Value, propertyExp, options);
                         break;
                     case "greater":
-                        expression = GreaterThan(type, rule.Value, propertyExp);
+                        expression = GreaterThan(type, rule.Value, propertyExp, options);
                         break;
                     case "greater_or_equal":
-                        expression = GreaterThanOrEqual(type, rule.Value, propertyExp);
+                        expression = GreaterThanOrEqual(type, rule.Value, propertyExp, options);
                         break;
                     case "begins_with":
                         expression = BeginsWith(type, rule.Value, propertyExp);
@@ -245,19 +328,19 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static List<ConstantExpression> GetConstants(Type type, string value, bool isCollection)
+        private static List<ConstantExpression> GetConstants(Type type, string value, bool isCollection, BuildExpressionOptions options)
         {
-            if (type == typeof (DateTime) && ParseDatesAsUtc)
+            if (type == typeof(DateTime) && (options.ParseDatesAsUtc || ParseDatesAsUtc))
             {
                 DateTime tDate;
                 if (isCollection)
                 {
                     var vals =
-                        value.Split(new[] {",", "[", "]", "\r\n"}, StringSplitOptions.RemoveEmptyEntries)
+                        value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                             .Where(p => !string.IsNullOrWhiteSpace(p))
                             .Select(
                                 p =>
-                                    DateTime.TryParse(p.Trim(), CultureInfo.InvariantCulture,
+                                    DateTime.TryParse(p.Trim(), options.CultureInfo,
                                         DateTimeStyles.AdjustToUniversal, out tDate)
                                         ? (DateTime?)
                                             tDate
@@ -269,7 +352,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     return new List<ConstantExpression>()
                     {
-                        Expression.Constant(DateTime.TryParse(value.Trim(), CultureInfo.InvariantCulture,
+                        Expression.Constant(DateTime.TryParse(value.Trim(), options.CultureInfo,
                             DateTimeStyles.AdjustToUniversal, out tDate)
                             ? (DateTime?)
                                 tDate
@@ -282,24 +365,36 @@ namespace Castle.DynamicLinqQueryBuilder
                 if (isCollection)
                 {
                     var tc = TypeDescriptor.GetConverter(type);
-                    var vals =
-                        value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
-                            .Where(p => !string.IsNullOrWhiteSpace(p))
-                            .Select(p => tc.ConvertFromString(p.Trim())).Select(p =>
-                                Expression.Constant(p, type));
-                    return vals.ToList();
+                    if (type == typeof(string))
+                    {
+                        var bracketSplit = value.Split(new[] { "[", "]" }, StringSplitOptions.RemoveEmptyEntries);
+                        var vals = 
+                                bracketSplit.SelectMany(v => v.Split(new[] { ",", "\r\n" }, StringSplitOptions.None))
+                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
+                                    Expression.Constant(p, type));
+                        return vals.Distinct().ToList();
+                    }
+                    else
+                    {
+                        var vals =
+                            value.Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                                .Where(p => !string.IsNullOrWhiteSpace(p))
+                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
+                                    Expression.Constant(p, type));
+                        return vals.ToList();
+                    }
                 }
                 else
                 {
                     var tc = TypeDescriptor.GetConverter(type);
                     return new List<ConstantExpression>()
                 {
-                    Expression.Constant(tc.ConvertFromString(value.Trim()))
+                    Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, value.Trim()))
                 };
                 }
             }
 
-            
+
 
         }
 
@@ -434,16 +529,16 @@ namespace Castle.DynamicLinqQueryBuilder
 
 
 
-        private static Expression NotEquals(Type type, string value, Expression propertyExp)
+        private static Expression NotEquals(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            return Expression.Not(Equals(type, value, propertyExp));
+            return Expression.Not(Equals(type, value, propertyExp, options));
         }
 
 
 
-        private static Expression Equals(Type type, string value, Expression propertyExp)
+        private static Expression Equals(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            Expression someValue = GetConstants(type, value, false).First();
+            Expression someValue = GetConstants(type, value, false, options).First();
 
             Expression exOut;
             if (type == typeof(string))
@@ -451,7 +546,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 var nullCheck = GetNullCheckExpression(propertyExp);
 
                 exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                someValue = Expression.Call(someValue, typeof (string).GetMethod("ToLower", Type.EmptyTypes));
+                someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
             else
@@ -464,9 +559,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression LessThan(Type type, string value, Expression propertyExp)
+        private static Expression LessThan(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false).First();
+            var someValue = GetConstants(type, value, false, options).First();
 
             Expression exOut = Expression.LessThan(propertyExp, Expression.Convert(someValue, propertyExp.Type));
 
@@ -476,9 +571,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression LessThanOrEqual(Type type, string value, Expression propertyExp)
+        private static Expression LessThanOrEqual(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false).First();
+            var someValue = GetConstants(type, value, false, options).First();
 
             Expression exOut = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue, propertyExp.Type));
 
@@ -488,10 +583,10 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression GreaterThan(Type type, string value, Expression propertyExp)
+        private static Expression GreaterThan(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
 
-            var someValue = GetConstants(type, value, false).First();
+            var someValue = GetConstants(type, value, false, options).First();
 
 
 
@@ -503,9 +598,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression GreaterThanOrEqual(Type type, string value, Expression propertyExp)
+        private static Expression GreaterThanOrEqual(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false).First();
+            var someValue = GetConstants(type, value, false, options).First();
 
             Expression exOut = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue, propertyExp.Type));
 
@@ -515,9 +610,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression Between(Type type, string value, Expression propertyExp)
+        private static Expression Between(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, true);
+            var someValue = GetConstants(type, value, true, options);
 
 
             Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
@@ -528,16 +623,16 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression NotBetween(Type type, string value, Expression propertyExp)
+        private static Expression NotBetween(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            return Expression.Not(Between(type, value, propertyExp));
+            return Expression.Not(Between(type, value, propertyExp, options));
         }
 
-        private static Expression In(Type type, string value, Expression propertyExp)
+        private static Expression In(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
 
 
-            var someValues = GetConstants(type, value, true);
+            var someValues = GetConstants(type, value, true, options);
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
@@ -576,14 +671,16 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
 
                         exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, Expression.Convert(someValues[0], propertyExp.Type));
+                        var somevalue = Expression.Call(someValues[0], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        exOut = Expression.Equal(exOut, somevalue);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
+                            var nextvalue = Expression.Call(someValues[counter], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                             exOut = Expression.Or(exOut,
                                 Expression.Equal(
                                     Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes)),
-                                    Expression.Convert(someValues[counter], propertyExp.Type)));
+                                    nextvalue));
                             counter++;
                         }
                     }
@@ -608,7 +705,8 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
 
                         exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, someValues.First());
+                        var somevalue = Expression.Call(someValues.First(), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        exOut = Expression.Equal(exOut, somevalue);
                     }
                     else
                     {
@@ -623,9 +721,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         }
 
-        private static Expression NotIn(Type type, string value, Expression propertyExp)
+        private static Expression NotIn(Type type, string value, Expression propertyExp, BuildExpressionOptions options)
         {
-            return Expression.Not(In(type, value, propertyExp));
+            return Expression.Not(In(type, value, propertyExp, options));
         }
 
         #endregion
