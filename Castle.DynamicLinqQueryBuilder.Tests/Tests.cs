@@ -374,6 +374,31 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 longerTextToFilterList.Select(p => p.LongerTextToFilter.ToLower())
                     .All(p => p == "there is something interesting about this text"));
 
+            //expect 3 entries to match for a case-insensitive string comparison
+            var longerTextToFilterFilterCaps = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LongerTextToFilter",
+                        Id = "LongerTextToFilter",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = "THERE is something interesting about this text,there is something interesting about this text2"
+                    }
+                }
+            };
+            var longerTextToFilterListCaps = startingQuery.BuildQuery(longerTextToFilterFilterCaps).ToList();
+            Assert.IsTrue(longerTextToFilterListCaps != null);
+            Assert.IsTrue(longerTextToFilterListCaps.Count == 3);
+            Assert.IsTrue(
+                longerTextToFilterListCaps.Select(p => p.LongerTextToFilter.ToLower())
+                    .All(p => p == "there is something interesting about this text"));
+
 
             //expect 4 entries to match for a Date comparison
             var lastModifiedFilter = new FilterRule()
