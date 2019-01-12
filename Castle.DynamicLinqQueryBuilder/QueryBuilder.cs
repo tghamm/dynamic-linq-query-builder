@@ -671,14 +671,16 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
 
                         exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, Expression.Convert(someValues[0], propertyExp.Type));
+                        var somevalue = Expression.Call(someValues[0], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        exOut = Expression.Equal(exOut, somevalue);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
+                            var nextvalue = Expression.Call(someValues[counter], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                             exOut = Expression.Or(exOut,
                                 Expression.Equal(
                                     Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes)),
-                                    Expression.Convert(someValues[counter], propertyExp.Type)));
+                                    nextvalue));
                             counter++;
                         }
                     }
@@ -703,7 +705,8 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
 
                         exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, someValues.First());
+                        var somevalue = Expression.Call(someValues.First(), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        exOut = Expression.Equal(exOut, somevalue);
                     }
                     else
                     {
