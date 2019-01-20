@@ -23,30 +23,37 @@ namespace Castle.DynamicLinqQueryBuilder.Samples.Controllers
                 ContentEncoding = contentEncoding
             };
         }
+
+        //Return the default definitions for the class, and the list of People
         public ActionResult Index()
         {
             var jsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+
+            var definitions = typeof(PersonRecord).GetDefaultColumnDefinitionsForType(false);
+            var people = PersonBuilder.GetPeople();
+            
+            //Augment the definitions to show advanced scenarios not
+            //handled by GetDefaultColumnDefinitionsForType(...)
+
+            //Let's tweak the generated definition of FirstName to make it
+            //a select element in jQuery QueryBuilder UI populated by
+            //the possible values from our dataset
+            var firstName = definitions.First(p => p.Field.ToLower() == "firstname");
+            firstName.Values = people.Select(p => p.FirstName).Distinct().ToList();
+            firstName.Input = "select";
+
             ViewBag.FilterDefinition =
-               JsonConvert.SerializeObject(typeof (PersonRecord).GetDefaultColumnDefinitionsForType(false), jsonSerializerSettings);
-            ViewBag.Model = PersonBuilder.GetPeople();
+               JsonConvert.SerializeObject(definitions, jsonSerializerSettings);
+            ViewBag.Model = people;
             return View();
         }
 
+        //Take the POSTed FilterRule, build query, and return results
         [HttpPost]
         public JsonResult Index(FilterRule obj)
         {
-            var jsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
             var people = PersonBuilder.GetPeople().BuildQuery(obj).ToList();
-            //ViewBag.Json = people;
             return Json(people);
-
-            /* 
-
-             ViewBag.FilterDefinition =
-                JsonConvert.SerializeObject(typeof(PersonRecord).GetDefaultColumnDefinitionsForType(false), jsonSerializerSettings);
-             ViewBag.Model = PersonBuilder.GetPeople();
-             return View();*/
-            //return "";
         }
 
         public ActionResult About()
