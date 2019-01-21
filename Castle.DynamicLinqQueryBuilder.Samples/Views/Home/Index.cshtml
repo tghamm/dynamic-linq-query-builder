@@ -7,6 +7,14 @@
     <script type="text/javascript">
     $(function() {
         // Handler for .ready() called.
+
+        // Fix for Bootstrap Datepicker
+        $('#jquery-query-builder').on('afterUpdateRuleValue.queryBuilder', function(e, rule) {
+            if (rule.filter.plugin === 'datepicker') {
+                rule.$el.find('.rule-value-container input').datepicker('update');
+            }
+        });
+
         var tableData = [];
 
         var filterDefinition = @Html.Raw(ViewBag.FilterDefinition);

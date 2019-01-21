@@ -42,6 +42,18 @@ namespace Castle.DynamicLinqQueryBuilder.Samples.Controllers
             firstName.Values = people.Select(p => p.FirstName).Distinct().ToList();
             firstName.Input = "select";
 
+            //Let's tweak birthday to use the jQuery-UI datepicker plugin instead of
+            //just a text input.
+            var birthday = definitions.First(p => p.Field.ToLower() == "birthday");
+            birthday.Plugin = "datepicker";
+            birthday.Plugin_config = new
+            {
+                format = "mm/dd/yyyy",
+                todayBtn = "linked",
+                todayHighlight = true,
+                autoclose = true
+            };
+
             ViewBag.FilterDefinition =
                JsonConvert.SerializeObject(definitions, jsonSerializerSettings);
             ViewBag.Model = people;
