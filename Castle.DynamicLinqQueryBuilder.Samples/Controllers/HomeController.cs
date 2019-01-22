@@ -46,13 +46,6 @@ namespace Castle.DynamicLinqQueryBuilder.Samples.Controllers
             //just a text input.
             var birthday = definitions.First(p => p.Field.ToLower() == "birthday");
             birthday.Plugin = "datepicker";
-            birthday.Plugin_config = new
-            {
-                format = "mm/dd/yyyy",
-                todayBtn = "linked",
-                todayHighlight = true,
-                autoclose = true
-            };
 
             ViewBag.FilterDefinition =
                JsonConvert.SerializeObject(definitions, jsonSerializerSettings);

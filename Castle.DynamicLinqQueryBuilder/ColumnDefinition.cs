@@ -125,15 +125,5 @@ namespace Castle.DynamicLinqQueryBuilder
         /// </value>
         [DataMember]
         public string Plugin { get; set; }
-
-        /// <summary>
-        /// Gets or sets the plugin configuration.
-        /// </summary>
-        /// <value>
-        /// The object defining the plugin configuration.
-        /// </value>
-        [DataMember]
-        public object Plugin_config { get; set; }
-
     }
 }
