@@ -3288,6 +3288,101 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         #endregion
 
+        #region NestedObjects
+
+        public class NestedClass
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public NestedAddress Address { get; set; }
+        }
+
+        public class NestedAddress
+        {
+            public string Address { get; set; }
+            public string City { get; set; }
+            public string State { get; set; }
+            public string Zip { get; set; }
+            public LatLonPair Location { get; set; }
+            
+        }
+
+        public class LatLonPair
+        {
+            public double Latitude { get; set; }
+            public double Longitude { get; set; }
+        }
+
+        public List<NestedClass> GetNestedClassTest()
+        {
+            var list = new List<NestedClass>()
+            {
+                new NestedClass()
+                {
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Address = new NestedAddress()
+                    {
+                        Address = "1234 Downing St",
+                        City = "London",
+                        State = "UK",
+                        Zip = "029375",
+                        Location = new LatLonPair()
+                        {
+                            Latitude = 38,
+                            Longitude = -78
+                        }
+                    }
+                },
+                new NestedClass()
+                {
+                    FirstName = "Jane",
+                    LastName = "Doe",
+                    Address = new NestedAddress()
+                    {
+                        Address = "1235 Downing St",
+                        City = "London",
+                        State = "UK",
+                        Zip = "029375",
+                        Location = new LatLonPair()
+                        {
+                            Latitude = 39,
+                            Longitude = -78
+                        }
+                    }
+                }
+            };
+
+            return list;
+        }
+
+        [Test]
+        public void TestNestedProperties()
+        {
+            var rule = new FilterRule
+            {
+                Condition = "and",
+                Field = "Address.Location.Latitude",
+                Id = "Address.Location.Latitude",
+                Input = "NA",
+                Operator = "equal",
+                Type = "double",
+                Value = "38",
+            };
+
+
+            var list = GetNestedClassTest();
+
+            var res = list.BuildQuery(rule).ToList();
+
+            Assert.IsTrue(res.Count == 1);
+
+        }
+
+
+        
+        #endregion
+
         #region Misc
         [Test]
         public void Build_Query_Null_Test()
