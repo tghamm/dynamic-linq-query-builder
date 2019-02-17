@@ -66,7 +66,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// The values.
         /// </value>
         [DataMember]
-        public string Values { get; set; }
+        public object Values { get; set; }
         /// <summary>
         /// Gets or sets the operators.
         /// </summary>
@@ -116,5 +116,14 @@ namespace Castle.DynamicLinqQueryBuilder
         /// </value>
         [DataMember]
         public string Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the plugin to use.
+        /// </summary>
+        /// <value>
+        /// The plugin.
+        /// </value>
+        [DataMember]
+        public string Plugin { get; set; }
     }
 }

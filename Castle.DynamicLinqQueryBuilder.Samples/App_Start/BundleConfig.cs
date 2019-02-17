@@ -11,6 +11,9 @@ namespace Castle.DynamicLinqQueryBuilder.Samples
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/jquery-ui").Include(
+                "~/Scripts/jquery-ui-{version}.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/jquery-querybuilder").Include(
                         "~/Scripts/query-builder.standalone.min.js"));
 
@@ -29,7 +32,8 @@ namespace Castle.DynamicLinqQueryBuilder.Samples
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css",
-                      "~/Content/query-builder.default.min.css"));
+                      "~/Content/query-builder.default.min.css",
+                      "~/Content/themes/base/all.css"));
         }
     }
 }
