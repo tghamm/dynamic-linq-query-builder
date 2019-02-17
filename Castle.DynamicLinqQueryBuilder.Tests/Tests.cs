@@ -3478,6 +3478,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         }
 
+        [Test]
+        public void TestColumnDefinition()
+        {
+            var cDef = new ColumnDefinition();
+            var res = cDef.PrettyOutputTransformer.Invoke("Test");
+            Assert.IsTrue(res.ToString() == "Test");
+        }
+
         #endregion
     }
 }
