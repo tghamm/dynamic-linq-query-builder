@@ -48,6 +48,10 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     type = "string";
                 }
+                else if ((prop.PropertyType == typeof(bool)))
+                {
+                    type = "boolean";
+                }
 
                 switch (type)
                 {
@@ -79,6 +83,15 @@ namespace Castle.DynamicLinqQueryBuilder
                         });
                         break;
                     case "date":
+                        itemBankColumnDefinitions.Add(new ColumnDefinition()
+                        {
+                            Label = title,
+                            Field = name,
+                            Type = type,
+                            Id = id.ToString()
+                        });
+                        break;                    
+                    case "boolean":
                         itemBankColumnDefinitions.Add(new ColumnDefinition()
                         {
                             Label = title,
