@@ -7,7 +7,7 @@ namespace Castle.DynamicLinqQueryBuilder
     /// This class is used to define a hierarchical filter for a given collection.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class FilterRule : IFilterRule
+    public class QueryBuilderFilterRule : IFilterRule
     {
         /// <summary>
         /// Condition - acceptable values are "and" and "or".
@@ -50,7 +50,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <value>
         /// The rules.
         /// </value>
-        public List<FilterRule> Rules { get; set; }
+        public List<QueryBuilderFilterRule> Rules { get; set; }
         /// <summary>
         /// Gets or sets the type. Supported values are "integer", "double", "string", "date", "datetime", and "boolean".
         /// </summary>
@@ -64,9 +64,8 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; set; }
+        public object Value { get; set; }
 
         IEnumerable<IFilterRule> IFilterRule.Rules => Rules;
-        object IFilterRule.Value => Value;
     }
 }
