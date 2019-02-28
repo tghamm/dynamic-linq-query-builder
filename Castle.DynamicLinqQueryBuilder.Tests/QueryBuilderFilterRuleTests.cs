@@ -1673,1459 +1673,1432 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         }
 
-        //[Test]
-        //public void NotEqualsClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect two entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "integer",
-        //                Value = "1"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId != 1));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 3 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "integer",
-        //                Value = "1"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 3);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId != 1));
-
-
-
-
-        //    //expect 1 entries to match for a case-insensitive string comparison
-        //    var longerTextToFilterFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LongerTextToFilter",
-        //                Id = "LongerTextToFilter",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "string",
-        //                Value = "there is something interesting about this text"
-        //            }
-        //        }
-        //    };
-        //    var longerTextToFilterList = startingQuery.BuildQuery(longerTextToFilterFilter).ToList();
-        //    Assert.IsTrue(longerTextToFilterList != null);
-        //    Assert.IsTrue(longerTextToFilterList.Count == 1);
-        //    Assert.IsTrue(
-        //        longerTextToFilterList.Select(p => p.LongerTextToFilter)
-        //            .All(p => (p == null) || (p.ToLower() != "there is something interesting about this text")));
-
-
-        //    //expect 0 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => p == DateTime.UtcNow.Date));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 1 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => p != DateTime.UtcNow.Date));
-
-
-        //    //expect 1 entries to match for a boolean field
-        //    var isSelectedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "IsSelected",
-        //                Id = "IsSelected",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "boolean",
-        //                Value = "true"
-        //            }
-        //        }
-        //    };
-        //    var isSelectedFilterList = startingQuery.BuildQuery(isSelectedFilter).ToList();
-        //    Assert.IsTrue(isSelectedFilterList != null);
-        //    Assert.IsTrue(isSelectedFilterList.Count == 1);
-        //    Assert.IsTrue(
-        //        isSelectedFilterList.Select(p => p.IsSelected)
-        //            .All(p => p != true));
-
-        //    //expect failure when an invalid bool is encountered in bool comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        isSelectedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(isSelectedFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableIsSelectedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "IsPossiblyNotSetBool",
-        //                Id = "IsPossiblyNotSetBool",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "boolean",
-        //                Value = "true"
-        //            }
-        //        }
-        //    };
-        //    var nullableIsSelectedFilterList = startingQuery.BuildQuery(nullableIsSelectedFilter).ToList();
-        //    Assert.IsTrue(nullableIsSelectedFilterList != null);
-        //    Assert.IsTrue(nullableIsSelectedFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableIsSelectedFilterList.Select(p => p.IsPossiblyNotSetBool)
-        //            .All(p => p != true));
-
-
-        //    //expect 2 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "double",
-        //                Value = "1.11"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => p != 1.11));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "not_equal",
-        //                Type = "double",
-        //                Value = "1.112"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p != 1.112));
-
-        //}
-
-        //[Test]
-        //public void BetweenClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 3 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "integer",
-        //                Value = "1,2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 3);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 3));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "integer",
-        //                Value = "1,2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 3));
-
-
-
-
-
-        //    //expect 4 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2)) && (p <= DateTime.UtcNow.Date)));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 3 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2)) && (p <= DateTime.UtcNow.Date)));
-
-
-        //    //expect 3 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "double",
-        //                Value = "1.0,1.12"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 3);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p >= 1.0) && (p <= 1.12)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "between",
-        //                Type = "double",
-        //                Value = "1.112,1.112"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p == 1.112));
-
-        //}
-
-        //[Test]
-        //public void NotBetweenClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 1 entry to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "integer",
-        //                Value = "1,2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 1);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 1 || p.ContentTypeId > 2));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "integer",
-        //                Value = "1,2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 1 || p.NullableContentTypeId > 2 || p.NullableContentTypeId == null));
-
-
-
-
-
-        //    //expect 0 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2)) && (p >= DateTime.UtcNow.Date)));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 1 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," + DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2) && p >= DateTime.UtcNow.Date) || p == null));
-
-
-        //    //expect 3 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "double",
-        //                Value = "1.0,1.12"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 1);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p <= 1.0) || (p >= 1.12)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "not_between",
-        //                Type = "double",
-        //                Value = "1.112,1.112"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p != 1.112));
-
-        //}
-
-        //[Test]
-        //public void GreaterOrEqualClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 1 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId >= 2));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 1 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId >= 2));
-
-
-        //    //expect 4 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2))));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 0 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p >= DateTime.UtcNow.Date.AddDays(1))));
-
-
-        //    //expect 4 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "double",
-        //                Value = "1"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p >= 1)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "greater_or_equal",
-        //                Type = "double",
-        //                Value = "1.112"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p >= 1.112));
-
-        //}
-
-        //[Test]
-        //public void GreaterClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 1 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 1);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId > 2));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 1 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 1);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId > 2));
-
-
-        //    //expect 4 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p > DateTime.UtcNow.Date.AddDays(-2))));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 0 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p > DateTime.UtcNow.Date.AddDays(1))));
-
-
-        //    //expect 4 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "double",
-        //                Value = "1"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p > 1)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "greater",
-        //                Type = "double",
-        //                Value = "1.112"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p > 1.112));
-
-        //}
-
-        //[Test]
-        //public void LessClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 2 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 2));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 1 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 1);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 2));
-
-
-        //    //expect 0 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2))));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 3 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(1))));
-
-
-        //    //expect 3 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "double",
-        //                Value = "1.13"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 3);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p <= 1.12)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable boolean field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "less",
-        //                Type = "double",
-        //                Value = "1.113"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p < 1.113));
-
-        //}
-
-        //[Test]
-        //public void LessOrEqualClause()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 3 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var contentIdFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    Assert.IsTrue(contentIdFilteredList != null);
-        //    Assert.IsTrue(contentIdFilteredList.Count == 3);
-        //    Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId <= 2));
-
-        //    //expect failure when non-numeric value is encountered in integer comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for an integer comparison
-        //    var nullableContentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "NullableContentTypeId",
-        //                Id = "NullableContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-        //    var nullableContentIdFilteredList =
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentIdFilter).ToList();
-        //    Assert.IsTrue(nullableContentIdFilteredList != null);
-        //    Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
-        //    Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId <= 2));
-
-
-        //    //expect 0 entries to match for a Date comparison
-        //    var lastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModified",
-        //                Id = "LastModified",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
-        //    Assert.IsTrue(lastModifiedFilterList != null);
-        //    Assert.IsTrue(lastModifiedFilterList.Count == 0);
-        //    Assert.IsTrue(
-        //        lastModifiedFilterList.Select(p => p.LastModified)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2))));
-
-        //    //expect failure when an invalid date is encountered in date comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        lastModifiedFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter).ToList();
-
-        //    });
-
-        //    //expect 3 entries to match for a possibly empty Date comparison
-        //    var nullableLastModifiedFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "LastModifiedIfPresent",
-        //                Id = "LastModifiedIfPresent",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "datetime",
-        //                Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
-        //            }
-        //        }
-        //    };
-        //    var nullableLastModifiedFilterList = startingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
-        //    Assert.IsTrue(nullableLastModifiedFilterList != null);
-        //    Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
-        //    Assert.IsTrue(
-        //        nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-        //            .All(p => (p <= DateTime.UtcNow.Date.AddDays(1))));
-
-
-        //    //expect 3 entries to match for a double field
-        //    var statValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "StatValue",
-        //                Id = "StatValue",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "double",
-        //                Value = "1.13"
-        //            }
-        //        }
-        //    };
-        //    var statValueFilterList = startingQuery.BuildQuery(statValueFilter).ToList();
-        //    Assert.IsTrue(statValueFilterList != null);
-        //    Assert.IsTrue(statValueFilterList.Count == 4);
-        //    Assert.IsTrue(
-        //        statValueFilterList.Select(p => p.StatValue)
-        //            .All(p => (p <= 1.13)));
-
-        //    //expect failure when an invalid double is encountered in double comparison
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        statValueFilter.Rules.First().Value = "hello";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(statValueFilter).ToList();
-
-        //    });
-
-        //    //expect 2 entries to match for a nullable double field
-        //    var nullableStatValueFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "PossiblyEmptyStatValue",
-        //                Id = "PossiblyEmptyStatValue",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "double",
-        //                Value = "1.113"
-        //            }
-        //        }
-        //    };
-        //    var nullableStatFilterList = startingQuery.BuildQuery(nullableStatValueFilter).ToList();
-        //    Assert.IsTrue(nullableStatFilterList != null);
-        //    Assert.IsTrue(nullableStatFilterList.Count == 2);
-        //    Assert.IsTrue(
-        //        nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
-        //            .All(p => p <= 1.113));
-
-        //}
-
-        //[Test]
-        //public void FilterWithInvalidParameters()
-        //{
-        //    var startingQuery = GetExpressionTreeData().AsQueryable();
-
-
-        //    //expect 3 entries to match for an integer comparison
-        //    var contentIdFilter = new FilterRule()
-        //    {
-        //        Condition = "and",
-        //        Rules = new List<FilterRule>()
-        //        {
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            },
-        //            new FilterRule()
-        //            {
-        //                Condition = "and",
-        //                Field = "ContentTypeId",
-        //                Id = "ContentTypeId",
-        //                Input = "NA",
-        //                Operator = "less_or_equal",
-        //                Type = "integer",
-        //                Value = "2"
-        //            }
-        //        }
-        //    };
-
-        //    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    contentIdFilter.Condition = "or";
-
-        //    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(null).ToList();
-
-        //    startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(new FilterRule()).ToList();
-
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Type = "NOT_A_TYPE";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-
-        //    });
-
-        //    ExceptionAssert.Throws<Exception>(() =>
-        //    {
-        //        contentIdFilter.Rules.First().Type = "integer";
-        //        contentIdFilter.Rules.First().Operator = "NOT_AN_OPERATOR";
-        //        startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
-        //    });
-        //}
-
-        //private class IndexedClass
-        //{
-        //    int this[string someIndex]
-        //    {
-        //        get
-        //        {
-        //            return 2;
-        //        }
-        //    }
-        //}
-
-        //[Test]
-        //public void IndexedExpression_Test()
-        //{
-        //    var rule = new FilterRule
-        //    {
-        //        Condition = "and",
-        //        Field = "ContentTypeId",
-        //        Id = "ContentTypeId",
-        //        Input = "NA",
-        //        Operator = "equal",
-        //        Type = "integer",
-        //        Value = "2"
-        //    };
-
-        //    var result = new List<IndexedClass> { new IndexedClass() }.AsQueryable().BuildQuery(rule,
-        //        new BuildExpressionOptions() { UseIndexedProperty = true, IndexedPropertyName = "Item" });
-        //    Assert.IsTrue(result.Any());
-
-        //    rule.Value = "3";
-        //    result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
-        //    Assert.IsFalse(result.Any());
-        //}
+        [Test]
+        public void NotEqualsClause()
+        {
+            //expect two entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "integer",
+                        Value = 1
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 2);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId != 1));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 3 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "integer",
+                        Value = 1
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 3);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId != 1));
+
+            //expect 1 entries to match for a case-insensitive string comparison
+            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LongerTextToFilter",
+                        Id = "LongerTextToFilter",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "string",
+                        Value = "there is something interesting about this text"
+                    }
+                }
+            };
+            var longerTextToFilterList = StartingQuery.BuildQuery(longerTextToFilterFilter).ToList();
+            Assert.IsTrue(longerTextToFilterList != null);
+            Assert.IsTrue(longerTextToFilterList.Count == 1);
+            Assert.IsTrue(
+                longerTextToFilterList.Select(p => p.LongerTextToFilter)
+                    .All(p => (p == null) || (p.ToLower() != "there is something interesting about this text")));
+
+
+            //expect 0 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => p == DateTime.UtcNow.Date));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => p != DateTime.UtcNow.Date));
+
+
+            //expect 1 entries to match for a boolean field
+            var isSelectedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "IsSelected",
+                        Id = "IsSelected",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "boolean",
+                        Value = true
+                    }
+                }
+            };
+            var isSelectedFilterList = StartingQuery.BuildQuery(isSelectedFilter).ToList();
+            Assert.IsTrue(isSelectedFilterList != null);
+            Assert.IsTrue(isSelectedFilterList.Count == 1);
+            Assert.IsTrue(
+                isSelectedFilterList.Select(p => p.IsSelected)
+                    .All(p => p != true));
+
+            //expect failure when an invalid bool is encountered in bool comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                isSelectedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(isSelectedFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableIsSelectedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "IsPossiblyNotSetBool",
+                        Id = "IsPossiblyNotSetBool",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "boolean",
+                        Value = true
+                    }
+                }
+            };
+            var nullableIsSelectedFilterList = StartingQuery.BuildQuery(nullableIsSelectedFilter).ToList();
+            Assert.IsTrue(nullableIsSelectedFilterList != null);
+            Assert.IsTrue(nullableIsSelectedFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableIsSelectedFilterList.Select(p => p.IsPossiblyNotSetBool)
+                    .All(p => p != true));
+
+
+            //expect 2 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "double",
+                        Value = 1.11D
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 2);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => p != 1.11));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "not_equal",
+                        Type = "double",
+                        Value = 1.112D
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p != 1.112));
+
+        }
+
+        [Test]
+        public void BetweenClause()
+        {
+            //expect 3 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "integer",
+                        Value = new[] { 1, 2 }
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 3);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 3));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "integer",
+                        Value = new[] { 1, 2 }
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 3));
+
+
+
+
+
+            //expect 4 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "datetime",
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 4);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2)) && (p <= DateTime.UtcNow.Date)));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 3 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "datetime",
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2)) && (p <= DateTime.UtcNow.Date)));
+
+
+            //expect 3 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "double",
+                        Value = new[] { 1.0D, 1.12D }
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 3);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p >= 1.0) && (p <= 1.12)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "double",
+                        Value = new[] { 1.112D, 1.112D }
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p == 1.112));
+
+        }
+
+        [Test]
+        public void NotBetweenClause()
+        {
+            //expect 1 entry to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "integer",
+                        Value = new[] { 1, 2 }
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 1 || p.ContentTypeId > 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "integer",
+                        Value = new[] { 1, 2 }
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 1 || p.NullableContentTypeId > 2 || p.NullableContentTypeId == null));
+
+
+
+
+
+            //expect 0 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "datetime",
+                        Value = new[] {DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2)) && (p >= DateTime.UtcNow.Date)));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "datetime",
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2) && p >= DateTime.UtcNow.Date) || p == null));
+
+
+            //expect 3 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "double",
+                        Value = new[] { 1.0D, 1.12D }
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 1);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p <= 1.0) || (p >= 1.12)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "not_between",
+                        Type = "double",
+                        Value = "1.112,1.112"
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p != 1.112));
+
+        }
+
+        [Test]
+        public void GreaterOrEqualClause()
+        {            
+            //expect 1 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 2);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId >= 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId >= 2));
+
+
+            //expect 4 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 4);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2))));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 0 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p >= DateTime.UtcNow.Date.AddDays(1))));
+
+
+            //expect 4 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "double",
+                        Value = 1D
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 4);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p >= 1)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "double",
+                        Value = 1.112D
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p >= 1.112));
+
+        }
+
+        [Test]
+        public void GreaterClause()
+        {
+            //expect 1 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId > 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 1);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId > 2));
+
+
+            //expect 4 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 4);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p > DateTime.UtcNow.Date.AddDays(-2))));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 0 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p > DateTime.UtcNow.Date.AddDays(1))));
+
+
+            //expect 4 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "double",
+                        Value = 1D
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 4);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p > 1)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "double",
+                        Value = 1.112D
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 0);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p > 1.112));
+
+        }
+
+        [Test]
+        public void LessClause()
+        {
+            //expect 2 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 2);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId < 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 1 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 1);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId < 2));
+
+
+            //expect 0 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2))));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 3 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(1))));
+
+
+            //expect 3 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "double",
+                        Value = 1.13D
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 3);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p <= 1.12)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable boolean field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "double",
+                        Value = "1.113"
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p < 1.113));
+
+        }
+
+        [Test]
+        public void LessOrEqualClause()
+        {
+            //expect 3 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "integer",
+                        Value = "2"
+                    }
+                }
+            };
+            var contentIdFilteredList = StartingQuery.BuildQuery(contentIdFilter).ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 3);
+            Assert.IsTrue(contentIdFilteredList.All(p => p.ContentTypeId <= 2));
+
+            //expect failure when non-numeric value is encountered in integer comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for an integer comparison
+            var nullableContentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeId",
+                        Id = "NullableContentTypeId",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "integer",
+                        Value = "2"
+                    }
+                }
+            };
+            var nullableContentIdFilteredList =
+                StartingQuery.BuildQuery(nullableContentIdFilter).ToList();
+            Assert.IsTrue(nullableContentIdFilteredList != null);
+            Assert.IsTrue(nullableContentIdFilteredList.Count == 2);
+            Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId <= 2));
+
+
+            //expect 0 entries to match for a Date comparison
+            var lastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            Assert.IsTrue(
+                lastModifiedFilterList.Select(p => p.LastModified)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2))));
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+
+            });
+
+            //expect 3 entries to match for a possibly empty Date comparison
+            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            Assert.IsTrue(nullableLastModifiedFilterList != null);
+            Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
+            Assert.IsTrue(
+                nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(1))));
+
+
+            //expect 3 entries to match for a double field
+            var statValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "StatValue",
+                        Id = "StatValue",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "double",
+                        Value = "1.13"
+                    }
+                }
+            };
+            var statValueFilterList = StartingQuery.BuildQuery(statValueFilter).ToList();
+            Assert.IsTrue(statValueFilterList != null);
+            Assert.IsTrue(statValueFilterList.Count == 4);
+            Assert.IsTrue(
+                statValueFilterList.Select(p => p.StatValue)
+                    .All(p => (p <= 1.13)));
+
+            //expect failure when an invalid double is encountered in double comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                statValueFilter.Rules.First().Value = "hello";
+                StartingQuery.BuildQuery(statValueFilter).ToList();
+
+            });
+
+            //expect 2 entries to match for a nullable double field
+            var nullableStatValueFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "double",
+                        Value = "1.113"
+                    }
+                }
+            };
+            var nullableStatFilterList = StartingQuery.BuildQuery(nullableStatValueFilter).ToList();
+            Assert.IsTrue(nullableStatFilterList != null);
+            Assert.IsTrue(nullableStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p <= 1.113));
+
+        }
+
+        [Test]
+        public void FilterWithInvalidParameters()
+        {
+            //expect 3 entries to match for an integer comparison
+            var contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "integer",
+                        Value = 2
+                    },
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "integer",
+                        Value = 2
+                    }
+                }
+            };
+
+            StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            contentIdFilter.Condition = "or";
+
+            StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            StartingQuery.BuildQuery(null).ToList();
+
+            StartingQuery.BuildQuery(new QueryBuilderFilterRule()).ToList();
+
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Type = "NOT_A_TYPE";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+
+            });
+
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                contentIdFilter.Rules.First().Type = "integer";
+                contentIdFilter.Rules.First().Operator = "NOT_AN_OPERATOR";
+                StartingQuery.BuildQuery(contentIdFilter).ToList();
+            });
+        }
+
+        private class IndexedClass
+        {
+            int this[string someIndex]
+            {
+                get
+                {
+                    return 2;
+                }
+            }
+        }
+
+        [Test]
+        public void IndexedExpression_Test()
+        {
+            var rule = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Field = "ContentTypeId",
+                Id = "ContentTypeId",
+                Input = "NA",
+                Operator = "equal",
+                Type = "integer",
+                Value = 2
+            };
+
+            var result = new List<IndexedClass> { new IndexedClass() }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions() { UseIndexedProperty = true, IndexedPropertyName = "Item" });
+            Assert.IsTrue(result.Any());
+
+            rule.Value = 3;
+            result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
+            Assert.IsFalse(result.Any());
+        }
         #endregion
     }
 }
