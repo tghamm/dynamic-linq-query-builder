@@ -39,25 +39,9 @@
             }
         });
 
-        var convertArraysToCommaDelimited = function(obj) {
-            if (obj != null) {
-                if (obj.hasOwnProperty("value")) {
-                    if( Object.prototype.toString.call( obj.value ) === '[object Array]' ) {
-                        obj.value = obj.value.join(", ");
-                    }
-                }
-                if (obj.hasOwnProperty("rules") && obj.rules != null) {
-                    for (var i = 0; i < obj.rules.length; i++) {
-                        convertArraysToCommaDelimited(obj.rules[i]);
-                    }
-                }
-            }
-        }
         var getRules = function() {
             try {
-                var res =  jqueryQueryBuilder.queryBuilder('getRules');
-                convertArraysToCommaDelimited(res);
-                return res;
+                return jqueryQueryBuilder.queryBuilder('getRules');                
             } catch (ex) {
                 //console.log(ex);
                 return null;
