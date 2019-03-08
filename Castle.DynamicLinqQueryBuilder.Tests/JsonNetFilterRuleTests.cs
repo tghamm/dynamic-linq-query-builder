@@ -9,7 +9,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]
-    public class QueryBuilderFilterRuleTests
+    public class JsonNetFilterRuleTests
     {
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingQuery;
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingDateQuery;
@@ -19,7 +19,24 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             StartingQuery = Tests.GetExpressionTreeData().AsQueryable();
             StartingDateQuery = Tests.GetDateExpressionTreeData().AsQueryable();
-        }        
+        }
+
+        #region Wrapper
+        /// <summary>
+        /// Some libraries, such as Newtonsoft.Json, will deserialize the elements of an array (that should be placed in the <see cref="IFilterRule.Value"/>) into a wrapper object
+        /// </summary>
+        private class Wrapper
+        {
+            public object Value { get; }
+
+            public Wrapper(object value)
+            {
+                Value = value;
+            }
+
+            public override string ToString() => Value?.ToString();
+        }
+        #endregion
 
         #region Expression Tree Builder        
 
@@ -27,12 +44,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void DateHandling()
         {
             QueryBuilder.ParseDatesAsUtc = true;
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -40,7 +57,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "date",
-                        Value = new[] { "2/23/2016" }
+                        Value = "2/23/2016"
                     }
                 }
             };
@@ -49,12 +66,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);
 
-            contentIdFilter = new QueryBuilderFilterRule
+            contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -62,7 +79,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "date",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -72,12 +89,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             });
 
 
-            contentIdFilter = new QueryBuilderFilterRule
+            contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -85,7 +102,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "date",
-                        Value = new[] { "2/23/2016" }
+                        Value = "2/23/2016"
                     }
                 }
             };
@@ -94,12 +111,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentIdFilteredList2 != null);
             Assert.IsTrue(contentIdFilteredList2.Count == 1);
 
-            contentIdFilter = new QueryBuilderFilterRule
+            contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -107,7 +124,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "date",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -124,12 +141,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void InClause()
         {
             //expect two entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -137,7 +154,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -149,18 +166,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //single value test
-            contentIdFilter = new QueryBuilderFilterRule
+            contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -168,7 +185,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
-                        Value = new[] { "1" }
+                        Value = new[] { 1 }
                     }
                 }
             };
@@ -178,12 +195,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentIdFilteredList.All(p => (new List<int>() { 1 }).Contains(p.ContentTypeId)));
 
             //expect two entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -191,7 +208,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -206,12 +223,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -231,12 +248,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     .All(p => p == "there is something interesting about this text"));
 
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilterCaps = new QueryBuilderFilterRule
+            var longerTextToFilterFilterCaps = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -257,12 +274,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -284,18 +301,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -316,12 +333,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -329,7 +346,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "double",
-                        Value = new[] { "1.11", "1.12" }
+                        Value = new[] { 1.11d, 1.12d }
                     }
                 }
             };
@@ -343,18 +360,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable double field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -362,7 +379,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "double",
-                        Value = new[] {"1.112", "1.113" }
+                        Value = new[] {1.112D, 1.113D }
                     }
                 }
             };
@@ -374,12 +391,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     .All(p => p == 1.112));
 
             //expect 2 entries to match for a List<DateTime> field
-            var dateListFilter = new QueryBuilderFilterRule
+            var dateListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -387,7 +404,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -399,18 +416,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                dateListFilter.Rules.First().Value = new[] { "hello" };
+                dateListFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(dateListFilter).ToList();
 
             });
 
             //expect 2 entries to match for a List<string> field
-            var strListFilter = new QueryBuilderFilterRule
+            var strListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StrList",
@@ -418,7 +435,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "string",
-                        Value = new[] { "Str2" }
+                        Value = "Str2"
                     }
                 }
             };
@@ -428,12 +445,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(strListFilterList.All(p => p.StrList.Contains("Str2")));
 
             //expect 2 entries to match for a List<int> field
-            var intListFilter = new QueryBuilderFilterRule
+            var intListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntList",
@@ -453,18 +470,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                intListFilter.Rules.First().Value = new[] { "hello" };
+                intListFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(intListFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable nullable int field
-            var nullableIntListFilter = new QueryBuilderFilterRule
+            var nullableIntListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntNullList",
@@ -472,7 +489,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
-                        Value = new[] { "5" }
+                        Value = 5
                     }
                 }
             };
@@ -481,12 +498,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(nullableIntListList.Count == 3);
             Assert.IsTrue(nullableIntListList.All(p => p.IntNullList.Contains(5)));
 
-            var multipleWithBlankRule = new QueryBuilderFilterRule
+            var multipleWithBlankRule = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StrList",
@@ -502,18 +519,43 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(multipleWithBlankList != null);
             Assert.IsTrue(multipleWithBlankList.Count == 4);
             Assert.IsTrue(multipleWithBlankList.All(p => p.StrList.Contains("") || p.StrList.Contains("Str2")));
+
+            //expect 2 entries to match for a nullable double field
+            var nullableWrappedStatValueFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossiblyEmptyStatValue",
+                        Id = "PossiblyEmptyStatValue",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "double",
+                        Value = new[] {new Wrapper(1.112D), new Wrapper(1.113D) }
+                    }
+                }
+            };
+            var nullableWrappedStatFilterList = StartingQuery.BuildQuery(nullableWrappedStatValueFilter).ToList();
+            Assert.IsTrue(nullableWrappedStatFilterList != null);
+            Assert.IsTrue(nullableWrappedStatFilterList.Count == 2);
+            Assert.IsTrue(
+                nullableWrappedStatFilterList.Select(p => p.PossiblyEmptyStatValue)
+                    .All(p => p == 1.112));
         }
 
         [Test]
         public void NotInClause()
         {
             //expect two entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -521,7 +563,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1,2 }
                     }
                 }
             };
@@ -533,18 +575,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect two entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -552,7 +594,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -567,12 +609,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -580,7 +622,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "string",
-                        Value = new[] { "there is something interesting about this text" }
+                        Value = "there is something interesting about this text"
                     }
                 }
             };
@@ -593,12 +635,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -620,18 +662,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -652,12 +694,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -665,7 +707,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "double",
-                        Value = new[] { "1.11", "1.12" }
+                        Value = new[] { 1.11D, 1.12D }
                     }
                 }
             };
@@ -679,18 +721,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable double field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -698,7 +740,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "double",
-                        Value = new[] { "1.112", "1.113" }
+                        Value = new object[] { 1.112D, 1.113D }
                     }
                 }
             };
@@ -709,13 +751,19 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p != 1.112));
 
+
+
+
+
+
+
             //expect 2 entries to match for a List<DateTime> field
-            var dateListFilter = new QueryBuilderFilterRule
+            var dateListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -723,7 +771,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -735,18 +783,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                dateListFilter.Rules.First().Value = new[] { "hello" };
+                dateListFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(dateListFilter).ToList();
 
             });
 
             //expect 2 entries to match for a List<string> field
-            var strListFilter = new QueryBuilderFilterRule
+            var strListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StrList",
@@ -754,7 +802,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "string",
-                        Value = new[] { "Str2" }
+                        Value = "Str2"
                     }
                 }
             };
@@ -764,13 +812,20 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(strListFilterList.All(p => !p.StrList.Contains("Str2")));
 
 
+
+
+
+
+
+
+
             //expect 2 entries to match for a List<int> field
-            var intListFilter = new QueryBuilderFilterRule
+            var intListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntList",
@@ -778,7 +833,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
-                        Value = new[] { "1" ,"3" }
+                        Value = new[] { 1 ,3 }
                     }
                 }
             };
@@ -790,18 +845,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                intListFilter.Rules.First().Value = new[] { "hello" };
+                intListFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(intListFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable nullable int field
-            var nullableIntListFilter = new QueryBuilderFilterRule
+            var nullableIntListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntNullList",
@@ -809,7 +864,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
-                        Value = new[] { "5" }
+                        Value = "5"
                     }
                 }
             };
@@ -820,12 +875,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 nullableIntListList.All(p => !p.IntNullList.Contains(5)));
 
             //expect 2 entries to match for a nullable double field
-            var nullableWrappedStatValueFilter = new QueryBuilderFilterRule
+            var nullableWrappedStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -833,7 +888,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_in",
                         Type = "double",
-                        Value = new[] {"1.112", "1.113" }
+                        Value = new[] {new Wrapper(1.112D), new Wrapper(1.113D) }
                     }
                 }
             };
@@ -843,18 +898,21 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(
                 nullableWrappedStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p != 1.112));
+
+
+
         }
 
         [Test]
         public void IsNullClause()
         {
             //expect 1 entries to match for a case-insensitive string comparison (nullable type)
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -862,7 +920,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_null",
                         Type = "string",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -875,12 +933,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a non-nullable type
-            var contentTypeIdFilter = new QueryBuilderFilterRule
+            var contentTypeIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -888,7 +946,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_null",
                         Type = "integer",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -905,12 +963,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void IsNotNullClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison (nullable type)
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -918,7 +976,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_null",
                         Type = "string",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -931,12 +989,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a non-nullable type
-            var contentTypeIdFilter = new QueryBuilderFilterRule
+            var contentTypeIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -944,7 +1002,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_null",
                         Type = "integer",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -961,12 +1019,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void IsEmptyClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -974,7 +1032,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_empty",
                         Type = "string",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -984,12 +1042,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<DateTime> field
-            var dateListFilter = new QueryBuilderFilterRule
+            var dateListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -997,7 +1055,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_empty",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1009,12 +1067,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<string> field
-            var strListFilter = new QueryBuilderFilterRule
+            var strListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StrList",
@@ -1022,7 +1080,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_empty",
                         Type = "string",
-                        Value = new[] { "Str2" }
+                        Value = "Str2"
                     }
                 }
             };
@@ -1033,12 +1091,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<int> field
-            var intListFilter = new QueryBuilderFilterRule
+            var intListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntList",
@@ -1046,7 +1104,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_empty",
                         Type = "integer",
-                        Value = new[] { "1", "3" }
+                        Value = new[] { 1, 3 }
                     }
                 }
             };
@@ -1062,12 +1120,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void IsNotEmptyClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1075,7 +1133,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_empty",
                         Type = "string",
-                        Value = new[] { "" }
+                        Value = ""
                     }
                 }
             };
@@ -1088,12 +1146,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<DateTime> field
-            var dateListFilter = new QueryBuilderFilterRule
+            var dateListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "DateList",
@@ -1101,7 +1159,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_empty",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1113,12 +1171,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<string> field
-            var strListFilter = new QueryBuilderFilterRule
+            var strListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StrList",
@@ -1126,7 +1184,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_empty",
                         Type = "string",
-                        Value = new[] { "Str2" }
+                        Value = "Str2"
                     }
                 }
             };
@@ -1137,12 +1195,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a List<int> field
-            var intListFilter = new QueryBuilderFilterRule
+            var intListFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IntList",
@@ -1150,7 +1208,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "is_not_empty",
                         Type = "integer",
-                        Value = new[] {"1", "3" }
+                        Value = new[] {1, 3 }
                     }
                 }
             };
@@ -1164,12 +1222,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void ContainsClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1177,7 +1235,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "contains",
                         Type = "string",
-                        Value = new[] { "something interesting" }
+                        Value = "something interesting"
                     }
                 }
             };
@@ -1194,12 +1252,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void NotContainsClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1207,7 +1265,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_contains",
                         Type = "string",
-                        Value = new[] { "something interesting" }
+                        Value = "something interesting"
                     }
                 }
             };
@@ -1224,12 +1282,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void NotEndsWithClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1237,7 +1295,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_ends_with",
                         Type = "string",
-                        Value = new[] { "about this text" }
+                        Value = "about this text"
                     }
                 }
             };
@@ -1254,12 +1312,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void EndsWithClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1267,7 +1325,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "ends_with",
                         Type = "string",
-                        Value = new[] { "about this text" }
+                        Value = "about this text"
                     }
                 }
             };
@@ -1284,12 +1342,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void NotBeginsWithClause()
         {
             //expect 1 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1297,7 +1355,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_begins_with",
                         Type = "string",
-                        Value = new[] { "there is something" }
+                        Value = "there is something"
                     }
                 }
             };
@@ -1314,12 +1372,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void BeginsWithClause()
         {
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1327,7 +1385,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "begins_with",
                         Type = "string",
-                        Value = new[] { "there is something" }
+                        Value = "there is something"
                     }
                 }
             };
@@ -1343,14 +1401,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         [Test]
         public void EqualsClause()
         {
-
+            
             //expect two entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -1358,7 +1416,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "integer",
-                        Value = new[] { "1" }
+                        Value = "1"
                     }
                 }
             };
@@ -1370,18 +1428,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect two entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -1389,7 +1447,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "integer",
-                        Value = new[] { "1" }
+                        Value = "1"
                     }
                 }
             };
@@ -1403,12 +1461,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1416,7 +1474,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "string",
-                        Value = new[] { "there is something interesting about this text" }
+                        Value = "there is something interesting about this text"
                     }
                 }
             };
@@ -1429,12 +1487,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -1442,7 +1500,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1456,18 +1514,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -1475,7 +1533,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1493,12 +1551,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a boolean field
-            var isSelectedFilter = new QueryBuilderFilterRule
+            var isSelectedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IsSelected",
@@ -1506,7 +1564,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "boolean",
-                        Value = new[] { "true" }
+                        Value = true
                     }
                 }
             };
@@ -1520,18 +1578,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid bool is encountered in bool comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                isSelectedFilter.Rules.First().Value = new[] { "hello" };
+                isSelectedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(isSelectedFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableIsSelectedFilter = new QueryBuilderFilterRule
+            var nullableIsSelectedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IsPossiblyNotSetBool",
@@ -1539,7 +1597,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "boolean",
-                        Value = new[] { "true" }
+                        Value = true
                     }
                 }
             };
@@ -1552,12 +1610,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -1565,7 +1623,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "double",
-                        Value = new[] { "1.11" }
+                        Value = 1.11D
                     }
                 }
             };
@@ -1579,18 +1637,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -1598,7 +1656,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "equal",
                         Type = "double",
-                        Value = new[] { "1.112" }
+                        Value = 1.112D
                     }
                 }
             };
@@ -1617,12 +1675,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void NotEqualsClause()
         {
             //expect two entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -1630,7 +1688,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "integer",
-                        Value = new[] { "1" }
+                        Value = 1
                     }
                 }
             };
@@ -1642,18 +1700,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 3 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -1661,7 +1719,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "integer",
-                        Value = new[] { "1" }
+                        Value = 1
                     }
                 }
             };
@@ -1672,12 +1730,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId != 1));
 
             //expect 1 entries to match for a case-insensitive string comparison
-            var longerTextToFilterFilter = new QueryBuilderFilterRule
+            var longerTextToFilterFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LongerTextToFilter",
@@ -1685,7 +1743,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "string",
-                        Value = new[] { "there is something interesting about this text" }
+                        Value = "there is something interesting about this text"
                     }
                 }
             };
@@ -1698,12 +1756,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -1711,7 +1769,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1725,18 +1783,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 1 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -1744,7 +1802,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -1757,12 +1815,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 1 entries to match for a boolean field
-            var isSelectedFilter = new QueryBuilderFilterRule
+            var isSelectedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IsSelected",
@@ -1770,7 +1828,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "boolean",
-                        Value = new[] { "true" }
+                        Value = true
                     }
                 }
             };
@@ -1784,18 +1842,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid bool is encountered in bool comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                isSelectedFilter.Rules.First().Value = new[] { "hello" };
+                isSelectedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(isSelectedFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableIsSelectedFilter = new QueryBuilderFilterRule
+            var nullableIsSelectedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "IsPossiblyNotSetBool",
@@ -1803,7 +1861,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "boolean",
-                        Value = new[] { "true" }
+                        Value = true
                     }
                 }
             };
@@ -1816,12 +1874,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 2 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -1829,7 +1887,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "double",
-                        Value = new[] { "1.11" }
+                        Value = 1.11D
                     }
                 }
             };
@@ -1843,18 +1901,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -1862,7 +1920,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_equal",
                         Type = "double",
-                        Value = new[] { "1.112" }
+                        Value = 1.112D
                     }
                 }
             };
@@ -1879,12 +1937,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void BetweenClause()
         {
             //expect 3 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -1892,7 +1950,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -1904,18 +1962,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 2 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -1923,7 +1981,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -1938,12 +1996,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -1965,18 +2023,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -1997,12 +2055,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2010,7 +2068,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "double",
-                        Value = new[] { "1.0", "1.12" }
+                        Value = new[] { 1.0D, 1.12D }
                     }
                 }
             };
@@ -2024,18 +2082,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2043,7 +2101,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "between",
                         Type = "double",
-                        Value = new[] { "1.112", "1.112" }
+                        Value = new[] { 1.112D, 1.112D }
                     }
                 }
             };
@@ -2060,12 +2118,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void NotBetweenClause()
         {
             //expect 1 entry to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2073,7 +2131,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -2085,18 +2143,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 2 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -2104,7 +2162,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "integer",
-                        Value = new[] { "1", "2" }
+                        Value = new[] { 1, 2 }
                     }
                 }
             };
@@ -2119,12 +2177,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -2146,18 +2204,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 1 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -2178,12 +2236,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2191,7 +2249,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "double",
-                        Value = new[] { "1.0", "1.12" }
+                        Value = new[] { 1.0D, 1.12D }
                     }
                 }
             };
@@ -2205,18 +2263,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2224,7 +2282,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "not_between",
                         Type = "double",
-                        Value = new[] { "1.112", "1.112" }
+                        Value = "1.112,1.112"
                     }
                 }
             };
@@ -2239,14 +2297,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         [Test]
         public void GreaterOrEqualClause()
-        {
+        {            
             //expect 1 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2254,7 +2312,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2266,18 +2324,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 1 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -2285,7 +2343,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2297,12 +2355,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -2310,7 +2368,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2324,18 +2382,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 0 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -2343,7 +2401,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2356,12 +2414,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2369,7 +2427,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "double",
-                        Value = new[] { "1" }
+                        Value = 1D
                     }
                 }
             };
@@ -2383,18 +2441,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2402,7 +2460,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater_or_equal",
                         Type = "double",
-                        Value = new[] { "1.112" }
+                        Value = 1.112D
                     }
                 }
             };
@@ -2419,12 +2477,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void GreaterClause()
         {
             //expect 1 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2432,7 +2490,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2444,18 +2502,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 1 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -2463,7 +2521,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2475,12 +2533,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -2488,7 +2546,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2502,18 +2560,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 0 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -2521,7 +2579,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2534,12 +2592,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 4 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2547,7 +2605,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "double",
-                        Value = new[] { "1" }
+                        Value = 1D
                     }
                 }
             };
@@ -2561,18 +2619,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2580,7 +2638,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "greater",
                         Type = "double",
-                        Value = new[] { "1.112" }
+                        Value = 1.112D
                     }
                 }
             };
@@ -2597,12 +2655,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void LessClause()
         {
             //expect 2 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2610,7 +2668,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2622,18 +2680,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 1 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -2641,7 +2699,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2653,12 +2711,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -2666,7 +2724,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2680,18 +2738,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -2699,7 +2757,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2712,12 +2770,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2725,7 +2783,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "double",
-                        Value = new[] { "1.13" }
+                        Value = 1.13D
                     }
                 }
             };
@@ -2739,18 +2797,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable boolean field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2758,7 +2816,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less",
                         Type = "double",
-                        Value = new[] { "1.113" }
+                        Value = "1.113"
                     }
                 }
             };
@@ -2775,12 +2833,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void LessOrEqualClause()
         {
             //expect 3 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2788,7 +2846,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = "2"
                     }
                 }
             };
@@ -2800,18 +2858,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when non-numeric value is encountered in integer comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                contentIdFilter.Rules.First().Value = new[] { "hello" };
+                contentIdFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(contentIdFilter).ToList();
 
             });
 
             //expect 2 entries to match for an integer comparison
-            var nullableContentIdFilter = new QueryBuilderFilterRule
+            var nullableContentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "NullableContentTypeId",
@@ -2819,7 +2877,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = "2"
                     }
                 }
             };
@@ -2831,12 +2889,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 0 entries to match for a Date comparison
-            var lastModifiedFilter = new QueryBuilderFilterRule
+            var lastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModified",
@@ -2844,7 +2902,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2858,18 +2916,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                lastModifiedFilter.Rules.First().Value = new[] { "hello" };
+                lastModifiedFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
 
             //expect 3 entries to match for a possibly empty Date comparison
-            var nullableLastModifiedFilter = new QueryBuilderFilterRule
+            var nullableLastModifiedFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "LastModifiedIfPresent",
@@ -2877,7 +2935,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture) }
+                        Value = DateTime.UtcNow.Date.AddDays(1).ToString("d", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -2890,12 +2948,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
             //expect 3 entries to match for a double field
-            var statValueFilter = new QueryBuilderFilterRule
+            var statValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "StatValue",
@@ -2903,7 +2961,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "double",
-                        Value = new[] { "1.13" }
+                        Value = "1.13"
                     }
                 }
             };
@@ -2917,18 +2975,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             //expect failure when an invalid double is encountered in double comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
-                statValueFilter.Rules.First().Value = new[] { "hello" };
+                statValueFilter.Rules.First().Value = "hello";
                 StartingQuery.BuildQuery(statValueFilter).ToList();
 
             });
 
             //expect 2 entries to match for a nullable double field
-            var nullableStatValueFilter = new QueryBuilderFilterRule
+            var nullableStatValueFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "PossiblyEmptyStatValue",
@@ -2936,7 +2994,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "double",
-                        Value = new[] { "1.113" }
+                        Value = "1.113"
                     }
                 }
             };
@@ -2953,12 +3011,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void FilterWithInvalidParameters()
         {
             //expect 3 entries to match for an integer comparison
-            var contentIdFilter = new QueryBuilderFilterRule
+            var contentIdFilter = new JsonNetFilterRule
             {
                 Condition = "and",
-                Rules = new List<QueryBuilderFilterRule>
+                Rules = new List<JsonNetFilterRule>
                 {
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2966,9 +3024,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     },
-                    new QueryBuilderFilterRule
+                    new JsonNetFilterRule
                     {
                         Condition = "and",
                         Field = "ContentTypeId",
@@ -2976,7 +3034,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Input = "NA",
                         Operator = "less_or_equal",
                         Type = "integer",
-                        Value = new[] { "2" }
+                        Value = 2
                     }
                 }
             };
@@ -2989,7 +3047,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
             StartingQuery.BuildQuery(null).ToList();
 
-            StartingQuery.BuildQuery(new QueryBuilderFilterRule()).ToList();
+            StartingQuery.BuildQuery(new JsonNetFilterRule()).ToList();
 
             ExceptionAssert.Throws<Exception>(() =>
             {
@@ -3020,7 +3078,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         [Test]
         public void IndexedExpression_Test()
         {
-            var rule = new QueryBuilderFilterRule
+            var rule = new JsonNetFilterRule
             {
                 Condition = "and",
                 Field = "ContentTypeId",
@@ -3028,14 +3086,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 Input = "NA",
                 Operator = "equal",
                 Type = "integer",
-                Value = new[] { "2" }
+                Value = 2
             };
 
             var result = new List<IndexedClass> { new IndexedClass() }.AsQueryable().BuildQuery(rule,
                 new BuildExpressionOptions() { UseIndexedProperty = true, IndexedPropertyName = "Item" });
             Assert.IsTrue(result.Any());
 
-            rule.Value = new[] { "3" };
+            rule.Value = 3;
             result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
             Assert.IsFalse(result.Any());
         }

@@ -263,7 +263,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
                         propertyExp = Expression.Property(pe, rule.Field);
                     }
-                        
+
                 }
 
                 Expression expression;
@@ -349,11 +349,11 @@ namespace Castle.DynamicLinqQueryBuilder
                 DateTime tDate;
                 if (isCollection)
                 {
-                    if(!(value is string) && value is IEnumerable list)
+                    if (!(value is string) && value is IEnumerable list)
                     {
                         var constants = new List<ConstantExpression>();
 
-                        foreach(object item in list)
+                        foreach (object item in list)
                         {
                             var date = DateTime.TryParse(item.ToString().Trim(), options.CultureInfo,
                                             DateTimeStyles.AdjustToUniversal, out tDate)
@@ -383,6 +383,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 }
                 else
                 {
+                    if (value is Array items) value = items.GetValue(0);
                     return new List<ConstantExpression>()
                     {
                         Expression.Constant(DateTime.TryParse(value.ToString().Trim(), options.CultureInfo,
@@ -400,11 +401,11 @@ namespace Castle.DynamicLinqQueryBuilder
                     var tc = TypeDescriptor.GetConverter(type);
                     if (type == typeof(string))
                     {
-                        if(!(value is string) && value is IEnumerable list)
+                        if (!(value is string) && value is IEnumerable list)
                         {
                             var expressions = new List<ConstantExpression>();
 
-                            foreach(object item in list)
+                            foreach (object item in list)
                             {
                                 expressions.Add(Expression.Constant(tc.ConvertFromString(item.ToString()), type));
                             }
@@ -448,10 +449,12 @@ namespace Castle.DynamicLinqQueryBuilder
                 else
                 {
                     var tc = TypeDescriptor.GetConverter(type);
-                    return new List<ConstantExpression>()
-                {
-                    Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, value.ToString().Trim()))
-                };
+                    if (value is Array items) value = items.GetValue(0);
+
+                    return new List<ConstantExpression>
+                    {
+                        Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, value.ToString().Trim()))
+                    };
                 }
             }
 
@@ -530,6 +533,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Contains(Type type, object value, Expression propertyExp)
         {
+            if (value is Array items) value = items.GetValue(0);
+
             var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
@@ -550,6 +555,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression EndsWith(Type type, object value, Expression propertyExp)
         {
+            if (value is Array items) value = items.GetValue(0);
+
             var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
@@ -570,6 +577,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression BeginsWith(Type type, object value, Expression propertyExp)
         {
+            if (value is Array items) value = items.GetValue(0);
+
             var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
@@ -691,8 +700,6 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression In(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-
-
             var someValues = GetConstants(type, value, true, options);
 
             var nullCheck = GetNullCheckExpression(propertyExp);
