@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Castle.DynamicLinqQueryBuilder
 {
     /// <summary>
-    /// This class is used to define a hierarchical filter for a given collection. This type can be serialized/deserialized by JSON.NET without needing to modify the data structure from QueryBuilder.
+    /// This class is used to define a hierarchical filter for a given collection. This type assumes the data structure from QueryBuilder will be convert all Value instances to an array in JS.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class QueryBuilderFilterRule : IFilterRule

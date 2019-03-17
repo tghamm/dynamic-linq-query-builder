@@ -8,7 +8,7 @@ namespace Castle.DynamicLinqQueryBuilder
     /// This class is used to define a hierarchical filter for a given collection.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    [Obsolete("This type is deprecated in favor of QueryBuilderFilterRule or JsonNetFilterRule")]
+    [Obsolete("This type is deprecated in favor of QueryBuilderFilterRule or JsonNetFilterRule - see Wiki for more")]
     public class FilterRule : IFilterRule
     {
         /// <summary>

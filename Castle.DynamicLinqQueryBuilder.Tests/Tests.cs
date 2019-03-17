@@ -3463,6 +3463,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 #pragma warning restore IDE1006 // Naming Styles
             [IgnoreDataMember]
             public int IgnoreField { get; set; }
+            public bool IsOfAge { get; set; }
+
+            public bool? IsOfAge2 { get; set; }
         }
 
         [Test]
@@ -3470,11 +3473,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var result = typeof (ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType();
 
-            Assert.IsTrue(result.Count == 8);
+            Assert.IsTrue(result.Count == 10);
 
             result = typeof(ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType(true);
 
-            Assert.IsTrue(result.Count == 8);
+            Assert.IsTrue(result.Count == 10);
 
         }
 
