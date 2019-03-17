@@ -55,7 +55,7 @@ namespace Castle.DynamicLinqQueryBuilder.Samples.Controllers
 
         //Take the POSTed FilterRule, build query, and return results
         [HttpPost]
-        public JsonResult Index(FilterRule obj)
+        public JsonResult Index(QueryBuilderFilterRule obj)
         {
             var people = PersonBuilder.GetPeople().BuildQuery(obj).ToList();
             return Json(people);
