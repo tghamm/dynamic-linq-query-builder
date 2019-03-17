@@ -48,7 +48,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     type = "string";
                 }
-                else if ((prop.PropertyType == typeof(bool)))
+                else if ((prop.PropertyType == typeof(bool)) || (prop.PropertyType == typeof(bool?)))
                 {
                     type = "boolean";
                 }
