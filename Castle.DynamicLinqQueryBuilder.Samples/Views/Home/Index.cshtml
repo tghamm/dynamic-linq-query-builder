@@ -39,34 +39,34 @@
             }
         });
 
-        var convertArraysToCommaDelimited = function(obj) {
+        var convertSingleValuesToArray = function (obj) {
             if (obj != null) {
                 if (obj.hasOwnProperty("value")) {
-                    if( Object.prototype.toString.call( obj.value ) === '[object Array]' ) {
-                        obj.value = obj.value.join(", ");
+                    if (Object.prototype.toString.call(obj.value) !== '[object Array]') {
+                        obj.value = [obj.value];
                     }
                 }
                 if (obj.hasOwnProperty("rules") && obj.rules != null) {
                     for (var i = 0; i < obj.rules.length; i++) {
-                        convertArraysToCommaDelimited(obj.rules[i]);
+                        convertSingleValuesToArray(obj.rules[i]);
                     }
                 }
             }
         }
+
         var getRules = function() {
             try {
-                var res =  jqueryQueryBuilder.queryBuilder('getRules');
-                convertArraysToCommaDelimited(res);
+                var res = jqueryQueryBuilder.queryBuilder('getRules');
+                convertSingleValuesToArray(res);
                 return res;
             } catch (ex) {
-                //console.log(ex);
                 return null;
             }
         }
-        
+
         var buildTable;
         var filterData = function() {
-            
+
             $.ajax({
                 type: 'POST',
                 url: "../Home/Index",
@@ -80,7 +80,7 @@
                     console && console.log ("request failed");
                 },
                 dataType: "json",
-                contentType: "application/json",            
+                contentType: "application/json",
                 processData: false,
                 async: true
             });
@@ -96,7 +96,7 @@
             $.each(tableData, function(i, reservation) {
                 var tr = $('<tr>');
                 $.each(props, function(i, prop) {
-                    $('<td>').html(reservation[prop]).appendTo(tr);  
+                    $('<td>').html(reservation[prop]).appendTo(tr);
                 });
                 tbody.append(tr);
             });
@@ -108,7 +108,7 @@
 
 
 
-</script>
+    </script>
 }
 
 <div class="jumbotron">
@@ -137,10 +137,8 @@
                     <th>Zip Code</th>
                 </tr>
             </thead>
-            <tbody>
-                
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
-    
+
 </div>

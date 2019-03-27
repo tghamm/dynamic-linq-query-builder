@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Castle.DynamicLinqQueryBuilder
 {
     /// <summary>
-    /// This class is used to define a hierarchical filter for a given collection.
+    /// This class is used to define a hierarchical filter for a given collection. This type assumes the data structure from QueryBuilder will be convert all Value instances to an array in JS.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    [Obsolete("This type is deprecated in favor of QueryBuilderFilterRule or JsonNetFilterRule - see Wiki for more")]
-    public class FilterRule : IFilterRule
+    public class QueryBuilderFilterRule : IFilterRule
     {
         /// <summary>
         /// Condition - acceptable values are "and" and "or".
@@ -52,7 +50,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <value>
         /// The rules.
         /// </value>
-        public List<FilterRule> Rules { get; set; }
+        public List<QueryBuilderFilterRule> Rules { get; set; }
         /// <summary>
         /// Gets or sets the type. Supported values are "integer", "double", "string", "date", "datetime", and "boolean".
         /// </summary>
@@ -66,7 +64,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; set; }
+        public string[] Value { get; set; }
 
         IEnumerable<IFilterRule> IFilterRule.Rules => Rules;
         object IFilterRule.Value => Value;

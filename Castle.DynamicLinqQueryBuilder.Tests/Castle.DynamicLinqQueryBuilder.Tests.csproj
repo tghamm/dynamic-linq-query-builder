@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExceptionAssert.cs" />
+    <Compile Include="JsonNetFilterRuleTests.cs" />
+    <Compile Include="QueryBuilderFilterRuleTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
