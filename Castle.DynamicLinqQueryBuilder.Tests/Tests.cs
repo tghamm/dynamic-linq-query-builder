@@ -3399,6 +3399,35 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
 
         }
+
+        [Test]
+        public void AttemptDateCultureTest()
+        {
+            var startingQuery = GetDateExpressionTreeData().AsQueryable();
+            var contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = "23/02/2016"
+                    }
+                }
+            };
+            var queryable = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter,
+                new BuildExpressionOptions() {CultureInfo = new CultureInfo("en-GB", true)});
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+        }
+
         [Test]
         public void ComparePerformanceOfMethods_Test()
         {

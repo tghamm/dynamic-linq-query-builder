@@ -11,7 +11,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// <summary>
         /// The <see cref="CultureInfo"/> to use when converting string representations (default InvariantCulture).
         /// </summary>
-        public CultureInfo CultureInfo => CultureInfo.InvariantCulture;
+        public CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
 
         /// <summary>
         /// Whether <see cref="DateTime"/> types should be parsed as UTC.
