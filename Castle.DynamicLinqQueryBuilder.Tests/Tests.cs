@@ -3295,6 +3295,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public NestedAddress Address { get; set; }
+            public List<NestedClass> Children { get; set; }
         }
 
         public class NestedAddress
@@ -3321,6 +3322,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 {
                     FirstName = "John",
                     LastName = "Doe",
+                    Children = new List<NestedClass>()
+                    {
+                        new NestedClass()
+                        {
+                            FirstName = "John Jr.",
+                            LastName = "Doe",
+                        }
+                    },
                     Address = new NestedAddress()
                     {
                         Address = "1234 Downing St",
@@ -3338,6 +3347,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 {
                     FirstName = "Jane",
                     LastName = "Doe",
+                    Children = new List<NestedClass>(),
                     Address = new NestedAddress()
                     {
                         Address = "1235 Downing St",
@@ -3379,8 +3389,30 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         }
 
+        [Test]
+        public void TestNestedCollection()
+        {
+            var rule = new FilterRule
+            {
+                Condition = "and",
+                Field = "Children.FirstName",
+                Id = "Children.FirstName",
+                Input = "NA",
+                Operator = "equal",
+                Type = "string",
+                Value = "John Jr.",
+            };
 
-        
+
+            var list = GetNestedClassTest();
+
+            var res = list.BuildQuery(rule).ToList();
+
+            Assert.IsTrue(res.Count == 1);
+        }
+
+
+
         #endregion
 
         #region Misc

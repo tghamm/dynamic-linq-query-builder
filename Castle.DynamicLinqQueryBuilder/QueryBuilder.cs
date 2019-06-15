@@ -243,103 +243,134 @@ namespace Castle.DynamicLinqQueryBuilder
                         throw new Exception($"Unexpected data type {rule.Type}");
                 }
 
-                Expression propertyExp = null;
                 if (options.UseIndexedProperty)
                 {
-                    propertyExp = Expression.Property(pe, options.IndexedPropertyName, Expression.Constant(rule.Field));
+                    var propertyExp = Expression.Property(pe, options.IndexedPropertyName, Expression.Constant(rule.Field));
+                    return BuildOperatorExpression(propertyExp, rule, options, type);
                 }
                 else
                 {
-                    var propertyList = rule.Field.Split('.').ToList();
-                    if (propertyList.Count() > 1)
+                    var propertyList = rule.Field.Split('.');
+                    if (propertyList.Length > 1)
                     {
-                        propertyExp = Expression.Property(pe, propertyList.First());
-                        foreach (var prop in propertyList.Skip(1))
-                        {
-                            propertyExp = Expression.Property(propertyExp, prop);
-                        }
+                        var propertyCollectionEnumerator = propertyList.AsEnumerable().GetEnumerator();
+                        return BuildNestedExpression(pe, propertyCollectionEnumerator, rule, options, type);
                     }
                     else
                     {
-                        propertyExp = Expression.Property(pe, rule.Field);
+                        var propertyExp = Expression.Property(pe, rule.Field);
+                        return BuildOperatorExpression(propertyExp, rule, options, type);
                     }
-
                 }
-
-                Expression expression;
-
-                switch (rule.Operator.ToLower())
-                {
-                    case "in":
-                        expression = In(type, rule.Value, propertyExp, options);
-                        break;
-                    case "not_in":
-                        expression = NotIn(type, rule.Value, propertyExp, options);
-                        break;
-                    case "equal":
-                        expression = Equals(type, rule.Value, propertyExp, options);
-                        break;
-                    case "not_equal":
-                        expression = NotEquals(type, rule.Value, propertyExp, options);
-                        break;
-                    case "between":
-                        expression = Between(type, rule.Value, propertyExp, options);
-                        break;
-                    case "not_between":
-                        expression = NotBetween(type, rule.Value, propertyExp, options);
-                        break;
-                    case "less":
-                        expression = LessThan(type, rule.Value, propertyExp, options);
-                        break;
-                    case "less_or_equal":
-                        expression = LessThanOrEqual(type, rule.Value, propertyExp, options);
-                        break;
-                    case "greater":
-                        expression = GreaterThan(type, rule.Value, propertyExp, options);
-                        break;
-                    case "greater_or_equal":
-                        expression = GreaterThanOrEqual(type, rule.Value, propertyExp, options);
-                        break;
-                    case "begins_with":
-                        expression = BeginsWith(type, rule.Value, propertyExp);
-                        break;
-                    case "not_begins_with":
-                        expression = NotBeginsWith(type, rule.Value, propertyExp);
-                        break;
-                    case "contains":
-                        expression = Contains(type, rule.Value, propertyExp);
-                        break;
-                    case "not_contains":
-                        expression = NotContains(type, rule.Value, propertyExp);
-                        break;
-                    case "ends_with":
-                        expression = EndsWith(type, rule.Value, propertyExp);
-                        break;
-                    case "not_ends_with":
-                        expression = NotEndsWith(type, rule.Value, propertyExp);
-                        break;
-                    case "is_empty":
-                        expression = IsEmpty(propertyExp);
-                        break;
-                    case "is_not_empty":
-                        expression = IsNotEmpty(propertyExp);
-                        break;
-                    case "is_null":
-                        expression = IsNull(propertyExp);
-                        break;
-                    case "is_not_null":
-                        expression = IsNotNull(propertyExp);
-                        break;
-                    default:
-                        throw new Exception($"Unknown expression operator: {rule.Operator}");
-                }
-
-                return expression;
-
-
             }
             return null;
+        }
 
+        private static Expression BuildNestedExpression(Expression expression, IEnumerator<string> propertyCollectionEnumerator, IFilterRule rule, BuildExpressionOptions options, Type type)
+        {
+            while (propertyCollectionEnumerator.MoveNext())
+            {
+                var propertyName = propertyCollectionEnumerator.Current;
+                var property = expression.Type.GetProperty(propertyName);
+                expression = Expression.Property(expression, property);
+
+                var propertyType = property.PropertyType;
+                var enumerable = propertyType.GetInterface("IEnumerable`1");
+                if (propertyType != typeof(string) && enumerable != null)
+                {
+                    var elementType = enumerable.GetGenericArguments()[0];
+                    var predicateFnType = typeof(Func<,>).MakeGenericType(elementType, typeof(bool));
+                    var parameterExpression = Expression.Parameter(elementType);
+
+                    Expression body = BuildNestedExpression(parameterExpression, propertyCollectionEnumerator, rule, options, type);
+                    var predicate = Expression.Lambda(predicateFnType, body, parameterExpression);
+
+                    var queryable = Expression.Call(typeof(Queryable), "AsQueryable", new[] { elementType }, expression);
+
+                    return Expression.Call(
+                        typeof(Queryable),
+                        "Any", 
+                        new[] { elementType },
+                        queryable,
+                        predicate
+                    );
+                }
+            }
+
+            return BuildOperatorExpression(expression, rule, options, type);
+        }
+
+        private static Expression BuildOperatorExpression(Expression propertyExp, IFilterRule rule, BuildExpressionOptions options, Type type)
+        {
+            Expression expression;
+
+            switch (rule.Operator.ToLower())
+            {
+                case "in":
+                    expression = In(type, rule.Value, propertyExp, options);
+                    break;
+                case "not_in":
+                    expression = NotIn(type, rule.Value, propertyExp, options);
+                    break;
+                case "equal":
+                    expression = Equals(type, rule.Value, propertyExp, options);
+                    break;
+                case "not_equal":
+                    expression = NotEquals(type, rule.Value, propertyExp, options);
+                    break;
+                case "between":
+                    expression = Between(type, rule.Value, propertyExp, options);
+                    break;
+                case "not_between":
+                    expression = NotBetween(type, rule.Value, propertyExp, options);
+                    break;
+                case "less":
+                    expression = LessThan(type, rule.Value, propertyExp, options);
+                    break;
+                case "less_or_equal":
+                    expression = LessThanOrEqual(type, rule.Value, propertyExp, options);
+                    break;
+                case "greater":
+                    expression = GreaterThan(type, rule.Value, propertyExp, options);
+                    break;
+                case "greater_or_equal":
+                    expression = GreaterThanOrEqual(type, rule.Value, propertyExp, options);
+                    break;
+                case "begins_with":
+                    expression = BeginsWith(type, rule.Value, propertyExp);
+                    break;
+                case "not_begins_with":
+                    expression = NotBeginsWith(type, rule.Value, propertyExp);
+                    break;
+                case "contains":
+                    expression = Contains(type, rule.Value, propertyExp);
+                    break;
+                case "not_contains":
+                    expression = NotContains(type, rule.Value, propertyExp);
+                    break;
+                case "ends_with":
+                    expression = EndsWith(type, rule.Value, propertyExp);
+                    break;
+                case "not_ends_with":
+                    expression = NotEndsWith(type, rule.Value, propertyExp);
+                    break;
+                case "is_empty":
+                    expression = IsEmpty(propertyExp);
+                    break;
+                case "is_not_empty":
+                    expression = IsNotEmpty(propertyExp);
+                    break;
+                case "is_null":
+                    expression = IsNull(propertyExp);
+                    break;
+                case "is_not_null":
+                    expression = IsNotNull(propertyExp);
+                    break;
+                default:
+                    throw new Exception($"Unknown expression operator: {rule.Operator}");
+            }
+
+            return expression;
         }
 
         private static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
