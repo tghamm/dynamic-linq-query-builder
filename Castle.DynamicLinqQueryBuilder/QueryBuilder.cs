@@ -366,6 +366,12 @@ namespace Castle.DynamicLinqQueryBuilder
                 case "is_not_null":
                     expression = IsNotNull(propertyExp);
                     break;
+                case "is_null_or_empty":
+                    expression = IsNullOrEmpty(propertyExp);
+                    break;
+                case "is_not_null_and_not_empty":
+                    expression = IsNotNullAndNotEmpty(propertyExp);
+                    break;
                 default:
                     throw new Exception($"Unknown expression operator: {rule.Operator}");
             }
@@ -560,6 +566,16 @@ namespace Castle.DynamicLinqQueryBuilder
         private static Expression IsNotEmpty(Expression propertyExp)
         {
             return Expression.Not(IsEmpty(propertyExp));
+        }
+
+        private static Expression IsNullOrEmpty(Expression propertyExp)
+        {
+            return Expression.Or(IsEmpty(propertyExp), IsNull(propertyExp));
+        }
+
+        private static Expression IsNotNullAndNotEmpty(Expression propertyExp)
+        {
+            return Expression.Not(IsNullOrEmpty(propertyExp));
         }
 
         private static Expression Contains(Type type, object value, Expression propertyExp)
