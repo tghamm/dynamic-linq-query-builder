@@ -12,7 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.4.1</Version>
+    <Version>1.1.4.2</Version>
     <Authors>Grant Hamm</Authors>
     <Company>Castle Worldwide, Inc</Company>
     <Product>Dynamic Linq Query Builder</Product>
@@ -23,9 +23,9 @@
     <RepositoryUrl>https://github.com/castle-it/dynamic-linq-query-builder/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-    <PackageReleaseNotes>Adds two operators : is_null_or_empty and is_not_null_and_not_empty.</PackageReleaseNotes>
-    <AssemblyVersion>1.1.4.1</AssemblyVersion>
-    <FileVersion>1.1.4.1</FileVersion>
+    <PackageReleaseNotes>Handling one new type in order to query 'MMdd' formatted dates (anniversarydate)</PackageReleaseNotes>
+    <AssemblyVersion>1.1.4.2</AssemblyVersion>
+    <FileVersion>1.1.4.2</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
