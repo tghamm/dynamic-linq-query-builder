@@ -320,10 +320,10 @@ namespace Castle.DynamicLinqQueryBuilder
                     expression = NotEquals(type, rule.Value, propertyExp, options, rule.Type);
                     break;
                 case "between":
-                    expression = Between(type, rule.Value, propertyExp, options, rule.Type);
+                    expression = Between(type, rule.Value, propertyExp, options);
                     break;
                 case "not_between":
-                    expression = NotBetween(type, rule.Value, propertyExp, options, rule.Type);
+                    expression = NotBetween(type, rule.Value, propertyExp, options);
                     break;
                 case "less":
                     expression = LessThan(type, rule.Value, propertyExp, options);
@@ -668,10 +668,20 @@ namespace Castle.DynamicLinqQueryBuilder
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
             // Handling customized type "anniversarydate" in order to filter on dd/MM formatted dates
-            else if (propertyExp.Type.Equals(typeof(DateTime)) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
+            else if ((propertyExp.Type.Equals(typeof(DateTime)) || propertyExp.Type.Equals(typeof(DateTime?))) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
             {
-                Expression exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Day"));
-                Expression exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Month"));
+                Expression exDayEqual;
+                Expression exMonthEqual;
+                if (propertyExp.Type.Equals(typeof(DateTime?)))
+                {
+                    exDayEqual = Expression.Equal(Expression.Property(Expression.Property(propertyExp, "Value"), "Day"), Expression.Property(Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Value"), "Day"));
+                    exMonthEqual = Expression.Equal(Expression.Property(Expression.Property(propertyExp, "Value"), "Month"), Expression.Property(Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Value"), "Month"));
+                }
+                else
+                {
+                    exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Day"));
+                    exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValue, propertyExp.Type), "Month"));
+                }
 
                 exOut = Expression.And(exDayEqual, exMonthEqual);
             }
@@ -735,25 +745,56 @@ namespace Castle.DynamicLinqQueryBuilder
 
 
         }
+        private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
+        {
+            var someValue = GetConstants(type, value, true, options);
 
+
+            Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
+            Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
+
+            return Expression.And(exBelow, exAbove);
+        }
+
+        #region Bugged Between function to handle anniversarydate type
+        /*
         private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options, string customizedType = null)
         {
             var someValue = GetConstants(type, value, true, options);
+            var nullCheck = GetNullCheckExpression(propertyExp);
             Expression exBelow;
             Expression exAbove;
 
             // Handling customized type "anniversarydate" in order to filter on dd/MM formatted dates
-            if (propertyExp.Type.Equals(typeof(DateTime)) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
+            if ((propertyExp.Type.Equals(typeof(DateTime)) || propertyExp.Type.Equals(typeof(DateTime?))) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
             {
-                int startPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Day")).Compile().DynamicInvoke();
-                int startPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Month")).Compile().DynamicInvoke();
-                                
-                int endPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Day")).Compile().DynamicInvoke();
-                int endPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Month")).Compile().DynamicInvoke();
+                int startPeriodDay, startPeriodMonth, endPeriodDay, endPeriodMonth;
+                MethodCallExpression propertyExpToStringMmDd, startPeriodDayToStringMmDd, endPeriodDayToStringMmDd;
 
-                var propertyExpToStringMmDd = Expression.Call(propertyExp, typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
-                var startPeriodDayToStringMmDd = Expression.Call(Expression.Convert(someValue[0], propertyExp.Type), typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
-                var endPeriodDayToStringMmDd = Expression.Call(Expression.Convert(someValue[1], propertyExp.Type), typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                if (propertyExp.Type.Equals(typeof(DateTime?)))
+                {
+                    startPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Value"), "Day")).Compile().DynamicInvoke();
+                    startPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Value"), "Month")).Compile().DynamicInvoke();
+
+                    endPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Value"), "Day")).Compile().DynamicInvoke();
+                    endPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Value"), "Month")).Compile().DynamicInvoke();
+                    
+                    propertyExpToStringMmDd =  Expression.Call(Expression.Property(propertyExp, "Value"), typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                    startPeriodDayToStringMmDd = Expression.Call(someValue[0], typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                    endPeriodDayToStringMmDd = Expression.Call(someValue[1], typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                }
+                else
+                {
+                    startPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Day")).Compile().DynamicInvoke();
+                    startPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[0], propertyExp.Type), "Month")).Compile().DynamicInvoke();
+
+                    endPeriodDay = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Day")).Compile().DynamicInvoke();
+                    endPeriodMonth = (int)Expression.Lambda(Expression.Property(Expression.Convert(someValue[1], propertyExp.Type), "Month")).Compile().DynamicInvoke();
+
+                    propertyExpToStringMmDd = Expression.Call(propertyExp, typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                    startPeriodDayToStringMmDd = Expression.Call(Expression.Convert(someValue[0], propertyExp.Type), typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                    endPeriodDayToStringMmDd = Expression.Call(Expression.Convert(someValue[1], propertyExp.Type), typeof(DateTime).GetMethod("ToString", new[] { typeof(string) }), Expression.Constant("MMdd"));
+                }
 
                 var propertyExpMmDd = Expression.Call(typeof(int).GetMethod("Parse", new[] { typeof(string) }), propertyExpToStringMmDd);
                 var startPeriodDayMmDd = Expression.Call(typeof(int).GetMethod("Parse", new[] { typeof(string) }), startPeriodDayToStringMmDd);
@@ -780,7 +821,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     exAbove = Expression.And(exGreaterThanStartNextYear, exLessThanEndPeriod);
 
 
-                    return Expression.Or(exBelow, exAbove);
+                    return Expression.AndAlso(nullCheck, Expression.Or(exBelow, exAbove));
                 }
             }
             else
@@ -789,14 +830,14 @@ namespace Castle.DynamicLinqQueryBuilder
                 exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
             }
 
-            return Expression.And(exBelow, exAbove);
-
-
+            return Expression.AndAlso(nullCheck, Expression.And(exBelow, exAbove));
         }
+        */
+        #endregion
 
-        private static Expression NotBetween(Type type, object value, Expression propertyExp, BuildExpressionOptions options, string customizedType = null)
+        private static Expression NotBetween(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            return Expression.Not(Between(type, value, propertyExp, options, customizedType));
+            return Expression.Not(Between(type, value, propertyExp, options));
         }
 
         private static Expression In(Type type, object value, Expression propertyExp, BuildExpressionOptions options, string customizedType = null)
@@ -854,19 +895,45 @@ namespace Castle.DynamicLinqQueryBuilder
                         }
                     }
                     // Handling customized type "anniversarydate" in order to filter on dd/MM formatted dates
-                    else if (propertyExp.Type.Equals(typeof(DateTime)) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
+                    else if ((propertyExp.Type.Equals(typeof(DateTime)) || propertyExp.Type.Equals(typeof(DateTime?))) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
                     {
-                        Expression exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Day"));
-                        Expression exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Month"));
+                        Expression exDayEqual;
+                        Expression exMonthEqual;
+
+                        if (propertyExp.Type.Equals(typeof(DateTime?)))
+                        {
+                            exDayEqual = Expression.Equal(
+                                Expression.Property(Expression.Property(propertyExp, "Value"), "Day"),
+                                Expression.Property(Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Value"), "Day"));
+                            exMonthEqual = Expression.Equal(
+                                Expression.Property(Expression.Property(propertyExp, "Value"), "Month"),
+                                Expression.Property(Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Value"), "Month"));
+                        }
+                        else
+                        {
+                            exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Day"));
+                            exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues[0], propertyExp.Type), "Month"));
+                        }
 
                         exOut = Expression.And(exDayEqual, exMonthEqual);
 
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
-                            exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Day"));
-                            exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Month"));
-
+                            if (propertyExp.Type.Equals(typeof(DateTime?)))
+                            {
+                                exDayEqual = Expression.Equal(
+                                    Expression.Property(Expression.Property(propertyExp, "Value"), "Day"),
+                                    Expression.Property(Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Value"), "Day"));
+                                exMonthEqual = Expression.Equal(
+                                    Expression.Property(Expression.Property(propertyExp, "Value"), "Month"),
+                                    Expression.Property(Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Value"), "Month"));
+                            }
+                            else
+                            {
+                                exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Day"));
+                                exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues[counter], propertyExp.Type), "Month"));
+                            }
                             exOut = Expression.Or(exOut, Expression.And(exDayEqual, exMonthEqual));
                             counter++;
                         }
@@ -896,10 +963,25 @@ namespace Castle.DynamicLinqQueryBuilder
                         exOut = Expression.Equal(exOut, somevalue);
                     }
                     // Handling customized type "anniversarydate" in order to filter on dd/MM formatted dates
-                    else if (propertyExp.Type.Equals(typeof(DateTime)) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
+                    else if ((propertyExp.Type.Equals(typeof(DateTime)) || propertyExp.Type.Equals(typeof(DateTime?))) && !String.IsNullOrEmpty(customizedType) && customizedType.Equals("anniversarydate"))
                     {
-                        Expression exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Day"));
-                        Expression exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Month"));
+                        Expression exDayEqual;
+                        Expression exMonthEqual;
+
+                        if (propertyExp.Type.Equals(typeof(DateTime?)))
+                        {
+                            exDayEqual = Expression.Equal(
+                                Expression.Property(Expression.Property(propertyExp, "Value"), "Day"),
+                                Expression.Property(Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Value"), "Day"));
+                            exMonthEqual = Expression.Equal(
+                                Expression.Property(Expression.Property(propertyExp, "Value"), "Month"),
+                                Expression.Property(Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Value"), "Month"));
+                        }
+                        else
+                        {
+                            exDayEqual = Expression.Equal(Expression.Property(propertyExp, "Day"), Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Day"));
+                            exMonthEqual = Expression.Equal(Expression.Property(propertyExp, "Month"), Expression.Property(Expression.Convert(someValues.First(), propertyExp.Type), "Month"));
+                        }
 
                         exOut = Expression.And(exDayEqual, exMonthEqual);
                     }
