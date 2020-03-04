@@ -236,6 +236,9 @@ namespace Castle.DynamicLinqQueryBuilder
                     case "datetime":
                         type = typeof(DateTime);
                         break;
+                    case "time":
+                        type = typeof(TimeSpan);
+                        break;
                     case "boolean":
                         type = typeof(bool);
                         break;
