@@ -44,6 +44,10 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     type = "date";
                 }
+                else if ((prop.PropertyType == typeof(TimeSpan)) || (prop.PropertyType == typeof(TimeSpan?)))
+                {
+                    type = "time";
+                }
                 else if ((prop.PropertyType == typeof(string)))
                 {
                     type = "string";
@@ -90,7 +94,16 @@ namespace Castle.DynamicLinqQueryBuilder
                             Type = type,
                             Id = id.ToString()
                         });
-                        break;                    
+                        break;    
+                    case "time":
+                        itemBankColumnDefinitions.Add(new ColumnDefinition()
+                        {
+                            Label = title,
+                            Field = name,
+                            Type = type,
+                            Id = id.ToString()
+                        });
+                        break;
                     case "boolean":
                         itemBankColumnDefinitions.Add(new ColumnDefinition()
                         {
