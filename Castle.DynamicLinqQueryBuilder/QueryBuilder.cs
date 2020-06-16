@@ -210,8 +210,8 @@ namespace Castle.DynamicLinqQueryBuilder
                 while (counter < expressions.Count)
                 {
                     expressionTree = rule.Condition.ToLower() == "or"
-                        ? Expression.Or(expressionTree, expressions[counter])
-                        : Expression.And(expressionTree, expressions[counter]);
+                        ? Expression.OrElse(expressionTree, expressions[counter])
+                        : Expression.AndAlso(expressionTree, expressions[counter]);
                     counter++;
                 }
 
