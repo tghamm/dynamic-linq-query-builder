@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Castle.DynamicLinqQueryBuilder
@@ -27,5 +28,10 @@ namespace Castle.DynamicLinqQueryBuilder
         /// The name of indexable property to use.
         /// </summary>
         public string IndexedPropertyName { get; set; }
+
+        /// <summary>
+        /// Custom operators
+        /// </summary>
+        public IEnumerable<IFilterOperator> Operators { get; set; }
     }
 }

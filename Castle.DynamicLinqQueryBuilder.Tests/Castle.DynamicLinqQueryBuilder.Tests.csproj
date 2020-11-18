@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomOperatorsTests.cs" />
     <Compile Include="ExceptionAssert.cs" />
     <Compile Include="JsonNetFilterRuleTests.cs" />
     <Compile Include="QueryBuilderFilterRuleTests.cs" />
