@@ -12,7 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.4</Version>
+    <Version>1.2.0</Version>
     <Authors>Grant Hamm</Authors>
     <Company>Castle Worldwide, Inc</Company>
     <Product>Dynamic Linq Query Builder</Product>
@@ -23,7 +23,7 @@
     <RepositoryUrl>https://github.com/castle-it/dynamic-linq-query-builder/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-    <PackageReleaseNotes>Adds support for nested collections.</PackageReleaseNotes>
+    <PackageReleaseNotes>Adds support for custom operator functions, improves SQL performance.</PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
