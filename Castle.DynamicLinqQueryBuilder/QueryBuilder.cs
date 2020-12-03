@@ -303,8 +303,9 @@ namespace Castle.DynamicLinqQueryBuilder
         private static Expression BuildOperatorExpression(Expression propertyExp, IFilterRule rule, BuildExpressionOptions options, Type type)
         {
             Expression expression;
+            string oper = rule.Operator.ToLower();
 
-            switch (rule.Operator.ToLower())
+            switch (oper)
             {
                 case "in":
                     expression = In(type, rule.Value, propertyExp, options);
@@ -367,6 +368,15 @@ namespace Castle.DynamicLinqQueryBuilder
                     expression = IsNotNull(propertyExp);
                     break;
                 default:
+                    //custom operators support
+                    var operators = options.Operators;
+                    if (operators != null && operators.Count() > 0) {
+                        var customOperator = (from p in operators where p.Operator.ToLower() == oper select p).FirstOrDefault();
+                        if (customOperator != null) {
+                            return customOperator.GetExpression(type, rule, propertyExp, options);
+                        }
+                    }
+
                     throw new Exception($"Unknown expression operator: {rule.Operator}");
             }
 
