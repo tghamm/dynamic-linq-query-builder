@@ -20,6 +20,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             public int ContentTypeId { get; set; }
             public int? NullableContentTypeId { get; set; }
+            public Guid ContentTypeGuid { get; set; }
+            public Guid? NullableContentTypeGuid { get; set; }
             public List<int> Enemies { get; set; }
             public List<string> Flags { get; set; }
             public string ContentTypeName { get; set; }
@@ -45,6 +47,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry1 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 1,
+                ContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Multiple-Choice",
                 Enemies = new List<int>(),
                 Flags = new List<string>(),
@@ -74,6 +77,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry1 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 1,
+                ContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Multiple-Choice",
                 Enemies = new List<int>(),
                 Flags = new List<string>(),
@@ -96,6 +100,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry2 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 2,
+                ContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Multiple-Select",
                 Enemies = null,
                 Flags = null,
@@ -118,6 +123,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry3 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 3,
+                ContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Drag-and-Drop Item",
                 Enemies = new List<int>() { 3391, 3985 },
                 Flags = new List<string>() { "this is a flag" },
@@ -140,6 +146,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry4 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 1,
+                ContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Multiple-Choice",
                 Enemies = new List<int>(),
                 Flags = new List<string>() { "THIS IS A FLAG" },
