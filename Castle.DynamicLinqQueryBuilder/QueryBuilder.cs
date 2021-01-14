@@ -458,7 +458,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             var bracketSplit = value.ToString().Split(new[] { "[", "]" }, StringSplitOptions.RemoveEmptyEntries);
                             var vals =
                                     bracketSplit.SelectMany(v => v.Split(new[] { ",", "\r\n" }, StringSplitOptions.None))
-                                    .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
+                                    .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim('"').Trim())).Select(p =>
                                         Expression.Constant(p, type));
                             return vals.Distinct().ToList();
                         }
@@ -481,7 +481,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             var vals =
                             value.ToString().Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                                 .Where(p => !string.IsNullOrWhiteSpace(p))
-                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
+                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim('"').Trim())).Select(p =>
                                     Expression.Constant(p, type));
                             return vals.ToList();
                         }

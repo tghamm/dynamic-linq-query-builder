@@ -38,7 +38,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         }
 
-        internal static List<ExpressionTreeBuilderTestClass> GetDateExpressionTreeData()
+        public static List<ExpressionTreeBuilderTestClass> GetDateExpressionTreeData()
         {
             var tData = new List<ExpressionTreeBuilderTestClass>();
 
@@ -67,7 +67,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             return tData;
         }
 
-        internal static List<ExpressionTreeBuilderTestClass> GetExpressionTreeData()
+        public static List<ExpressionTreeBuilderTestClass> GetExpressionTreeData()
         {
             var tData = new List<ExpressionTreeBuilderTestClass>();
 
