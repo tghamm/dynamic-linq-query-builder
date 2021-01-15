@@ -219,29 +219,7 @@ namespace Castle.DynamicLinqQueryBuilder
             }
             if (rule.Field != null)
             {
-                Type type;
-
-                switch (rule.Type)
-                {
-                    case "integer":
-                        type = typeof(int);
-                        break;
-                    case "double":
-                        type = typeof(double);
-                        break;
-                    case "string":
-                        type = typeof(string);
-                        break;
-                    case "date":
-                    case "datetime":
-                        type = typeof(DateTime);
-                        break;
-                    case "boolean":
-                        type = typeof(bool);
-                        break;
-                    default:
-                        throw new Exception($"Unexpected data type {rule.Type}");
-                }
+                Type type = GetCSharpType(rule.Type);
 
                 if (options.UseIndexedProperty)
                 {
@@ -264,6 +242,35 @@ namespace Castle.DynamicLinqQueryBuilder
                 }
             }
             return null;
+        }
+
+        public static System.Type GetCSharpType(string typeName)
+        {
+            Type type;
+
+            switch (typeName)
+            {
+                case "integer":
+                    type = typeof(int);
+                    break;
+                case "double":
+                    type = typeof(double);
+                    break;
+                case "string":
+                    type = typeof(string);
+                    break;
+                case "date":
+                case "datetime":
+                    type = typeof(DateTime);
+                    break;
+                case "boolean":
+                    type = typeof(bool);
+                    break;
+                default:
+                    throw new Exception($"Unexpected data type {typeName}");
+            }
+
+            return type;
         }
 
         private static Expression BuildNestedExpression(Expression expression, IEnumerator<string> propertyCollectionEnumerator, IFilterRule rule, BuildExpressionOptions options, Type type)
@@ -458,7 +465,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             var bracketSplit = value.ToString().Split(new[] { "[", "]" }, StringSplitOptions.RemoveEmptyEntries);
                             var vals =
                                     bracketSplit.SelectMany(v => v.Split(new[] { ",", "\r\n" }, StringSplitOptions.None))
-                                    .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim('"').Trim())).Select(p =>
+                                    .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
                                         Expression.Constant(p, type));
                             return vals.Distinct().ToList();
                         }
@@ -481,7 +488,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             var vals =
                             value.ToString().Split(new[] { ",", "[", "]", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                                 .Where(p => !string.IsNullOrWhiteSpace(p))
-                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim('"').Trim())).Select(p =>
+                                .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
                                     Expression.Constant(p, type));
                             return vals.ToList();
                         }
