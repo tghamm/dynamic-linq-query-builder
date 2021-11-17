@@ -3290,6 +3290,17 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         #region NestedObjects
 
+        public class StudentDTO
+        {
+            public int Id { get; set; }
+            public List<SubjectDTO> Subjects { get; set; }
+        }
+        public class SubjectDTO
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
         public class NestedClass
         {
             public string FirstName { get; set; }
@@ -3312,6 +3323,30 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             public double Latitude { get; set; }
             public double Longitude { get; set; }
+        }
+
+        public List<StudentDTO> GetStudents()
+        {
+            List<StudentDTO> list = new List<StudentDTO>();
+            list.Add(new StudentDTO
+            {
+                Id = 1,
+                Subjects = new List<SubjectDTO>
+                    {new SubjectDTO {Id = 1, Name = "Math"}, new SubjectDTO {Id = 1, Name = "Science"}}
+            });
+            list.Add(new StudentDTO
+            {
+                Id = 2,
+                Subjects = new List<SubjectDTO>
+                    {new SubjectDTO {Id = 1, Name = "Math"}, new SubjectDTO {Id = 1, Name = "Science"}}
+            });
+            list.Add(new StudentDTO
+            {
+                Id = 3,
+                Subjects = new List<SubjectDTO>
+                    {new SubjectDTO {Id = 1, Name = "History"}, new SubjectDTO {Id = 1, Name = "Geography"}}
+            });
+            return list;
         }
 
         public List<NestedClass> GetNestedClassTest()
@@ -3392,13 +3427,34 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         [Test]
         public void TestNestedCollection()
         {
+            var searchFilterTest = new QueryBuilderFilterRule()
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>()
+                {
+                    new QueryBuilderFilterRule()
+                    {
+                        Condition = "and",
+                        Field = "Subjects.Name",
+                        Id = "Name",
+                        Operator = "not_equal", //not_equal
+                        Type = "string",
+                        Value = new [] { "Geography" }
+                    }
+                }
+            };
+
+            var data = GetStudents().AsQueryable().BuildQuery(searchFilterTest).ToList();
+
+
+
             var rule = new FilterRule
             {
                 Condition = "and",
                 Field = "Children.FirstName",
                 Id = "Children.FirstName",
                 Input = "NA",
-                Operator = "equal",
+                Operator = "not_equal",
                 Type = "string",
                 Value = "John Jr.",
             };
