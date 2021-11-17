@@ -544,6 +544,55 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(
                 nullableWrappedStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p == 1.112));
+
+            var firstGuid = StartingQuery.First().ContentTypeGuid.ToString();
+            //expect one entry to match for a Guid Comparison
+            var contentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new[] { firstGuid, firstGuid }
+                    }
+                }
+            };
+
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count == 1);
+
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new[] { firstGuid }
+                    }
+                }
+            };
+
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+
         }
 
         [Test]
@@ -1246,6 +1295,52 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 longerTextToFilterList.Select(p => p.LongerTextToFilter.ToLower())
                     .All(p => p.Contains("something interesting")));
 
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = StartingQuery.First().ContentTypeGuid.ToString().Substring(0,5)
+                    }
+                }
+            };
+
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = StartingQuery.First().ContentTypeGuid.ToString().Substring(0, 5)
+                    }
+                }
+            };
+
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
         }
 
         [Test]
@@ -1336,6 +1431,54 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 longerTextToFilterList.Select(p => p.LongerTextToFilter.ToLower())
                     .All(p => p.EndsWith("about this text")));
 
+            var fristGuid = StartingQuery.First().ContentTypeGuid.ToString();
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "ends_with",
+                        Type = "string",
+                        Value = fristGuid.Substring(fristGuid.Length - 5)
+                    }
+                }
+            };
+
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "ends_with",
+                        Type = "string",
+                        Value = fristGuid.Substring(fristGuid.Length - 5)
+                    }
+                }
+            };
+
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+
         }
 
         [Test]
@@ -1395,6 +1538,54 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(
                 longerTextToFilterList.Select(p => p.LongerTextToFilter.ToLower())
                     .All(p => p.StartsWith("there is something")));
+
+            var firstGuid = StartingQuery.First().ContentTypeGuid.ToString();
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "begins_with",
+                        Type = "string",
+                        Value = firstGuid.Substring(0,5)
+                    }
+                }
+            };
+
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "begins_with",
+                        Type = "string",
+                        Value = firstGuid.Substring(0,5)
+                    }
+                }
+            };
+
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
         }
 
@@ -1457,8 +1648,52 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(nullableContentIdFilteredList.Count == 1);
             Assert.IsTrue(nullableContentIdFilteredList.All(p => p.NullableContentTypeId == 1));
 
+            //expect one entry to match for a Guid Comparison
+            var contentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = StartingQuery.First().ContentTypeGuid.ToString()
+                    }
+                }
+            };
+
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count == 1);
 
 
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = StartingQuery.First().ContentTypeGuid.ToString()
+                    }
+                }
+            };
+
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new JsonNetFilterRule

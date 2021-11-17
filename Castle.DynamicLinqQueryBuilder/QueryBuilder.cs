@@ -581,9 +581,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            var method = propertyExp.Type.GetMethod("Contains", new[] { type });
-
-            Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+            var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+            var method = propertyExpString.Type.GetMethod("Contains", new[] { type });
+            Expression exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
             exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
 
@@ -603,9 +603,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            var method = propertyExp.Type.GetMethod("EndsWith", new[] { type });
-
-            Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+            var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+            var method = propertyExpString.Type.GetMethod("EndsWith", new[] { type });
+            Expression exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
             exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
 
@@ -625,9 +625,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
-            var method = propertyExp.Type.GetMethod("StartsWith", new[] { type });
-
-            Expression exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+            var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+            var method = propertyExpString.Type.GetMethod("StartsWith", new[] { type });
+            Expression exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
             exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
 
@@ -657,8 +657,11 @@ namespace Castle.DynamicLinqQueryBuilder
             {
                 var nullCheck = GetNullCheckExpression(propertyExp);
 
-                exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+                exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+
+                var someValueString = Expression.Call(someValue, someValue.Type.GetMethod("ToString", Type.EmptyTypes));
+                someValue = Expression.Call(someValueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
             else
@@ -780,16 +783,22 @@ namespace Castle.DynamicLinqQueryBuilder
                     if (type == typeof(string))
                     {
 
-                        exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var somevalue = Expression.Call(someValues[0], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+                        exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+
+                        var someValueString = Expression.Call(someValues[0], someValues[0].Type.GetMethod("ToString", Type.EmptyTypes));
+                        var somevalue = Expression.Call(someValueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                         exOut = Expression.Equal(exOut, somevalue);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
-                            var nextvalue = Expression.Call(someValues[counter], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+
+                            var nextvalueString = Expression.Call(someValues[counter], someValues[counter].Type.GetMethod("ToString", Type.EmptyTypes));
+                            var nextvalue = Expression.Call(nextvalueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+
                             exOut = Expression.Or(exOut,
                                 Expression.Equal(
-                                    Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes)),
+                                    Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes)),
                                     nextvalue));
                             counter++;
                         }
@@ -813,9 +822,11 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     if (type == typeof(string))
                     {
+                        var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+                        exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
-                        exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var somevalue = Expression.Call(someValues.First(), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        var someValueString = Expression.Call(someValues.First(), someValues.First().Type.GetMethod("ToString", Type.EmptyTypes));
+                        var somevalue = Expression.Call(someValueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                         exOut = Expression.Equal(exOut, somevalue);
                     }
                     else
