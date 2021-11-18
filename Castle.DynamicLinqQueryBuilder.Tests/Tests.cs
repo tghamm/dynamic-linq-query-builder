@@ -3461,7 +3461,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 Field = "Children.FirstName",
                 Id = "Children.FirstName",
                 Input = "NA",
-                Operator = "not_equal",
+                Operator = "equal",
                 Type = "string",
                 Value = "John Jr.",
             };
