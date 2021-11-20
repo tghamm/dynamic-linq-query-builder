@@ -1,4 +1,4 @@
-﻿using Castle.DynamicLinqQueryBuilder.Tests;
+﻿
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Castle.DynamicLinqQueryBuilder.SystemTextJson;
+using Castle.DynamicLinqQueryBuilder.Tests;
 
 namespace Castle.DynamicLinqQueryBuilder.Tests31
 {

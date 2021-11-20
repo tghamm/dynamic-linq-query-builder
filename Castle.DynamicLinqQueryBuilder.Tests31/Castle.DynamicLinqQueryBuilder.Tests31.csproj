@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder.SystemTextJson\Castle.DynamicLinqQueryBuilder.SystemTextJson.csproj" />
     <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder.Tests\Castle.DynamicLinqQueryBuilder.Tests.csproj" />
   </ItemGroup>
 

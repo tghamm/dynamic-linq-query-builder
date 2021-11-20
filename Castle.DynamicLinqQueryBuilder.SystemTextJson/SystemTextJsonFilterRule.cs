@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 
-namespace Castle.DynamicLinqQueryBuilder
+namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
 {
-#if NETSTANDARD2_0
+
     using System.Text.Json;
     public class SystemTextJsonFilterRule : IFilterRule
     {
@@ -134,8 +134,4 @@ namespace Castle.DynamicLinqQueryBuilder
             }
         }
     }
-
-
-
-#endif
 }

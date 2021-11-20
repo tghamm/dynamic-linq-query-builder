@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	  <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	  <ProjectGuid>{22861CF7-71BB-44AF-9630-AC3A59F36838}</ProjectGuid>
+	  <OutputType>Library</OutputType>
+	  <AppDesignerFolder>Properties</AppDesignerFolder>
+	  <RootNamespace>Castle.DynamicLinqQueryBuilder.SystemTextJson</RootNamespace>
+	  <AssemblyName>Castle.DynamicLinqQueryBuilder.SystemTextJson</AssemblyName>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <FileAlignment>512</FileAlignment>
+	  <TargetFrameworkProfile />
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <Version>1.2.2</Version>
+	  <Authors>Grant Hamm</Authors>
+	  <Company>N/A</Company>
+	  <Product>Dynamic Linq Query Builder - System.Text.Json Extension</Product>
+	  <Description>A companion package for those using System.Text.Json</Description>
+	  <Copyright>Copyright Grant Hamm 2021</Copyright>
+	  <PackageLicenseUrl></PackageLicenseUrl>
+	  <PackageProjectUrl>https://github.com/tghamm/dynamic-linq-query-builder/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
+	  <RepositoryType>Git</RepositoryType>
+	  <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
+	  <PackageReleaseNotes>Adds support for custom operator functions, improves SQL performance.</PackageReleaseNotes>
+	  <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder\Castle.DynamicLinqQueryBuilder.csproj" />
+  </ItemGroup>
+
+</Project>
