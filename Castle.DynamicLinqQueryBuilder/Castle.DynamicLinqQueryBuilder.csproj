@@ -19,8 +19,8 @@
     <Description>A simple dynamic expression-tree query builder.  You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter to an arbitrary collection.</Description>
     <Copyright>Copyright Grant Hamm 2021</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/castle-it/dynamic-linq-query-builder/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/castle-it/dynamic-linq-query-builder/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/tghamm/dynamic-linq-query-builder/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
     <PackageReleaseNotes>Adds support for custom operator functions, improves SQL performance.</PackageReleaseNotes>
