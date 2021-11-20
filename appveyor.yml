@@ -10,7 +10,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 environment:
   COVERALLS_REPO_TOKEN:
-    secure: PECtFf6HJFflVqz5CrugJpYntoE7GdTDsBv6HhyGoh3x83kRqokRCS7Yj8T4a4ws
+    secure: YZgYgvsaUaZqzM48vp77PPRceyAfLmtrw66B5C6Y9y6zvAPusqxeMyQ0Un9RVAdv
 before_build:
   - nuget restore "Castle.DynamicLinqQueryBuilder.Tests.sln"
 build:

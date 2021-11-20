@@ -1,5 +1,5 @@
 # Dynamic Linq Query Builder
-[![Build status](https://ci.appveyor.com/api/projects/status/xylgqn0smrd63lnl/branch/master?svg=true)](https://ci.appveyor.com/project/tghamm/dynamic-linq-query-builder/branch/master) [![Coverage Status](https://coveralls.io/repos/castle-it/dynamic-linq-query-builder/badge.svg?branch=master&service=github)](https://coveralls.io/github/castle-it/dynamic-linq-query-builder?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/tghamm/dynamic-linq-query-builder/badge.svg?branch=master)](https://coveralls.io/github/tghamm/dynamic-linq-query-builder?branch=master) [![Coverage Status](https://coveralls.io/repos/github/tghamm/dynamic-linq-query-builder/badge.svg?branch=master)](https://coveralls.io/github/tghamm/dynamic-linq-query-builder?branch=master)
 
 `dynamic-linq-query-builder` is a small library that allows any `.Net` framework class collection to be filtered dynamically at runtime.  
 
@@ -40,9 +40,9 @@ Installation
 ```
 PM> Install-Package Castle.DynamicLinqQueryBuilder
 ```
-To Install the `System.Text.Json` extension:
+To Install the System.Text.Json extension:
 --
-`dynamic-linq-query-builder` can be installed via the nuget UI (as Castle.DynamicLinqQueryBuilder.SystemTextJson), or via the nuget package manager console:
+`dynamic-linq-query-builder-system-text-json` can be installed via the nuget UI (as Castle.DynamicLinqQueryBuilder.SystemTextJson), or via the nuget package manager console:
 ```
 PM> Install-Package Castle.DynamicLinqQueryBuilder.SystemTextJson
 ```
