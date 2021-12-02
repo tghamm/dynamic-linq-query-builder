@@ -558,14 +558,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "ContentTypeGuid",
                         Id = "ContentTypeGuid",
                         Input = "NA",
-                        Operator = "in",
+                        Operator = "in_guid",
                         Type = "string",
                         Value = new[] { firstGuid, firstGuid }
                     }
                 }
             };
-
-            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            var options = new BuildExpressionOptions();
+            options.Operators = new List<IFilterOperator>() { new CustomOperatorsTests.GuidInOperator() };
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter, options).ToList();
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count == 1);
 
@@ -582,14 +583,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "NullableContentTypeGuid",
                         Id = "NullableContentTypeGuid",
                         Input = "NA",
-                        Operator = "in",
+                        Operator = "in_guid",
                         Type = "string",
                         Value = new[] { firstGuid }
                     }
                 }
             };
 
-            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
             Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
@@ -1307,14 +1308,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "ContentTypeGuid",
                         Id = "ContentTypeGuid",
                         Input = "NA",
-                        Operator = "contains",
+                        Operator = "contains_guid",
                         Type = "string",
                         Value = StartingQuery.First().ContentTypeGuid.ToString().Substring(0,5)
                     }
                 }
             };
-
-            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            var options = new BuildExpressionOptions();
+            options.Operators = new List<IFilterOperator>() { new CustomOperatorsTests.GuidContainsOperator() };
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter, options).ToList();
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
@@ -1331,14 +1333,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "NullableContentTypeGuid",
                         Id = "NullableContentTypeGuid",
                         Input = "NA",
-                        Operator = "contains",
+                        Operator = "contains_guid",
                         Type = "string",
                         Value = StartingQuery.First().ContentTypeGuid.ToString().Substring(0, 5)
                     }
                 }
             };
 
-            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
             Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
         }
@@ -1444,14 +1446,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "ContentTypeGuid",
                         Id = "ContentTypeGuid",
                         Input = "NA",
-                        Operator = "ends_with",
+                        Operator = "ends_with_guid",
                         Type = "string",
                         Value = fristGuid.Substring(fristGuid.Length - 5)
                     }
                 }
             };
-
-            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            var options = new BuildExpressionOptions();
+            options.Operators = new List<IFilterOperator>() { new CustomOperatorsTests.GuidEndsWithOperator() };
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter, options).ToList();
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
@@ -1468,14 +1471,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "NullableContentTypeGuid",
                         Id = "NullableContentTypeGuid",
                         Input = "NA",
-                        Operator = "ends_with",
+                        Operator = "ends_with_guid",
                         Type = "string",
                         Value = fristGuid.Substring(fristGuid.Length - 5)
                     }
                 }
             };
 
-            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
             Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
@@ -1552,14 +1555,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "ContentTypeGuid",
                         Id = "ContentTypeGuid",
                         Input = "NA",
-                        Operator = "begins_with",
+                        Operator = "begins_with_guid",
                         Type = "string",
                         Value = firstGuid.Substring(0,5)
                     }
                 }
             };
-
-            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            var options = new BuildExpressionOptions();
+            options.Operators = new List<IFilterOperator>() { new CustomOperatorsTests.GuidBeginsWithOperator() };
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter, options).ToList();
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
@@ -1576,14 +1580,13 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "NullableContentTypeGuid",
                         Id = "NullableContentTypeGuid",
                         Input = "NA",
-                        Operator = "begins_with",
+                        Operator = "begins_with_guid",
                         Type = "string",
                         Value = firstGuid.Substring(0,5)
                     }
                 }
             };
-
-            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
             Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
@@ -1660,14 +1663,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "ContentTypeGuid",
                         Id = "ContentTypeGuid",
                         Input = "NA",
-                        Operator = "equal",
+                        Operator = "equal_guid",
                         Type = "string",
                         Value = StartingQuery.First().ContentTypeGuid.ToString()
                     }
                 }
             };
-
-            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter).ToList();
+            var options = new BuildExpressionOptions();
+            options.Operators = new List<IFilterOperator>() { new CustomOperatorsTests.GuidEqualsOperator() };
+            var contentGuidFilteredList = StartingQuery.BuildQuery(contentGuidFilter, options).ToList();
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count == 1);
 
@@ -1684,14 +1688,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         Field = "NullableContentTypeGuid",
                         Id = "NullableContentTypeGuid",
                         Input = "NA",
-                        Operator = "equal",
+                        Operator = "equal_guid",
                         Type = "string",
                         Value = StartingQuery.First().ContentTypeGuid.ToString()
                     }
                 }
             };
 
-            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
             Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
 
