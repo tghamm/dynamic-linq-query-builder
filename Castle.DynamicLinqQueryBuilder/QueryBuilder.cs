@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Castle.DynamicLinqQueryBuilder
 {
@@ -391,7 +392,7 @@ namespace Castle.DynamicLinqQueryBuilder
             return expression;
         }
 
-        public static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
+        public static HashSet<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
         {
             if (type == typeof(DateTime) && (options.ParseDatesAsUtc || ParseDatesAsUtc))
             {
@@ -400,7 +401,7 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     if (!(value is string) && value is IEnumerable list)
                     {
-                        var constants = new List<ConstantExpression>();
+                        var constants = new HashSet<ConstantExpression>();
 
                         foreach (object item in list)
                         {
@@ -427,13 +428,19 @@ namespace Castle.DynamicLinqQueryBuilder
                                                 tDate
                                             : null).Select(p =>
                                                 Expression.Constant(p, type));
-                        return vals.ToList();
+                        var hs = new HashSet<ConstantExpression>();
+                        foreach (var val in vals)
+                        {
+                            hs.Add(val);
+                        }
+
+                        return hs;
                     }
                 }
                 else
                 {
                     if (value is Array items) value = items.GetValue(0);
-                    return new List<ConstantExpression>()
+                    return new HashSet<ConstantExpression>()
                     {
                         Expression.Constant(DateTime.TryParse(value.ToString().Trim(), options.CultureInfo,
                             DateTimeStyles.AdjustToUniversal, out tDate)
@@ -452,7 +459,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
                         if (!(value is string) && value is IEnumerable list)
                         {
-                            var expressions = new List<ConstantExpression>();
+                            var expressions = new HashSet<ConstantExpression>();
 
                             foreach (object item in list)
                             {
@@ -468,14 +475,19 @@ namespace Castle.DynamicLinqQueryBuilder
                                     bracketSplit.SelectMany(v => v.Split(new[] { ",", "\r\n" }, StringSplitOptions.None))
                                     .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
                                         Expression.Constant(p, type));
-                            return vals.Distinct().ToList();
+                            var hs = new HashSet<ConstantExpression>();
+                            foreach (var val in vals)
+                            {
+                                hs.Add(val);
+                            }
+                            return hs;
                         }
                     }
                     else
                     {
                         if (!(value is string) && value is IEnumerable list)
                         {
-                            var expressions = new List<ConstantExpression>();
+                            var expressions = new HashSet<ConstantExpression>();
 
                             foreach (object item in list)
                             {
@@ -491,7 +503,12 @@ namespace Castle.DynamicLinqQueryBuilder
                                 .Where(p => !string.IsNullOrWhiteSpace(p))
                                 .Select(p => tc.ConvertFromString(null, options.CultureInfo, p.Trim())).Select(p =>
                                     Expression.Constant(p, type));
-                            return vals.ToList();
+                            var hs = new HashSet<ConstantExpression>();
+                            foreach (var val in vals)
+                            {
+                                hs.Add(val);
+                            }
+                            return hs;
                         }
                     }
                 }
@@ -500,7 +517,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     var tc = TypeDescriptor.GetConverter(type);
                     if (value is Array items) value = items.GetValue(0);
 
-                    return new List<ConstantExpression>
+                    return new HashSet<ConstantExpression>
                     {
                         Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, value.ToString().Trim()))
                     };
@@ -739,8 +756,8 @@ namespace Castle.DynamicLinqQueryBuilder
             var someValue = GetConstants(type, value, true, options);
 
 
-            Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
-            Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
+            Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue.ElementAt(0), propertyExp.Type));
+            Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue.ElementAt(0), propertyExp.Type));
 
             return Expression.And(exBelow, exAbove);
 
@@ -766,12 +783,12 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 if (someValues.Count > 1)
                 {
-                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
+                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.ElementAt(0), genericType));
                     var counter = 1;
                     while (counter < someValues.Count)
                     {
                         exOut = Expression.Or(exOut,
-                            Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType)));
+                            Expression.Call(propertyExp, method, Expression.Convert(someValues.ElementAt(counter), genericType)));
                         counter++;
                     }
                 }
@@ -793,13 +810,13 @@ namespace Castle.DynamicLinqQueryBuilder
                     {
 
                         exOut = Expression.Call(propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var somevalue = Expression.Call(someValues[0], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        var somevalue = Expression.Call(someValues.ElementAt(0), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                         exOut = Expression.Equal(exOut, somevalue);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
 
-                            var nextvalue = Expression.Call(someValues[counter], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                            var nextvalue = Expression.Call(someValues.ElementAt(counter), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
                             exOut = Expression.Or(exOut,
                                 Expression.Equal(
@@ -810,14 +827,29 @@ namespace Castle.DynamicLinqQueryBuilder
                     }
                     else
                     {
-                        exOut = Expression.Equal(propertyExp, Expression.Convert(someValues[0], propertyExp.Type));
-                        var counter = 1;
-                        while (counter < someValues.Count)
+                        var tc = TypeDescriptor.GetConverter(type);
+                        //var hs = Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(type));
+                        var hs = new HashSet<int>();
+                        foreach (object item in value as IEnumerable)
                         {
-                            exOut = Expression.Or(exOut,
-                                Expression.Equal(propertyExp, Expression.Convert(someValues[counter], propertyExp.Type)));
-                            counter++;
+                            ((dynamic)hs).Add((dynamic)tc.ConvertFromString(item.ToString()));
                         }
+                        var hs2 = hs as HashSet<int>;
+                        var temp = hs.GetType()
+                            .GetMethod("Contains", new[] {hs.GetType().GetGenericArguments().First()});
+                        Expression<Func<HashSet<int>>> e = () => hs2;
+                        //var param = Expression.Parameter(hs.GetType(), "j");
+                        //var assign = Expression.Assign(param, e.Body);
+                        exOut = Expression.Call(e.Body, temp, propertyExp);
+
+                        //exOut = Expression.Equal(propertyExp, Expression.Convert(someValues.ElementAt(0), propertyExp.Type));
+                        //var counter = 1;
+                        //while (counter < someValues.Count)
+                        //{
+                        //    exOut = Expression.Or(exOut,
+                        //        Expression.Equal(propertyExp, Expression.Convert(someValues.ElementAt(counter), propertyExp.Type)));
+                        //    counter++;
+                        //}
                     }
 
 

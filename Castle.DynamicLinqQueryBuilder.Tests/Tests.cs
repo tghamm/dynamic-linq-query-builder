@@ -3478,6 +3478,54 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
         #endregion
 
+        #region Performance
+
+        public class NumberContainer
+        {
+            public int PossibleNumber { get; set; }
+        }
+        [Test]
+        public void ProfileLargeInTest()
+        {
+            var largeList = new List<NumberContainer>();
+            var rnd = new Random();
+            for (var x = 0; x < 1200000; x++)
+            {
+                largeList.Add(new NumberContainer() { PossibleNumber = rnd.Next(0,500)});
+            }
+
+            var seedList = new List<int>();
+            for (int i = 1; i < 501; i++)
+            {
+                seedList.Add(i);
+            }
+
+            seedList = seedList.OrderBy(x => rnd.Next()).Take(50).ToList();
+            var filter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "PossibleNumber",
+                        Id = "PossibleNumber",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = seedList.Select(p => p.ToString()).ToArray()
+                    }
+                }
+            };
+            var dt1 = DateTime.UtcNow;
+            var res = largeList.AsQueryable().BuildQuery(filter).ToList();
+            var dt2 = DateTime.UtcNow;
+            var elapsed = (dt2 - dt1).TotalMilliseconds;
+            Debug.WriteLine(elapsed);
+        }
+        #endregion
+
         #region Misc
         [Test]
         public void Build_Query_Null_Test()

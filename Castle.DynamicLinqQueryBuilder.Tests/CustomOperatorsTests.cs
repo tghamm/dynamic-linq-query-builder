@@ -184,12 +184,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
 
                     if (someValues.Count > 1)
                     {
-                        exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
+                        exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.ElementAt(0), genericType));
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
                             exOut = Expression.Or(exOut,
-                                Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType)));
+                                Expression.Call(propertyExp, method, Expression.Convert(someValues.ElementAt(counter), genericType)));
                             counter++;
                         }
                     }
@@ -213,14 +213,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                             var propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                             exOut = Expression.Call(propertyExpString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
-                            var someValueString = Expression.Call(someValues[0], someValues[0].Type.GetMethod("ToString", Type.EmptyTypes));
+                            var someValueString = Expression.Call(someValues.ElementAt(0), someValues.ElementAt(0).Type.GetMethod("ToString", Type.EmptyTypes));
                             var somevalue = Expression.Call(someValueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                             exOut = Expression.Equal(exOut, somevalue);
                             var counter = 1;
                             while (counter < someValues.Count)
                             {
 
-                                var nextvalueString = Expression.Call(someValues[counter], someValues[counter].Type.GetMethod("ToString", Type.EmptyTypes));
+                                var nextvalueString = Expression.Call(someValues.ElementAt(counter), someValues.ElementAt(counter).Type.GetMethod("ToString", Type.EmptyTypes));
                                 var nextvalue = Expression.Call(nextvalueString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
 
                                 exOut = Expression.Or(exOut,
@@ -232,12 +232,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                         }
                         else
                         {
-                            exOut = Expression.Equal(propertyExp, Expression.Convert(someValues[0], propertyExp.Type));
+                            exOut = Expression.Equal(propertyExp, Expression.Convert(someValues.ElementAt(0), propertyExp.Type));
                             var counter = 1;
                             while (counter < someValues.Count)
                             {
                                 exOut = Expression.Or(exOut,
-                                    Expression.Equal(propertyExp, Expression.Convert(someValues[counter], propertyExp.Type)));
+                                    Expression.Equal(propertyExp, Expression.Convert(someValues.ElementAt(counter), propertyExp.Type)));
                                 counter++;
                             }
                         }
