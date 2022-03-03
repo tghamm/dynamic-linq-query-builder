@@ -266,6 +266,9 @@ namespace Castle.DynamicLinqQueryBuilder
                 case "boolean":
                     type = typeof(bool);
                     break;
+                case "guid":
+                    type = typeof(bool);
+                    break;
                 default:
                     throw new Exception($"Unexpected data type {typeName}");
             }
