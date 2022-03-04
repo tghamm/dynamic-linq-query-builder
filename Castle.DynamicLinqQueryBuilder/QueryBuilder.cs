@@ -297,10 +297,10 @@ namespace Castle.DynamicLinqQueryBuilder
 
                     var queryable = Expression.Call(typeof(Queryable), "AsQueryable", new[] { elementType }, expression);
 
-                    
+
                     return Expression.Call(
                         typeof(Queryable),
-                        "Any", 
+                        "Any",
                         new[] { elementType },
                         queryable,
                         predicate
@@ -381,9 +381,11 @@ namespace Castle.DynamicLinqQueryBuilder
                 default:
                     //custom operators support
                     var operators = options.Operators;
-                    if (operators != null && operators.Count() > 0) {
+                    if (operators != null && operators.Count() > 0)
+                    {
                         var customOperator = (from p in operators where p.Operator.ToLower() == oper select p).FirstOrDefault();
-                        if (customOperator != null) {
+                        if (customOperator != null)
+                        {
                             return customOperator.GetExpression(type, rule, propertyExp, options);
                         }
                     }
@@ -575,9 +577,24 @@ namespace Castle.DynamicLinqQueryBuilder
             }
             else
             {
-                exOut = Expression.Property(propertyExp, typeof(string).GetProperty("Length"));
+                MethodCallExpression propertyExpString = null;
 
-                exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
+                if (propertyExp.Type.UnderlyingSystemType.Name == "Guid"
+                    || Nullable.GetUnderlyingType(propertyExp.Type)?.Name == "Guid")
+                {
+                    propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
+                }
+
+                exOut = Expression.Property(propertyExpString ?? propertyExp, typeof(string).GetProperty("Length"));
+
+                if (propertyExpString == null)
+                {
+                    exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
+                }
+                else
+                {
+                    exOut = Expression.Equal(exOut, someValue);
+                }
             }
 
             return exOut;
