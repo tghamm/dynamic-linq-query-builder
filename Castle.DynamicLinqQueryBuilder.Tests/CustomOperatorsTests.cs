@@ -36,6 +36,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
     }
 
 
+    // No need of custom operator for GUID anymore.
     [ExcludeFromCodeCoverage]
     [TestFixture]
     public class CustomOperatorsTests
