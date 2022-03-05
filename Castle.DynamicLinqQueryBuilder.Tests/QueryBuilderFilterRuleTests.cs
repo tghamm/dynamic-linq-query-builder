@@ -1331,7 +1331,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             var nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1349,12 +1349,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1374,7 +1373,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             };
             nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
         }
 
         [Test]
@@ -1513,7 +1512,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             var nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1531,12 +1530,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1554,10 +1552,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
         }
 
         [Test]
@@ -1666,7 +1663,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count >= 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             var nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1684,12 +1681,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1707,10 +1703,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
         }
 
         [Test]
@@ -1818,7 +1813,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(contentGuidFilteredList != null);
             Assert.IsTrue(contentGuidFilteredList.Count == 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             var nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1836,12 +1831,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                     }
                 }
             };
-
             var nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter, options).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
-            //expect no entry to match for a Guid Comparison against a null nullable Id
+            //expect one match for a Guid Comparison against a null nullable Id
             nullableContentGuidFilter = new QueryBuilderFilterRule
             {
                 Condition = "and",
@@ -1861,7 +1855,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             };
             nullableContentGuidFilteredList = StartingQuery.BuildQuery(nullableContentGuidFilter).ToList();
             Assert.IsTrue(nullableContentGuidFilteredList != null);
-            Assert.IsTrue(nullableContentGuidFilteredList.Count == 0);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new QueryBuilderFilterRule
