@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests
+namespace Castle.DynamicLinqQueryBuilder.Tests.Helpers
 {
     [ExcludeFromCodeCoverage]
     public static class ExceptionAssert

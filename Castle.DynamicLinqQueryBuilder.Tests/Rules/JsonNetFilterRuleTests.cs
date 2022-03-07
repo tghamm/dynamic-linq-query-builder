@@ -1,11 +1,12 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using Castle.DynamicLinqQueryBuilder.Tests.Helpers;
+using NUnit.Framework;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests
+namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]

@@ -1,9 +1,9 @@
 # Dynamic Linq Query Builder
-[![Build status](https://ci.appveyor.com/api/projects/status/f9jwqajaoshj0uy7?svg=true)](https://ci.appveyor.com/project/tghamm/dynamic-linq-query-builder-p2tii) [![Coverage Status](https://coveralls.io/repos/github/tghamm/dynamic-linq-query-builder/badge.svg?branch=master)](https://coveralls.io/github/tghamm/dynamic-linq-query-builder?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/f9jwqajaoshj0uy7?svg=true)](https://ci.appveyor.com/project/tghamm/dynamic-linq-query-builder-p2tii) [![Coverage Status](https://coveralls.io/repos/github/tghamm/dynamic-linq-query-builder/badge.svg?branch=master)](https://coveralls.io/github/tghamm/dynamic-linq-query-builder?branch=master) [![Nuget](https://img.shields.io/nuget/dt/Castle.DynamicLinqQueryBuilder)](https://www.nuget.org/packages/Castle.DynamicLinqQueryBuilder/)
 
 `dynamic-linq-query-builder` is a small library that allows any `.Net` framework class collection to be filtered dynamically at runtime.  
 
-Features (v1.2.3)
+Features (v1.2.4)
 --
 * Generates an `IQueryable` from any collection and filter combination
 * Capable of complex, grouped queries against as many fields as you want

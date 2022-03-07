@@ -1,30 +1,28 @@
-﻿
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using Castle.DynamicLinqQueryBuilder.SystemTextJson;
-using Castle.DynamicLinqQueryBuilder.Tests;
+using NUnit.Framework;
+using ExceptionAssert = Castle.DynamicLinqQueryBuilder.Tests.Helpers.ExceptionAssert;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests31
+namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]
 
     class SystemTextJsonTests
     {
-        IQueryable<Tests.Tests.ExpressionTreeBuilderTestClass> StartingQuery;
-        IQueryable<Tests.Tests.ExpressionTreeBuilderTestClass> StartingDateQuery;
+        IQueryable<Rules.Tests.ExpressionTreeBuilderTestClass> StartingQuery;
+        IQueryable<Rules.Tests.ExpressionTreeBuilderTestClass> StartingDateQuery;
 
         [SetUp]
         public void Setup()
         {
-            StartingQuery = Tests.Tests.GetExpressionTreeData().AsQueryable();
-            StartingDateQuery = Tests.Tests.GetDateExpressionTreeData().AsQueryable();
+            StartingQuery = Rules.Tests.GetExpressionTreeData().AsQueryable();
+            StartingDateQuery = Rules.Tests.GetDateExpressionTreeData().AsQueryable();
         }
 
         #region Wrapper
@@ -49,6 +47,404 @@ namespace Castle.DynamicLinqQueryBuilder.Tests31
         {
             return JsonSerializer.Deserialize<SystemTextJsonFilterRule>(JsonSerializer.Serialize(rule));
         }
+
+        [Test]
+        public void SystemTextJsonIntegerHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = JsonSerializer.SerializeToElement(new[] { 1, 2 })
+                    }
+                }
+            };
+
+            var queryable = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeId",
+                        Id = "ContentTypeId",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = JsonSerializer.SerializeToElement(new[] { "1", "2" })
+                    }
+                }
+            };
+
+            var queryable2 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var contentIdFilteredList2 = queryable2.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 1);
+
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonDoubleHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DoubleList",
+                        Id = "DoubleList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "double",
+                        Value = JsonSerializer.SerializeToElement(new[] { 1.84 })
+                    }
+                }
+            };
+
+            var queryable = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 3);
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DoubleList",
+                        Id = "DoubleList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "double",
+                        Value = JsonSerializer.SerializeToElement(new[] { "1.84" })
+                    }
+                }
+            };
+
+            var queryable2 = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var contentIdFilteredList2 = queryable2.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 3);
+
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonStringHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeName",
+                        Id = "ContentTypeName",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = JsonSerializer.SerializeToElement(new[] { "Multiple-Choice" })
+                    }
+                }
+            };
+
+            var queryable = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 2);
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeName",
+                        Id = "ContentTypeName",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = JsonSerializer.SerializeToElement("Multiple-Choice")
+                    }
+                }
+            };
+
+            var queryable2 = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var contentIdFilteredList2 = queryable2.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 2);
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonBoolHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "IsPossiblyNotSetBool",
+                        Id = "IsPossiblyNotSetBool",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "boolean",
+                        Value = JsonSerializer.SerializeToElement(new[] { false })
+                    }
+                }
+            };
+
+            var queryable = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "IsPossiblyNotSetBool",
+                        Id = "IsPossiblyNotSetBool",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "boolean",
+                        Value = JsonSerializer.SerializeToElement("true")
+                    }
+                }
+            };
+
+            var queryable2 = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var contentIdFilteredList2 = queryable2.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 2);
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonGuidHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "guid",
+                        Value = JsonSerializer.SerializeToElement(new[] { StartingQuery.Last().ContentTypeGuid })
+                    }
+                }
+            };
+
+            var queryable = StartingQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonErrorHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "non-type",
+                        Value = JsonSerializer.SerializeToElement(new[] { StartingQuery.Last().ContentTypeGuid })
+                    }
+                }
+            };
+
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                var shouldThrow = contentIdFilter.Rules.First().Value;
+            });
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "guid",
+                        Value = JsonSerializer.SerializeToElement(new[] { "totally invalid guid" })
+                    }
+                }
+            };
+
+            ExceptionAssert.Throws<InvalidCastException>(() =>
+            {
+                var shouldThrow = contentIdFilter2.Rules.First().Value;
+            });
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
+        [Test]
+        public void SystemTextJsonDateHandling()
+        {
+            QueryBuilder.ParseDatesAsUtc = true;
+            var contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "date",
+                        Value = JsonSerializer.SerializeToElement(new[] { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal) })
+                    }
+                }
+            };
+
+            var queryable = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            var contentIdFilter2 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "date",
+                        Value = JsonSerializer.SerializeToElement("2/23/2016")
+                    }
+                }
+            };
+
+            var queryable2 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var contentIdFilteredList2 = queryable2.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 1);
+
+            var contentIdFilter3 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "datetime",
+                        Value = JsonSerializer.SerializeToElement(new[] { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal) })
+                    }
+                }
+            };
+
+            var queryable3 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter3);
+            var contentIdFilteredList3 = queryable3.ToList();
+            Assert.IsTrue(contentIdFilteredList3 != null);
+            Assert.IsTrue(contentIdFilteredList3.Count == 1);
+
+            var contentIdFilter4 = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "date",
+                        Value = JsonSerializer.SerializeToElement("2/23/2016")
+                    }
+                }
+            };
+
+            var queryable4 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter4);
+            var contentIdFilteredList4 = queryable4.ToList();
+            Assert.IsTrue(contentIdFilteredList4 != null);
+            Assert.IsTrue(contentIdFilteredList4.Count == 1);
+
+            QueryBuilder.ParseDatesAsUtc = false;
+        }
+
         #endregion
 
         #region Expression Tree Builder
@@ -73,7 +469,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests31
                     }
                 }
             };
-            var queryable = StartingDateQuery.BuildQuery<Tests.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var queryable = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
             var contentIdFilteredList = queryable.ToList();
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);

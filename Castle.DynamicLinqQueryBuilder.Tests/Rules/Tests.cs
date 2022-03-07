@@ -5,10 +5,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-
+using Castle.DynamicLinqQueryBuilder.Tests.Helpers;
 using NUnit.Framework;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests
+namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]
