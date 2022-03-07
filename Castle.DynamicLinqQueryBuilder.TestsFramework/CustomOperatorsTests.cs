@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.Serialization;
-using System.Security;
 using NUnit.Framework;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests
+namespace Castle.DynamicLinqQueryBuilder.TestsFramework
 {
     public class MyRecord { 
         public string UserHostAddress { get; set; }

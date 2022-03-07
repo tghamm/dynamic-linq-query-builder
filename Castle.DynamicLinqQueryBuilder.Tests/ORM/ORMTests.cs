@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Castle.DynamicLinqQueryBuilder.Tests31.Database;
+using Castle.DynamicLinqQueryBuilder.Tests.Database;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests31.ORM
+namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture]
     public class ORMTests: IDisposable
     {

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Castle.DynamicLinqQueryBuilder.Tests31.Database
+namespace Castle.DynamicLinqQueryBuilder.Tests.Database
 {
+    [ExcludeFromCodeCoverage]
     public class StoreContext: DbContext
     {
         public StoreContext(DbContextOptions<StoreContext> options)
@@ -18,7 +19,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests31.Database
         public DbSet<Store> Stores { get; set; }
         public DbSet<Product> Products { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class StoreContextFactory : IDesignTimeDbContextFactory<StoreContext>
     {
         public StoreContext CreateDbContext(string[] args)
@@ -29,7 +30,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests31.Database
             return new StoreContext(optionsBuilder.Options);
         }
     }
-
+    [ExcludeFromCodeCoverage]
     public class Store
     {
         [Key]
@@ -42,7 +43,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests31.Database
 
         public virtual List<Product> Products { get; set; }
     }
-
+    [ExcludeFromCodeCoverage]
     public class Product
     {
         [Key]
