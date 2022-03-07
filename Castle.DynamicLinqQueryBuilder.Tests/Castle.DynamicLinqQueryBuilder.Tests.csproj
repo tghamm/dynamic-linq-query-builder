@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="altcover" Version="8.2.835" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder.SystemTextJson\Castle.DynamicLinqQueryBuilder.SystemTextJson.csproj" />
-    <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder.TestsFramework\Castle.DynamicLinqQueryBuilder.TestsFramework.csproj" />
   </ItemGroup>
 
 </Project>

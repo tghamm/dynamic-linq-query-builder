@@ -381,16 +381,19 @@ namespace Castle.DynamicLinqQueryBuilder
                 default:
                     //custom operators support
                     var operators = options.Operators;
-                    if (operators != null && operators.Count() > 0)
-                    {
-                        var customOperator = (from p in operators where p.Operator.ToLower() == oper select p).FirstOrDefault();
-                        if (customOperator != null)
-                        {
-                            return customOperator.GetExpression(type, rule, propertyExp, options);
-                        }
-                    }
+                    if (operators == null || operators.Count() <= 0)
+                        throw new Exception($"Unknown expression operator: {rule.Operator}");
 
-                    throw new Exception($"Unknown expression operator: {rule.Operator}");
+                    var customOperator = (from p in operators where p.Operator.ToLower() == oper select p).FirstOrDefault();
+                    if (customOperator != null)
+                    {
+                        expression = customOperator.GetExpression(type, rule, propertyExp, options);
+                    }
+                    else
+                    {
+                        throw new Exception($"Unknown expression operator: {rule.Operator}");
+                    }
+                    break;
             }
 
             return expression;

@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.SystemTextJson", "Castle.DynamicLinqQueryBuilder.SystemTextJson\Castle.DynamicLinqQueryBuilder.SystemTextJson.csproj", "{22861CF7-71BB-44AF-9630-AC3A59F36838}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.DynamicLinqQueryBuilder.TestsFramework", "Castle.DynamicLinqQueryBuilder.TestsFramework\Castle.DynamicLinqQueryBuilder.TestsFramework.csproj", "{AA125B72-F684-4DF0-803D-7CE45C0B915F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.Tests", "Castle.DynamicLinqQueryBuilder.Tests\Castle.DynamicLinqQueryBuilder.Tests.csproj", "{09AFE101-7579-423E-B271-1AEFC76DDCD7}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
