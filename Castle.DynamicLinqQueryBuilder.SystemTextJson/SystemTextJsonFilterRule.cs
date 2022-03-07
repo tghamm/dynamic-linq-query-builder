@@ -129,6 +129,9 @@ namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
                 case "boolean":
                     return element.GetBoolean();
                     break;
+                case "guid":
+                    return element.GetGuid();
+                    break;
                 default:
                     throw new Exception($"Unexpected data type {this.Type}");
             }
