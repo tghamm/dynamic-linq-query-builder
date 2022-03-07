@@ -77,7 +77,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var entry1 = new ExpressionTreeBuilderTestClass()
             {
                 ContentTypeId = 1,
-                ContentTypeGuid = Guid.NewGuid(),
+                ContentTypeGuid = Guid.Empty,
+                NullableContentTypeGuid = Guid.Empty,
                 ContentTypeName = "Multiple-Choice",
                 Enemies = new List<int>(),
                 Flags = new List<string>(),
@@ -101,6 +102,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             {
                 ContentTypeId = 2,
                 ContentTypeGuid = Guid.NewGuid(),
+                NullableContentTypeGuid = Guid.NewGuid(),
                 ContentTypeName = "Multiple-Select",
                 Enemies = null,
                 Flags = null,
@@ -218,8 +220,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             {
                 var contentIdFilteredListNull1 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
             });
-            
-            
+
+
             contentIdFilter = new FilterRule()
             {
                 Condition = "and",
@@ -264,7 +266,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 var contentIdFilteredListNull2 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
 
             });
-            
+
             QueryBuilder.ParseDatesAsUtc = false;
         }
 
@@ -273,6 +275,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+
+            var firstGuid = startingQuery.First().ContentTypeGuid.ToString();
+            //expect one entry to match for a Guid Comparison
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "guid",
+                        Value = new[] { firstGuid, firstGuid }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count == 1);
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "guid",
+                        Value = new[] { firstGuid }
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count == 1);
 
             //expect two entries to match for an integer comparison
             var contentIdFilter = new FilterRule()
@@ -679,6 +726,29 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
 
+            var firstGuid = startingQuery.First().ContentTypeGuid.ToString();
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "not_in",
+                        Type = "guid",
+                        Value = new[] { firstGuid, firstGuid }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentGuidFilter).ToList();
+            Assert.IsNotNull(contentGuidFilteredList);
+            CollectionAssert.IsNotEmpty(contentGuidFilteredList);
+            CollectionAssert.DoesNotContain(contentGuidFilteredList.Select(x => x.ContentTypeGuid), firstGuid);
+
             //expect two entries to match for an integer comparison
             var contentIdFilter = new FilterRule()
             {
@@ -1013,6 +1083,56 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+            var contentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_null",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsNotNull(contentGuidFilteredList);
+            CollectionAssert.IsEmpty(contentGuidFilteredList);
+            Assert.IsTrue(
+                contentGuidFilteredList.Select(p => p.ContentTypeGuid)
+                    .All(p => p == null));
+
+            var nullableContentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_null",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsNotNull(nullableContentGuidFilteredList);
+            CollectionAssert.IsNotEmpty(nullableContentGuidFilteredList);
+            Assert.AreEqual(2, nullableContentGuidFilteredList.Count);
+            Assert.IsTrue(
+                nullableContentGuidFilteredList.Select(p => p.NullableContentTypeGuid)
+                    .All(p => p == null));
+
+
             //expect 1 entries to match for a case-insensitive string comparison (nullable type)
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -1070,6 +1190,52 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void IsNotNullClause()
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
+
+            var contentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_not_null",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var contentGuidFilterList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsNotNull(contentGuidFilterList);
+            Assert.AreEqual(4, contentGuidFilterList.Count);
+            CollectionAssert.AllItemsAreNotNull(contentGuidFilterList.Select(x => x.ContentTypeGuid));
+
+
+            var nullableContentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_not_null",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsNotNull(nullableContentGuidFilteredList);
+            Assert.AreEqual(2, nullableContentGuidFilteredList.Count);
+            CollectionAssert.AllItemsAreNotNull(nullableContentGuidFilteredList.Select(x => x.NullableContentTypeGuid));
+
 
             //expect 3 entries to match for a case-insensitive string comparison (nullable type)
             var longerTextToFilterFilter = new FilterRule()
@@ -1129,6 +1295,58 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+            var contentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_empty",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var contentGuidFilterList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsNotNull(contentGuidFilterList);
+            CollectionAssert.IsNotEmpty(contentGuidFilterList);
+            Assert.AreEqual(1, contentGuidFilterList.Count);
+            Assert.IsTrue(
+                contentGuidFilterList.Select(p => p.NullableContentTypeGuid)
+                    .All(p => p == Guid.Empty));
+
+
+            var nullContentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_empty",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var nullContentGuidFilterList = startingQuery.BuildQuery(nullContentGuidFilter).ToList();
+            Assert.IsNotNull(nullContentGuidFilterList);
+            CollectionAssert.IsNotEmpty(nullContentGuidFilterList);
+            Assert.AreEqual(1, nullContentGuidFilterList.Count);
+            Assert.IsTrue(
+                nullContentGuidFilterList.Select(p => p.NullableContentTypeGuid)
+                    .All(p => p == Guid.Empty));
+
+
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -1159,8 +1377,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 Rules = new List<FilterRule>()
                 {
                     new FilterRule()
-                    {
-                        Condition = "and",
+                    {                        Condition = "and",
                         Field = "DateList",
                         Id = "DateList",
                         Input = "NA",
@@ -1174,7 +1391,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(dateListFilterList != null);
             Assert.IsTrue(dateListFilterList.Count == 0);
             //Assert.IsTrue(dateListFilterList.All(p => !p.DateList.Contains(DateTime.UtcNow.Date.AddDays(-2))));
-
 
 
             //expect 2 entries to match for a List<string> field
@@ -1222,15 +1438,64 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             var intListFilterList = startingQuery.BuildQuery(intListFilter).ToList();
             Assert.IsTrue(intListFilterList != null);
             Assert.IsTrue(intListFilterList.Count == 0);
-
-
-
         }
 
         [Test]
         public void IsNotEmptyClause()
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
+
+            var contentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_not_empty",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var contentGuidFilterList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsNotNull(contentGuidFilterList);
+            CollectionAssert.IsNotEmpty(contentGuidFilterList);
+            Assert.AreEqual(3, contentGuidFilterList.Count);
+            Assert.IsTrue(
+                            contentGuidFilterList.Select(p => p.ContentTypeGuid)
+                                .All(p => p != Guid.Empty));
+
+            var nullContentGuidFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "is_not_empty",
+                        Type = "guid",
+                        Value = ""
+                    }
+                }
+            };
+            var nullContentGuidFilterList = startingQuery.BuildQuery(nullContentGuidFilter).ToList();
+            Assert.IsNotNull(nullContentGuidFilterList);
+            CollectionAssert.IsNotEmpty(nullContentGuidFilterList);
+            Assert.AreEqual(1, nullContentGuidFilterList.Count);
+            CollectionAssert.AllItemsAreNotNull(nullContentGuidFilterList.Select(z => z.NullableContentTypeGuid));
+            Assert.IsTrue(
+                nullContentGuidFilterList.Select(p => p.NullableContentTypeGuid)
+                    .All(p => p != null && p != Guid.Empty));
+
 
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
@@ -1336,6 +1601,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "contains",
+                        Type = "guid",
+                        Value = new[] { startingQuery.First().ContentTypeGuid.ToString().Substring(0,5) }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "contains",
+                        Type = "guid",
+                        Value = new[] { startingQuery.First().ContentTypeGuid.ToString().Substring(0, 5) }
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
+
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -1432,6 +1742,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+            var fristGuid = startingQuery.First().ContentTypeGuid.ToString();
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "ends_with",
+                        Type = "guid",
+                        Value = new[] { fristGuid.Substring(fristGuid.Length - 5) }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "ends_with",
+                        Type = "guid",
+                        Value = new[] { fristGuid.Substring(fristGuid.Length - 5) }
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
+
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -1496,6 +1851,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
 
+            var firstGuid = startingQuery.First().ContentTypeGuid.ToString();
+            //expect at least one entry to match for a Guid Comparison
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "begins_with",
+                        Type = "guid",
+                        Value = new[] { firstGuid.Substring(0,5) }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count >= 1);
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "begins_with",
+                        Type = "guid",
+                        Value = new[] { firstGuid.Substring(0,5) }
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
+
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -1527,6 +1927,50 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void EqualsClause()
         {
             var startingQuery = GetExpressionTreeData().AsQueryable();
+
+            //expect one entry to match for a Guid Comparison
+            var contentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ContentTypeGuid",
+                        Id = "ContentTypeGuid",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = new[] { startingQuery.First().ContentTypeGuid.ToString() }
+                    }
+                }
+            };
+            var contentGuidFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentGuidFilter).ToList();
+            Assert.IsTrue(contentGuidFilteredList != null);
+            Assert.IsTrue(contentGuidFilteredList.Count == 1);
+
+            //expect no entry to match for a Guid Comparison against a null nullable Id
+            var nullableContentGuidFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableContentTypeGuid",
+                        Id = "NullableContentTypeGuid",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = new[] { startingQuery.First().ContentTypeGuid.ToString() }
+                    }
+                }
+            };
+            var nullableContentGuidFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(nullableContentGuidFilter).ToList();
+            Assert.IsTrue(nullableContentGuidFilteredList != null);
+            Assert.IsTrue(nullableContentGuidFilteredList.Count == 1);
 
 
             //expect two entries to match for an integer comparison
@@ -2371,7 +2815,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
             Assert.IsTrue(
                 nullableLastModifiedFilterList.Select(p => p.LastModifiedIfPresent)
-                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2) && p >= DateTime.UtcNow.Date) || p == null ));
+                    .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2) && p >= DateTime.UtcNow.Date) || p == null));
 
 
             //expect 3 entries to match for a double field
@@ -3243,8 +3687,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 Value = "2"
             };
 
-            var result = new List<IndexedClass> {new IndexedClass()}.AsQueryable().BuildQuery(rule,
-                new BuildExpressionOptions() {UseIndexedProperty = true, IndexedPropertyName = "Item"});
+            var result = new List<IndexedClass> { new IndexedClass() }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions() { UseIndexedProperty = true, IndexedPropertyName = "Item" });
             Assert.IsTrue(result.Any());
 
             rule.Value = "3";
@@ -3269,9 +3713,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             };
 
 
-            var predicate = rule.BuildPredicate<IndexedClass>(new BuildExpressionOptions { IndexedPropertyName = "Item", UseIndexedProperty = true});
+            var predicate = rule.BuildPredicate<IndexedClass>(new BuildExpressionOptions { IndexedPropertyName = "Item", UseIndexedProperty = true });
 
-            var result = new[] {new IndexedClass()}.Where(predicate);
+            var result = new[] { new IndexedClass() }.Where(predicate);
             Assert.IsTrue(result.Any());
 
             rule.Value = "3";
@@ -3282,7 +3726,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         public void Build_Predicate_Null_Test()
         {
             FilterRule rule = null;
-            var predicate = rule.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions() {ParseDatesAsUtc = true},
+            var predicate = rule.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions() { ParseDatesAsUtc = true },
                 out _);
 
             var resData = GetExpressionTreeData();
@@ -3323,7 +3767,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             public string State { get; set; }
             public string Zip { get; set; }
             public LatLonPair Location { get; set; }
-            
+
         }
 
         public class LatLonPair
@@ -3517,7 +3961,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
                 }
             };
             var queryable = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter,
-                new BuildExpressionOptions() {CultureInfo = new CultureInfo("en-GB", true)});
+                new BuildExpressionOptions() { CultureInfo = new CultureInfo("en-GB", true) });
             var contentIdFilteredList = queryable.ToList();
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);
@@ -3560,7 +4004,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             sw2.Start();
             var predicate =
                 contentIdFilter.BuildPredicate<ExpressionTreeBuilderTestClass>(new BuildExpressionOptions()
-                    {ParseDatesAsUtc = true});
+                { ParseDatesAsUtc = true });
             for (var x = 0; x < 1000; x++)
             {
                 var contentIdFilteredList =
@@ -3569,7 +4013,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
             sw2.Stop();
         }
         #endregion
-
 
         #region Column Definition Builder
 
@@ -3595,7 +4038,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests
         [Test]
         public void ColumnBuilderTest()
         {
-            var result = typeof (ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType();
+            var result = typeof(ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType();
 
             Assert.IsTrue(result.Count == 10);
 
