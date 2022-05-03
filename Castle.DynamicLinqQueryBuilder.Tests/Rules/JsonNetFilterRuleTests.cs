@@ -1397,6 +1397,40 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
         }
 
+        public class HashClass
+        {
+            public HashSet<string> Hobbies { get; set; }
+        }
+        [Test]
+        public void HashSetTest()
+        {
+            var hashSet = new List<HashClass>()
+            {
+                new HashClass() {Hobbies = new HashSet<string> {"Baseball"}},
+                new HashClass() {Hobbies = new HashSet<string> {"Football"}}
+            };
+            var longerTextToFilterFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Hobbies",
+                        Id = "Hobbies",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "string",
+                        Value = "Baseball"
+                    }
+                }
+            };
+            var longerTextToFilterList = hashSet.BuildQuery(longerTextToFilterFilter).ToList();
+            Assert.IsTrue(longerTextToFilterList != null);
+            Assert.IsTrue(longerTextToFilterList.Count == 1);
+        }
+
         [Test]
         public void EndsWithClause()
         {
