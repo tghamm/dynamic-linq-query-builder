@@ -23,7 +23,7 @@
 	  <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
 	  <RepositoryType>Git</RepositoryType>
 	  <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-	  <PackageReleaseNotes>Adds support for GUID type.</PackageReleaseNotes>
+	  <PackageReleaseNotes>Fixes issue with HashSets.</PackageReleaseNotes>
 	  <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
