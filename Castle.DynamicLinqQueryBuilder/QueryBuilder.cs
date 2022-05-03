@@ -906,7 +906,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
             if (oType.IsGenericType && ((oType.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
                                         (oType.GetGenericTypeDefinition() == typeof(ICollection<>)) ||
-                                        (oType.GetGenericTypeDefinition() == typeof(List<>))))
+                                        (oType.GetGenericTypeDefinition() == typeof(List<>)) || 
+                                        (oType.GetGenericTypeDefinition() == typeof(HashSet<>))))
                 isGenericList = true;
 
             return isGenericList;
