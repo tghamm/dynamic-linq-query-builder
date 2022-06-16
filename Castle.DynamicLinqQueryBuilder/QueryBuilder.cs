@@ -608,7 +608,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             MethodCallExpression propertyExpString = null;
 
-            if (IsGuid(propertyExp.Type))
+            if (IsGuid(propertyExp.Type) || propertyExp.Type != typeof(string))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
