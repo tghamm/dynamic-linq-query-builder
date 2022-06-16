@@ -65,6 +65,31 @@ namespace Castle.DynamicLinqQueryBuilder
         /// The value.
         /// </value>
         public string[] Value { get; set; }
+        
+        
+         public QueryBuilderFilterRule()
+        {
+        }
+
+        public QueryBuilderFilterRule(string json)
+        {
+            try
+            {
+                QueryBuilderFilterRule oMycustomclassname = Newtonsoft.Json.JsonConvert.DeserializeObject<QueryBuilderFilterRule>(json);
+                Condition = oMycustomclassname.Condition;
+                Field = oMycustomclassname.Field;
+                Id = oMycustomclassname.Id;
+                Input = oMycustomclassname.Input;
+                Operator = oMycustomclassname.Operator;
+                Rules = oMycustomclassname.Rules;
+                Type = oMycustomclassname.Type;
+                Value = oMycustomclassname.Value;
+            }
+            catch
+            {
+
+            }
+        }
 
         IEnumerable<IFilterRule> IFilterRule.Rules => Rules;
         object IFilterRule.Value => Value;
