@@ -37,7 +37,13 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public List<DateTime> DateList { get; set; }
             public List<double> DoubleList { get; set; }
             public List<string> StrList { get; set; }
+            public List<ChildClass> ChildClasses { get; set; }
 
+        }
+
+        public class ChildClass
+        {
+            public string ClassName { get; set; }
         }
 
         public static List<ExpressionTreeBuilderTestClass> GetDateExpressionTreeData()
@@ -80,7 +86,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 ContentTypeGuid = Guid.Empty,
                 NullableContentTypeGuid = Guid.Empty,
                 ContentTypeName = "Multiple-Choice",
-                Enemies = new List<int>(),
+                Enemies = null,
                 Flags = new List<string>(),
                 IsPossiblyNotSetBool = true,
                 IsSelected = true,
@@ -269,6 +275,36 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             QueryBuilder.ParseDatesAsUtc = false;
         }
+
+        [Test]
+        public void IsNullSubCollection()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            //expect no entries to match
+            var contentNullFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "ChildClasses.ClassName",
+                        Id = "ChildClasses.ClassName",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = new[] { "books" }
+                    }
+                }
+            };
+            var contentNullFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentNullFilter).ToList();
+            Assert.IsTrue(contentNullFilteredList != null);
+            Assert.IsTrue(contentNullFilteredList.Count == 0);
+        }
+
 
         [Test]
         public void InClause()
