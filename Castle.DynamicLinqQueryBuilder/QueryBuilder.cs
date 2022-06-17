@@ -295,16 +295,18 @@ namespace Castle.DynamicLinqQueryBuilder
                     Expression body = BuildNestedExpression(parameterExpression, propertyCollectionEnumerator, rule, options, type);
                     var predicate = Expression.Lambda(predicateFnType, body, parameterExpression);
 
+                    var notnull = Expression.NotEqual(expression, Expression.Constant(null, typeof(object)));
+
                     var queryable = Expression.Call(typeof(Queryable), "AsQueryable", new[] { elementType }, expression);
 
 
-                    return Expression.Call(
+                    return Expression.AndAlso(notnull,Expression.Call(
                         typeof(Queryable),
                         "Any",
                         new[] { elementType },
                         queryable,
                         predicate
-                    );
+                    ));
                 }
             }
 
