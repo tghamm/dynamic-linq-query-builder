@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
@@ -77,23 +78,28 @@ namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
                            
                     try
                     {
-                        IEnumerable<JsonElement> array = jsonValue.EnumerateArray();
-
-                        var outList = Array.CreateInstance(myType, jsonValue.GetArrayLength());
-                        var enumerator = 0;
-
-                        foreach (var item in jsonValue.EnumerateArray())
+                        if (jsonValue.ValueKind == JsonValueKind.Array)
                         {
-                            object typedItem = GetJsonElementAsType(item);
-                            outList.SetValue(typedItem, enumerator);
-                            enumerator++;
-                        }
+                            var outList = Array.CreateInstance(myType, jsonValue.GetArrayLength());
+                            var enumerator = 0;
 
-                        return outList;
+                            foreach (var item in jsonValue.EnumerateArray())
+                            {
+                                object typedItem = GetJsonElementAsType(item);
+                                outList.SetValue(typedItem, enumerator);
+                                enumerator++;
+                            }
+
+                            return outList;
+                        }
+                        else
+                        {
+                            return GetJsonElementAsType(jsonValue);
+                        }
                     }
                     catch (Exception ex)
                     {
-
+                        throw new InvalidCastException("Error converting JsonElement to .Net Type", ex);
                     }
                 }
 
@@ -111,27 +117,37 @@ namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
 
         private object GetJsonElementAsType(JsonElement element)
         {
+            Object o = null;
             switch (this.Type)
             {
                 case "integer":
-                    return Int32.Parse(element.GetString());
+                    o = element.ValueKind == JsonValueKind.Number
+                        ? element.GetInt32()
+                        : Int32.Parse(element.GetString());
                     break;
                 case "double":
-                    return element.GetDouble();
+                    o = element.ValueKind == JsonValueKind.Number
+                        ? element.GetDouble()
+                        : double.Parse(element.ToString());
                     break;
                 case "string":
-                    return element.ToString();
+                    o = element.ToString();
                     break;
                 case "date":
                 case "datetime":
-                    return DateTime.Parse(element.GetString());
+                    o = DateTime.Parse(element.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
                     break;
                 case "boolean":
-                    return element.GetBoolean();
+                    o = ((element.ValueKind == JsonValueKind.True) || (element.ValueKind == JsonValueKind.False))
+                        ? element.GetBoolean()
+                        : bool.Parse(element.ToString());
                     break;
-                default:
-                    throw new Exception($"Unexpected data type {this.Type}");
+                case "guid":
+                    o = element.GetGuid();
+                    break;
             }
+
+            return o;
         }
     }
 }

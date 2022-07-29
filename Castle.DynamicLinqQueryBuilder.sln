@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder", "Castle.DynamicLinqQueryBuilder\Castle.DynamicLinqQueryBuilder.csproj", "{C73EA60C-7046-4665-8A79-0E2AA85C43EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.DynamicLinqQueryBuilder.Tests", "Castle.DynamicLinqQueryBuilder.Tests\Castle.DynamicLinqQueryBuilder.Tests.csproj", "{AA125B72-F684-4DF0-803D-7CE45C0B915F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.SystemTextJson", "Castle.DynamicLinqQueryBuilder.SystemTextJson\Castle.DynamicLinqQueryBuilder.SystemTextJson.csproj", "{22861CF7-71BB-44AF-9630-AC3A59F36838}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.Tests31", "Castle.DynamicLinqQueryBuilder.Tests31\Castle.DynamicLinqQueryBuilder.Tests31.csproj", "{3D18C76A-C7EE-478E-8E20-9834A12706FD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Castle.DynamicLinqQueryBuilder.SystemTextJson", "Castle.DynamicLinqQueryBuilder.SystemTextJson\Castle.DynamicLinqQueryBuilder.SystemTextJson.csproj", "{22861CF7-71BB-44AF-9630-AC3A59F36838}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.Tests", "Castle.DynamicLinqQueryBuilder.Tests\Castle.DynamicLinqQueryBuilder.Tests.csproj", "{09AFE101-7579-423E-B271-1AEFC76DDCD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +19,14 @@ Global
 		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA125B72-F684-4DF0-803D-7CE45C0B915F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D18C76A-C7EE-478E-8E20-9834A12706FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D18C76A-C7EE-478E-8E20-9834A12706FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D18C76A-C7EE-478E-8E20-9834A12706FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D18C76A-C7EE-478E-8E20-9834A12706FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22861CF7-71BB-44AF-9630-AC3A59F36838}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AFE101-7579-423E-B271-1AEFC76DDCD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
