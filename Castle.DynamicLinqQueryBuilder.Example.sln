@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder", "Castle.DynamicLinqQueryBuilder\Castle.DynamicLinqQueryBuilder.csproj", "{C73EA60C-7046-4665-8A79-0E2AA85C43EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicLinqQueryBuilder.Example", "Castle.DynamicLinqQueryBuilder.Example\Castle.DynamicLinqQueryBuilder.Example.csproj", "{E126F465-CD99-4DE3-8AED-2098C2B96DA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C73EA60C-7046-4665-8A79-0E2AA85C43EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E126F465-CD99-4DE3-8AED-2098C2B96DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E126F465-CD99-4DE3-8AED-2098C2B96DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E126F465-CD99-4DE3-8AED-2098C2B96DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E126F465-CD99-4DE3-8AED-2098C2B96DA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {70D2BA8F-0D3B-4F03-9F40-FD4E06117555}
+	EndGlobalSection
+EndGlobal
