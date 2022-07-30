@@ -2581,30 +2581,31 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             
             //expect 4 entries to match for a Date comparison
-            var lastModifiedFilter = new FilterRule()
+            var lastModifiedFilter = new JsonNetFilterRule()
             {
                 Condition = "and",
-                Rules = new List<FilterRule>()
+                Rules = new List<JsonNetFilterRule>()
                 {
-                    new FilterRule()
+                    new JsonNetFilterRule()
                     {
                         Condition = "and",
                         Field = "LastModified",
                         Id = "LastModified",
                         Input = "NA",
-                        Operator = "between",
+                        Operator = "in",
                         Type = "datetime",
-                        Value = DateTime.UtcNow.Date.AddDays(-2).ToString("d", CultureInfo.InvariantCulture) + "," +
-                                DateTime.UtcNow.Date.ToString("d", CultureInfo.InvariantCulture)
+                        Value = DateTime.UtcNow.Date.AddDays(-2)
                     }
                 }
             };
-            var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter, new BuildExpressionOptions()
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                ParseDatesAsUtc = true
+            }).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
-            Assert.IsTrue(lastModifiedFilterList.Count == 4);
-            Assert.IsTrue(
-                lastModifiedFilterList.Select(p => p.LastModified)
-                    .All(p => (p >= DateTime.UtcNow.Date.AddDays(-2)) && (p <= DateTime.UtcNow.Date)));
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            
 
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
