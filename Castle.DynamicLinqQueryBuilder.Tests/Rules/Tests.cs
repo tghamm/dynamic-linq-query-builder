@@ -227,6 +227,33 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 var contentIdFilteredListNull1 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter).ToList();
             });
 
+            contentIdFilter = new FilterRule()
+            {
+                Condition = "and",
+                Rules = new List<FilterRule>()
+                {
+                    new FilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = "23/02/2016"
+                    }
+                }
+            };
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                var contentIdFilteredListNull1 = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentIdFilter, new BuildExpressionOptions()
+                {
+                    CultureInfo = CultureInfo.InvariantCulture,
+                    ParseDatesAsUtc = true,
+                    Operators = new List<IFilterOperator>()
+                }).ToList();
+            });
+
 
             contentIdFilter = new FilterRule()
             {
@@ -2545,6 +2572,55 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     .All(p => p != 1.112));
 
         }
+
+        [Test]
+        public void BetweenDatesCultureClause()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            
+            //expect 4 entries to match for a Date comparison
+            var lastModifiedFilter = new JsonNetFilterRule()
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>()
+                {
+                    new JsonNetFilterRule()
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "datetime",
+                        Value = DateTime.UtcNow.Date.AddDays(-2)
+                    }
+                }
+            };
+            var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter, new BuildExpressionOptions()
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                ParseDatesAsUtc = true
+            }).ToList();
+            Assert.IsTrue(lastModifiedFilterList != null);
+            Assert.IsTrue(lastModifiedFilterList.Count == 0);
+            
+
+            //expect failure when an invalid date is encountered in date comparison
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                lastModifiedFilter.Rules.First().Value = "hello";
+                startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(lastModifiedFilter, new BuildExpressionOptions()
+                {
+                    CultureInfo = CultureInfo.InvariantCulture
+                }).ToList();
+
+            });
+            
+        }
+
+
 
         [Test]
         public void BetweenClause()
