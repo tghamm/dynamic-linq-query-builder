@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore Castle.DynamicLinqQueryBuilder.sln
     - name: Build
       run: dotnet build Castle.DynamicLinqQueryBuilder.sln --no-restore
     - name: Test
