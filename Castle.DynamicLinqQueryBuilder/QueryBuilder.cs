@@ -308,6 +308,12 @@ namespace Castle.DynamicLinqQueryBuilder
                         predicate
                     ));
                 }
+                else if (!expression.Type.IsValueType)
+                {
+                    var notnull = IsNotNull(expression);
+                    Expression body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type);
+                    return Expression.AndAlso(notnull, body);
+                }
             }
 
             return BuildOperatorExpression(expression, rule, options, type);
