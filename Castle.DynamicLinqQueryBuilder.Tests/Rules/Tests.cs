@@ -38,10 +38,17 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public List<double> DoubleList { get; set; }
             public List<string> StrList { get; set; }
             public List<ChildClass> ChildClasses { get; set; }
+            public List<ChildClass> NestedNullObjectChildClasses { get; set; }
 
         }
 
         public class ChildClass
+        {
+            public string ClassName { get; set; }
+            public ChildSubClass ChildSubClass { get; set; }
+        }
+
+        public class  ChildSubClass
         {
             public string ClassName { get; set; }
         }
@@ -100,7 +107,17 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null }
+                IntNullList = new List<int?>() { 3, 4, 5, null },
+                NestedNullObjectChildClasses = new List<ChildClass>()
+                {
+                    new ChildClass()
+                    {
+                        ChildSubClass = new ChildSubClass()
+                        {
+                            ClassName = "ChildSubClass"
+                        }
+                    }
+                }
             };
             tData.Add(entry1);
 
@@ -124,7 +141,21 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null }
+                IntNullList = new List<int?>() { 3, 4, 5, null },
+                NestedNullObjectChildClasses = new List<ChildClass>()
+                {
+                    new ChildClass()
+                    {
+                        
+                    },
+                    new ChildClass()
+                    {
+                        ChildSubClass = new ChildSubClass()
+                        {
+                            ClassName = "className"
+                        }
+                    }
+                }
             };
             tData.Add(entry2);
 
@@ -332,6 +363,34 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(contentNullFilteredList.Count == 0);
         }
 
+        [Test]
+        public void IsNullNestedClassInSubCollection()
+        {
+            var startingQuery = GetExpressionTreeData().AsQueryable();
+
+
+            //expect no entries to match
+            var contentNullFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NestedNullObjectChildClasses.ChildSubClass.ClassName",
+                        Id = "NestedNullObjectChildClasses.ChildSubClass.ClassName",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = new[] { "books" }
+                    }
+                }
+            };
+            var contentNullFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentNullFilter).ToList();
+            Assert.IsTrue(contentNullFilteredList != null);
+            Assert.IsTrue(contentNullFilteredList.Count == 0);
+        }
 
         [Test]
         public void InClause()
