@@ -1,0 +1,30 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore Castle.DynamicLinqQueryBuilder.sln
+    - name: Build
+      run: dotnet build Castle.DynamicLinqQueryBuilder.sln --no-restore
+    - name: Test
+      run: dotnet test Castle.DynamicLinqQueryBuilder.Tests/Castle.DynamicLinqQueryBuilder.Tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build --verbosity normal
+    - name: Publish coverage report to coveralls.io   
+      uses: coverallsapp/github-action@master   
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: Castle.DynamicLinqQueryBuilder.Tests/TestResults/coverage.info
