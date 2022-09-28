@@ -124,6 +124,35 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
         }
 
         [Test]
+        public void ContainsTractorDeepTest()
+        {
+            var context = CreateContext();
+
+            //expect 3 entries to match for an contains Tractor comparison
+            var tractorFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Products.ProductName",
+                        Id = "Products.ProductName",
+                        Input = "NA",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = new[] { "Tractor" }
+                    }
+                }
+            };
+
+            var tractorIdFilteredList = context.Stores.BuildQuery(tractorFilter).ToList();
+            Assert.IsTrue(tractorIdFilteredList != null);
+            Assert.IsTrue(tractorIdFilteredList.Count == 2);
+        }
+
+        [Test]
         public void BeginsWithModelTest()
         {
             var context = CreateContext();
