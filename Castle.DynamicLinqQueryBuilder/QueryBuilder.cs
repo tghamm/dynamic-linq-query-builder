@@ -308,7 +308,7 @@ namespace Castle.DynamicLinqQueryBuilder
                         predicate
                     ));
                 }
-                else if (!expression.Type.IsValueType && propertyType != typeof(string))
+                else if (options.NullCheckNestedCLRObjects && !expression.Type.IsValueType && propertyType != typeof(string))
                 {
                     var notnull = IsNotNull(expression);
                     Expression body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type);
@@ -472,7 +472,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
                             foreach (object item in list)
                             {
-                                expressions.Add(Expression.Constant(tc.ConvertFromString(item.ToString()), type));
+                                expressions.Add(Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, item.ToString()), type));
                             }
 
                             return expressions;
@@ -495,7 +495,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
                             foreach (object item in list)
                             {
-                                expressions.Add(Expression.Constant(tc.ConvertFromString(item.ToString()), type));
+                                expressions.Add(Expression.Constant(tc.ConvertFromString(null, options.CultureInfo, item.ToString()), type));
                             }
 
                             return expressions;

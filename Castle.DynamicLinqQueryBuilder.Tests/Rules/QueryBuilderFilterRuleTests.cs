@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Castle.DynamicLinqQueryBuilder.Tests.Helpers;
 using NUnit.Framework;
 
@@ -267,7 +268,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -300,7 +301,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString(), DateTime.UtcNow.Date.AddDays(1).ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.AddDays(1).ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -384,7 +385,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -693,7 +694,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -726,7 +727,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.ToString(), DateTime.UtcNow.Date.AddDays(1).ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.AddDays(1).ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -810,7 +811,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "not_in",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -2384,7 +2385,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "between",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture), 
+                            DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -2417,7 +2419,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "between",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -2561,7 +2563,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "not_between",
                         Type = "datetime",
-                        Value = new[] {DateTime.UtcNow.Date.AddDays(-2).ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] {DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };
@@ -2594,7 +2596,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "not_between",
                         Type = "datetime",
-                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(), DateTime.UtcNow.Date.ToString() }
+                        Value = new[] { DateTime.UtcNow.Date.AddDays(-2).ToString(CultureInfo.InvariantCulture), DateTime.UtcNow.Date.ToString(CultureInfo.InvariantCulture) }
                     }
                 }
             };

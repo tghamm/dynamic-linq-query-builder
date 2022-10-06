@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Mime;
 using Castle.DynamicLinqQueryBuilder.Tests.Database;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -11,24 +13,35 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
 {
     [ExcludeFromCodeCoverage]
     [TestFixture]
-    public class ORMTests: IDisposable
+    public class ORMTestsSQLServer: IDisposable
     {
-        private readonly SqliteConnection _connection;
+        private readonly SqlConnection _connection;
         private readonly DbContextOptions<StoreContext> _contextOptions;
 
-        public ORMTests()
+        public ORMTestsSQLServer()
         {
-            _connection = new SqliteConnection("Filename=:memory:");
+            _connection = new SqlConnection("Server=localhost;Database=DynamicLinqQueryBuilderTests;User ID=sa;Password=Password123;Connection Timeout=30;TrustServerCertificate=True");
             _connection.Open();
 
             _contextOptions = new DbContextOptionsBuilder<StoreContext>()
-                .UseSqlite(_connection)
+                .UseSqlServer(_connection)
                 .Options;
 
             // Create the schema and seed some data
             using var context = new StoreContext(_contextOptions);
 
             context.Database.EnsureCreated();
+
+            var storesOld = context.Stores.ToList();
+
+            foreach (var store in storesOld)
+            {
+                context.Stores.Remove(store);
+            }
+
+            context.SaveChanges();
+
+
 
 
             var stores = new List<Store>()
@@ -38,6 +51,10 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     StoreId = Guid.NewGuid(),
                     OpenDate = new DateTime(2020, 12, 18),
                     StoreName = "Tractor Store",
+                    StoreOwner = new StoreOwner()
+                    {
+                        StoreOwnerName = "Henry Rollins"
+                    },
                     TotalRevenue = 200000000,
                     Products = new List<Product>()
                     {
@@ -63,6 +80,10 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     StoreId = Guid.NewGuid(),
                     OpenDate = new DateTime(2021, 12, 15),
                     StoreName = "Tire Store",
+                    StoreOwner = new StoreOwner()
+                    {
+                        StoreOwnerName = "Lucas Franken"
+                    },
                     TotalRevenue = 150000000,
                     Products = new List<Product>()
                     {
@@ -137,19 +158,37 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     new QueryBuilderFilterRule
                     {
                         Condition = "and",
-                        Field = "Products.ProductName",
-                        Id = "Products.ProductName",
+                        Field = "StoreOwner.StoreOwnerName",
+                        Id = "StoreOwner.StoreOwnerName",
                         Input = "NA",
-                        Operator = "contains",
+                        Operator = "equal",
                         Type = "string",
-                        Value = new[] { "Tractor" }
+                        Value = new[] { "Henry Rollins" }
                     }
                 }
             };
-
-            var tractorIdFilteredList = context.Stores.BuildQuery(tractorFilter).ToList();
+            var query = string.Empty;
+            var tractorIdFilteredList = context.Stores.Select(p => new StoreDto()
+            {
+                StoreId = p.StoreId,
+                StoreOwner = new StoreOwnerDto()
+                {
+                    StoreOwnerName = p.StoreOwner.StoreOwnerName
+                }
+            }).BuildQuery(tractorFilter, out query).ToList();
             Assert.IsTrue(tractorIdFilteredList != null);
-            Assert.IsTrue(tractorIdFilteredList.Count == 2);
+            Assert.IsTrue(tractorIdFilteredList.Count == 1);
+        }
+        [ExcludeFromCodeCoverage]
+        public class StoreDto
+        {
+            public Guid StoreId { get; set; }
+            public StoreOwnerDto StoreOwner { get; set; }
+        }
+        [ExcludeFromCodeCoverage]
+        public class StoreOwnerDto
+        {
+            public string StoreOwnerName { get; set; }
         }
 
         [Test]

@@ -33,5 +33,10 @@ namespace Castle.DynamicLinqQueryBuilder
         /// Custom operators
         /// </summary>
         public IEnumerable<IFilterOperator> Operators { get; set; }
+
+        /// <summary>
+        /// Flag to null check CLR objects in nested queries. May Cause ORM queries to fail.
+        /// </summary>
+        public bool NullCheckNestedCLRObjects { get; set; } = false;
     }
 }
