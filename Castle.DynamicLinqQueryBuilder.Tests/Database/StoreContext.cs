@@ -18,6 +18,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Database
 
         public DbSet<Store> Stores { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<StoreOwner> StoreOwners { get; set; }
     }
     [ExcludeFromCodeCoverage]
     public class StoreContextFactory : IDesignTimeDbContextFactory<StoreContext>
@@ -42,6 +43,19 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Database
         public double TotalRevenue { get; set; }
 
         public virtual List<Product> Products { get; set; }
+        public virtual  StoreOwner StoreOwner { get; set; }
+    }
+
+    public class StoreOwner
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int StoreOwnerId { get; set; }
+        public string StoreOwnerName { get; set; }
+        [ForeignKey("Store")]
+        public Guid StoreId { get; set; }
+
+        public virtual Store Store { get; set; }
     }
     [ExcludeFromCodeCoverage]
     public class Product
