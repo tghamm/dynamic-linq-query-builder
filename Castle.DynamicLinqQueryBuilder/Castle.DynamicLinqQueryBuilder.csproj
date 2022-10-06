@@ -12,7 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.7</Version>
+    <Version>1.2.8</Version>
     <Authors>Grant Hamm</Authors>
     <Company>N/A</Company>
     <Product>Dynamic Linq Query Builder</Product>
@@ -23,7 +23,7 @@
     <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-    <PackageReleaseNotes>Fixes issue with CultureInfo.</PackageReleaseNotes>
+    <PackageReleaseNotes>Addresses critical issue with Linq to SQL.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
