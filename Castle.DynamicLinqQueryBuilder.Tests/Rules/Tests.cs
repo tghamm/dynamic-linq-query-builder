@@ -358,7 +358,10 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var contentNullFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentNullFilter).ToList();
+            var contentNullFilteredList = startingQuery.BuildQuery<ExpressionTreeBuilderTestClass>(contentNullFilter, new BuildExpressionOptions()
+            {
+                NullCheckNestedCLRObjects = true
+            }).ToList();
             Assert.IsTrue(contentNullFilteredList != null);
             Assert.IsTrue(contentNullFilteredList.Count == 0);
         }

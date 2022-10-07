@@ -20,7 +20,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Castle.DynamicLinqQueryBuilder.sln
     - name: Build
-      run: dotnet build Castle.DynamicLinqQueryBuilder.sln --no-restore
+      run: dotnet build Castle.DynamicLinqQueryBuilder.sln --no-restore --configuration Debug
     - name: Test
       run: dotnet test Castle.DynamicLinqQueryBuilder.Tests/Castle.DynamicLinqQueryBuilder.Tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build --verbosity normal
     - name: Publish coverage report to coveralls.io   

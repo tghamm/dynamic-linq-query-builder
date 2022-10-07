@@ -299,14 +299,27 @@ namespace Castle.DynamicLinqQueryBuilder
 
                     var queryable = Expression.Call(typeof(Queryable), "AsQueryable", new[] { elementType }, expression);
 
-
-                    return Expression.AndAlso(notnull,Expression.Call(
-                        typeof(Queryable),
-                        "Any",
-                        new[] { elementType },
-                        queryable,
-                        predicate
-                    ));
+                    if (options.NullCheckNestedCLRObjects)
+                    {
+                        return Expression.AndAlso(notnull, Expression.Call(
+                            typeof(Queryable),
+                            "Any",
+                            new[] { elementType },
+                            queryable,
+                            predicate
+                        ));
+                    }
+                    else
+                    {
+                        return Expression.Call(
+                            typeof(Queryable),
+                            "Any",
+                            new[] { elementType },
+                            queryable,
+                            predicate
+                        );
+                    }
+                    
                 }
                 else if (options.NullCheckNestedCLRObjects && !expression.Type.IsValueType && propertyType != typeof(string))
                 {
