@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -25,6 +25,7 @@
 	  <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
 	  <PackageReleaseNotes>Fixes issue with CultureInfo.</PackageReleaseNotes>
 	  <LangVersion>latest</LangVersion>
+	  <Configurations>Debug;Release;LocalTest</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

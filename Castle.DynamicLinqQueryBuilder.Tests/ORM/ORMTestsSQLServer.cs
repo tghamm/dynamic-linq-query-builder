@@ -12,7 +12,9 @@ using NUnit.Framework;
 namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
 {
     [ExcludeFromCodeCoverage]
+#if LOCALTEST
     [TestFixture]
+#endif
     public class ORMTestsSQLServer: IDisposable
     {
         private readonly SqlConnection _connection;
@@ -115,7 +117,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
         
         public void Dispose() => _connection.Dispose();
 
+#if LOCALTEST
         [Test]
+#endif
         public void ContainsTractorTest()
         {
             var context = CreateContext();
@@ -144,7 +148,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             Assert.IsTrue(tractorIdFilteredList.Count == 3);
         }
 
+#if LOCALTEST
         [Test]
+#endif
         public void ContainsTractorDeepTest()
         {
             var context = CreateContext();
@@ -161,9 +167,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                         Field = "StoreOwner.StoreOwnerName",
                         Id = "StoreOwner.StoreOwnerName",
                         Input = "NA",
-                        Operator = "equal",
+                        Operator = "in",
                         Type = "string",
-                        Value = new[] { "Henry Rollins" }
+                        Value = new[] { "Henry Rollins", "Lucas Franken" }
                     }
                 }
             };
@@ -175,9 +181,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                 {
                     StoreOwnerName = p.StoreOwner.StoreOwnerName
                 }
-            }).BuildQuery(tractorFilter, out query).ToList();
+            }).BuildQuery(tractorFilter, new BuildExpressionOptions()
+            {
+                NullCheckNestedCLRObjects = false
+            }).ToList();
             Assert.IsTrue(tractorIdFilteredList != null);
-            Assert.IsTrue(tractorIdFilteredList.Count == 1);
+            Assert.IsTrue(tractorIdFilteredList.Count == 2);
         }
         [ExcludeFromCodeCoverage]
         public class StoreDto
@@ -191,7 +200,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             public string StoreOwnerName { get; set; }
         }
 
+#if LOCALTEST
         [Test]
+#endif
         public void BeginsWithModelTest()
         {
             var context = CreateContext();
@@ -220,7 +231,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             Assert.IsTrue(beginsFilteredList.Count == 2);
         }
 
+#if LOCALTEST
         [Test]
+#endif
         public void EqualsTireStoreTest()
         {
             var context = CreateContext();
