@@ -12,7 +12,7 @@
 	  <FileAlignment>512</FileAlignment>
 	  <TargetFrameworkProfile />
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <Version>1.2.8</Version>
+	  <Version>1.2.9</Version>
 	  <Authors>Grant Hamm</Authors>
 	  <Company>N/A</Company>
 	  <Product>Dynamic Linq Query Builder - System.Text.Json Extension</Product>
