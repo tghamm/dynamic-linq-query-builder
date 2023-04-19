@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.SymbolStore;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Castle.DynamicLinqQueryBuilder
 {
@@ -260,6 +262,8 @@ namespace Castle.DynamicLinqQueryBuilder
                     type = typeof(string);
                     break;
                 case "date":
+                    type = typeof(DateOnly);
+                    break;
                 case "datetime":
                     type = typeof(DateTime);
                     break;
@@ -422,6 +426,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
         public static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
         {
+            if (type == typeof(DateOnly))
+                type = typeof(DateTime);
             if (type == typeof(DateTime) && (options.ParseDatesAsUtc || ParseDatesAsUtc))
             {
                 DateTime tDate;
@@ -714,7 +720,7 @@ namespace Castle.DynamicLinqQueryBuilder
         }
 
 
-
+        private struct DateOnly { }
         private static Expression Equals(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
             Expression someValue = GetConstants(type, value, false, options).First();
@@ -735,6 +741,12 @@ namespace Castle.DynamicLinqQueryBuilder
                 exOut = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                 someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
+            }
+            else if(type == typeof(DateOnly))
+            {
+                exOut = Expression.Equal(
+                    Expression.Property(propertyExp, typeof(DateTime).GetProperty("Date")),
+                    Expression.Convert(someValue, propertyExp.Type));
             }
             else
             {
@@ -821,6 +833,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
+            
             if (IsGenericList(propertyExp.Type))
             {
                 var genericType = propertyExp.Type.GetGenericArguments().First();
@@ -840,9 +853,22 @@ namespace Castle.DynamicLinqQueryBuilder
                 }
                 else
                 {
-                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.First(), genericType));
-                }
+                    if (type == typeof(DateOnly))
+                    {
+                        type = typeof(DateTime);
 
+                        ParameterExpression parameter = Expression.Parameter(type, "d");
+                        MemberExpression memberExpression =
+                            Expression.Property(parameter, type.GetProperty("Date"));
+                        LambdaExpression lambda = Expression.Lambda(memberExpression, parameter);
+
+                        var select = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(type, type), propertyExp, lambda);
+                        var list = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(type), select);
+                        exOut = Expression.Call(list, method, Expression.Convert(someValues.First(), genericType));
+                    }
+                    else
+                        exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.First(), genericType));
+                }
 
                 return Expression.AndAlso(nullCheck, exOut);
             }

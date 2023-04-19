@@ -66,7 +66,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 Flags = new List<string>(),
                 IsPossiblyNotSetBool = true,
                 IsSelected = true,
-                LastModified = DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal),
+                LastModified = DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddHours(3),
                 LastModifiedIfPresent = DateTime.UtcNow.Date,
                 LongerTextToFilter = "There is something interesting about this text",
                 NullableContentTypeId = 1,
@@ -74,7 +74,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StatValue = 1.11,
                 IntList = new List<int>() { 1, 3, 5, 7 },
                 StrList = new List<string>() { "Str1", "Str2" },
-                DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal), DateTime.UtcNow.Date.AddDays(-2) },
+                DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddHours(2), DateTime.UtcNow.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
                 IntNullList = new List<int?>() { 3, 4, 5, null }
             };
