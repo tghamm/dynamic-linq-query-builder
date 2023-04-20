@@ -286,6 +286,20 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 var propertyType = property.PropertyType;
                 var enumerable = propertyType.GetInterface("IEnumerable`1");
+                // If the filter tries to access the Dictionary content
+                if (IsDictionary(propertyType) && propertyCollectionEnumerator.MoveNext())
+                {
+                    var key = propertyCollectionEnumerator.Current;
+                    var indexExpr = Expression.Constant(key);
+                    var containsKeyMethod = propertyType.GetMethod("ContainsKey");
+                    var containsKeyExpr = Expression.Call(expression, containsKeyMethod!, indexExpr);
+                    
+                    var indexer = propertyType.GetProperty("Item");
+                    expression = Expression.MakeIndex(expression, indexer, new[] { indexExpr });
+                    // recursively build the body of the lambda expression for the nested properties
+                    var body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type); 
+                    return Expression.AndAlso(containsKeyExpr, body);
+                }
                 if (propertyType != typeof(string) && enumerable != null)
                 {
                     var elementType = enumerable.GetGenericArguments()[0];
@@ -294,13 +308,11 @@ namespace Castle.DynamicLinqQueryBuilder
 
                     Expression body = BuildNestedExpression(parameterExpression, propertyCollectionEnumerator, rule, options, type);
                     var predicate = Expression.Lambda(predicateFnType, body, parameterExpression);
-
-                    var notnull = Expression.NotEqual(expression, Expression.Constant(null, typeof(object)));
-
                     var queryable = Expression.Call(typeof(Queryable), "AsQueryable", new[] { elementType }, expression);
 
                     if (options.NullCheckNestedCLRObjects)
                     {
+                        var notnull = Expression.NotEqual(expression, Expression.Constant(null, typeof(object)));
                         return Expression.AndAlso(notnull, Expression.Call(
                             typeof(Queryable),
                             "Any",
@@ -321,7 +333,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     }
                     
                 }
-                else if (options.NullCheckNestedCLRObjects && !expression.Type.IsValueType && propertyType != typeof(string))
+                if (options.NullCheckNestedCLRObjects && !expression.Type.IsValueType && propertyType != typeof(string))
                 {
                     var notnull = IsNotNull(expression);
                     Expression body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type);
@@ -332,6 +344,23 @@ namespace Castle.DynamicLinqQueryBuilder
             return BuildOperatorExpression(expression, rule, options, type);
         }
 
+        private static bool IsDictionary(Type type)
+        {
+            if (type.GetInterface("IDictionary`2") is not null)
+            {
+                var genericTypes = type.GetGenericArguments();
+                var keyType = genericTypes[0];
+                if (keyType != typeof(string))
+                {
+                    throw new NotSupportedException("Non string key types are not supported");
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+        
         private static Expression BuildOperatorExpression(Expression propertyExp, IFilterRule rule, BuildExpressionOptions options, Type type)
         {
             Expression expression;
@@ -575,8 +604,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 return exOut;
             }
-            return Expression.Equal(Expression.Constant(true, typeof(bool)),
-                Expression.Constant(false, typeof(bool)));
+            
+            return Expression.Constant(false, typeof(bool));
         }
 
         private static Expression IsNotNull(Expression propertyExp)
@@ -719,7 +748,7 @@ namespace Castle.DynamicLinqQueryBuilder
         {
             Expression someValue = GetConstants(type, value, false, options).First();
 
-            Expression exOut;
+            Expression exOut;    
             if (type == typeof(string))
             {
                 var nullCheck = GetNullCheckExpression(propertyExp);
@@ -729,12 +758,19 @@ namespace Castle.DynamicLinqQueryBuilder
                 if (IsGuid(propertyExp.Type))
                 {
                     propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
-                    type = typeof(string);
                 }
-
-                exOut = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
+                if (propertyExp.Type.GetMethod("ToLower", Type.EmptyTypes) is not null)
+                {
+                    var exToLower = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                    someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                    exOut = Expression.Equal(exToLower, someValue);
+                }
+                else
+                {
+                    exOut = Expression.Equal(propertyExpString ?? propertyExp, someValue);
+                }
+               
+                exOut = Expression.AndAlso(nullCheck, exOut);
             }
             else
             {
@@ -742,8 +778,6 @@ namespace Castle.DynamicLinqQueryBuilder
             }
 
             return exOut;
-
-
         }
 
         private static Expression LessThan(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
