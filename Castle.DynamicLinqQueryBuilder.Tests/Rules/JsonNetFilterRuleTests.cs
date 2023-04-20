@@ -3340,6 +3340,97 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             result = new[] { new IndexedClass() }.BuildQuery(rule, true, "Item");
             Assert.IsFalse(result.Any());
         }
+        
+           
+        private class DictionaryClass
+        {
+            public DictionaryClass() { DynamicData = new Dictionary<string, object>(); }
+
+            public Dictionary<string, object> DynamicData { get; set; }
+
+        }
+
+        private class DictionaryClassConcrete
+        {
+            public DictionaryClassConcrete() { DynamicData = new Dictionary<string, DataValue>(); }
+
+            public Dictionary<string, DataValue> DynamicData { get; set; }
+
+        }
+        private class DataValue
+        { 
+            public string StringValue { get; set; }
+        }
+
+        
+        [Test]
+        public void DictionaryConcreteExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test.StringValue",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "test"
+                    }
+                }
+            };
+            var dataValue = new DataValue { StringValue = "test" };
+            var d1 = new DictionaryClassConcrete();
+            d1.DynamicData.Add("test", dataValue);
+            var d2 = new DictionaryClassConcrete();
+            d2.DynamicData.Add("test", new DataValue { StringValue = "NotTest"} );
+
+            var result = new List<DictionaryClassConcrete> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList[0].DynamicData["test"], dataValue);
+        }
+        
+        [Test]
+        public void DictionaryExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "test"
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "NotTest" );
+
+            var result = new List<DictionaryClass> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList[0].DynamicData["test"], "test");
+        }
         #endregion
     }
 }
