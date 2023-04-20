@@ -3350,6 +3350,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
         }
 
+        private class DictionaryClassFail
+        {
+            public DictionaryClassFail() { DynamicData = new Dictionary<int, object>(); }
+
+            public Dictionary<int, object> DynamicData { get; set; }
+
+        }
+
         private class DictionaryClassConcrete
         {
             public DictionaryClassConcrete() { DynamicData = new Dictionary<string, DataValue>(); }
@@ -3430,6 +3438,40 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             var resultList = result.ToList();
             Assert.AreEqual(resultList[0].DynamicData["test"], "test");
+        }
+
+        [Test]
+        public void DictionaryExpression_Test_Fail()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "test"
+                    }
+                }
+            };
+            var d1 = new DictionaryClassFail();
+            d1.DynamicData.Add(1, "test");
+            var d2 = new DictionaryClassFail();
+            d2.DynamicData.Add(1, "NotTest");
+
+            
+
+            ExceptionAssert.Throws<NotSupportedException>(() =>
+            {
+                var result = new List<DictionaryClassFail> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                    new BuildExpressionOptions());
+            });
+            
         }
         #endregion
     }
