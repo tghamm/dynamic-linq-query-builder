@@ -974,7 +974,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
         public static bool IsGuid(this Type o) => o.UnderlyingSystemType.Name == "Guid" || Nullable.GetUnderlyingType(o)?.Name == "Guid";
 
-        public static bool ShouldConvertToString(this Type o) => IsGuid(o) || o == typeof(object); 
+        public static bool ShouldConvertToString(this Type o) => IsGuid(o) || o == typeof(object) || o.IsEnum; 
 
         private static object GetDefaultValue(this Type type)
         {
