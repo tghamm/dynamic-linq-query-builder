@@ -294,8 +294,8 @@ namespace Castle.DynamicLinqQueryBuilder
                     var containsKeyMethod = propertyType.GetMethod("ContainsKey");
                     var containsKeyExpr = Expression.Call(expression, containsKeyMethod!, indexExpr);
                     
-                    var indexer = propertyType.GetProperty("Item");
-                    expression = Expression.MakeIndex(expression, indexer, new[] { indexExpr });
+                    var getItemMethod = propertyType.GetMethod("get_Item");
+                    expression = Expression.Call(expression, getItemMethod!, indexExpr);
                     // recursively build the body of the lambda expression for the nested properties
                     var body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type); 
                     return Expression.AndAlso(containsKeyExpr, body);
@@ -399,22 +399,22 @@ namespace Castle.DynamicLinqQueryBuilder
                     expression = GreaterThanOrEqual(type, rule.Value, propertyExp, options);
                     break;
                 case "begins_with":
-                    expression = BeginsWith(type, rule.Value, propertyExp);
+                    expression = BeginsWith(type, rule.Value, propertyExp, options);
                     break;
                 case "not_begins_with":
-                    expression = NotBeginsWith(type, rule.Value, propertyExp);
+                    expression = NotBeginsWith(type, rule.Value, propertyExp, options);
                     break;
                 case "contains":
-                    expression = Contains(type, rule.Value, propertyExp);
+                    expression = Contains(type, rule.Value, propertyExp, options);
                     break;
                 case "not_contains":
-                    expression = NotContains(type, rule.Value, propertyExp);
+                    expression = NotContains(type, rule.Value, propertyExp, options);
                     break;
                 case "ends_with":
-                    expression = EndsWith(type, rule.Value, propertyExp);
+                    expression = EndsWith(type, rule.Value, propertyExp, options);
                     break;
                 case "not_ends_with":
-                    expression = NotEndsWith(type, rule.Value, propertyExp);
+                    expression = NotEndsWith(type, rule.Value, propertyExp, options);
                     break;
                 case "is_empty":
                     expression = IsEmpty(propertyExp);
@@ -586,8 +586,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     Expression.Constant(propertyExp.Type.GetDefaultValue(), propertyExp.Type));
 
             }
-            return Expression.Equal(Expression.Constant(true, typeof(bool)),
-                Expression.Constant(true, typeof(bool)));
+            return Expression.Constant(true, typeof(bool));
         }
 
 
@@ -648,91 +647,111 @@ namespace Castle.DynamicLinqQueryBuilder
                 ? Expression.AndAlso(GetNullCheckExpression(propertyExp), Expression.NotEqual(propertyExp, Expression.Constant(Guid.Empty, propertyExp.Type)))
                 : Expression.Not(IsEmpty(propertyExp));
 
-        private static Expression Contains(Type type, object value, Expression propertyExp)
+        private static Expression Contains(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions buildExpressionOptions)
         {
             if (value is Array items) value = items.GetValue(0);
-
-            var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
-
             var nullCheck = GetNullCheckExpression(propertyExp);
-
             MethodCallExpression propertyExpString = null;
 
-            if (IsGuid(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
             }
             var method = (propertyExpString ?? propertyExp).Type.GetMethod("Contains", new[] { type });
-
-            Expression exOut = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
+            GetExpressionsOperands(buildExpressionOptions, propertyExpString ?? propertyExp, value, out var exOut, out var argument);
+            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, argument));
 
             return exOut;
         }
 
-        private static Expression NotContains(Type type, object value, Expression propertyExp)
+        private static void GetExpressionsOperands(BuildExpressionOptions options, Expression property,
+            object value, out Expression operand, out Expression argument)
         {
-            return Expression.Not(Contains(type, value, propertyExp));
+            var strValue = value.ToString();
+            operand = property;
+            
+            if (!options.StringCaseSensitiveComparison)
+            {
+                strValue = strValue.ToLower();
+                operand = Expression.Call(property, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+            }
+                
+            argument = Expression.Constant(strValue, typeof(string));
+        }
+        
+        private static void GetExpressionsOperands(BuildExpressionOptions options, Expression property,
+            Expression value, out Expression operand, out Expression argument)
+        {
+            operand = property;
+            
+            if (!options.StringCaseSensitiveComparison)
+            {
+                value = Expression.Call(value, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                operand = Expression.Call(property, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+            }
+
+            argument = value;
         }
 
-        private static Expression EndsWith(Type type, object value, Expression propertyExp)
+        private static Expression NotContains(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions options)
+        {
+            return Expression.Not(Contains(type, value, propertyExp, options));
+        }
+
+        private static Expression EndsWith(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions options)
         {
             if (value is Array items) value = items.GetValue(0);
 
-            var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
-
             var nullCheck = GetNullCheckExpression(propertyExp);
-
             MethodCallExpression propertyExpString = null;
 
-            if (IsGuid(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
             }
             var method = (propertyExpString ?? propertyExp).Type.GetMethod("EndsWith", new[] { type });
 
-            Expression exOut = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
-
+            GetExpressionsOperands(options, propertyExpString ?? propertyExp, value, out var exOut, out var argument);
+            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, argument));
             return exOut;
         }
 
-        private static Expression NotEndsWith(Type type, object value, Expression propertyExp)
+        private static Expression NotEndsWith(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions buildExpressionOptions)
         {
-            return Expression.Not(EndsWith(type, value, propertyExp));
+            return Expression.Not(EndsWith(type, value, propertyExp, buildExpressionOptions));
         }
 
-        private static Expression BeginsWith(Type type, object value, Expression propertyExp)
+        private static Expression BeginsWith(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions options)
         {
             if (value is Array items) value = items.GetValue(0);
-
-            var someValue = Expression.Constant(value.ToString().ToLower(), typeof(string));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
 
             MethodCallExpression propertyExpString = null;
 
-            if (IsGuid(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
             }
             var method = (propertyExpString ?? propertyExp).Type.GetMethod("StartsWith", new[] { type });
 
-            Expression exOut = Expression.Call(propertyExpString ?? propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, someValue));
-
+            GetExpressionsOperands(options, propertyExpString ?? propertyExp, value, out var exOut, out var argument);
+            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, argument));
             return exOut;
         }
 
-        private static Expression NotBeginsWith(Type type, object value, Expression propertyExp)
+        private static Expression NotBeginsWith(Type type, object value, Expression propertyExp,
+            BuildExpressionOptions options)
         {
-            return Expression.Not(BeginsWith(type, value, propertyExp));
+            return Expression.Not(BeginsWith(type, value, propertyExp, options));
         }
 
 
@@ -755,22 +774,13 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 MethodCallExpression propertyExpString = null;
 
-                if (IsGuid(propertyExp.Type))
+                if (ShouldConvertToString(propertyExp.Type))
                 {
                     propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 }
-                if (propertyExp.Type.GetMethod("ToLower", Type.EmptyTypes) is not null)
-                {
-                    var exToLower = Expression.Call((propertyExpString ?? propertyExp), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                    someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                    exOut = Expression.Equal(exToLower, someValue);
-                }
-                else
-                {
-                    exOut = Expression.Equal(propertyExpString ?? propertyExp, someValue);
-                }
-               
-                exOut = Expression.AndAlso(nullCheck, exOut);
+                
+                GetExpressionsOperands(options, propertyExpString ?? propertyExp, someValue, out exOut, out var argument);
+                exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, argument));
             }
             else
             {
@@ -889,23 +899,19 @@ namespace Castle.DynamicLinqQueryBuilder
                     if (type == typeof(string))
                     {
                         Expression propertyExpString = null;
-                        if (IsGuid(propertyExp.Type))
+                        if (ShouldConvertToString(propertyExp.Type))
                         {
                             propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                         }
-                        exOut = Expression.Call(propertyExpString ?? propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var somevalue = Expression.Call(someValues[0], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, somevalue);
+
+                        var property = propertyExpString ?? propertyExp;
+                        GetExpressionsOperands(options, property, someValues[0], out var leftOperand, out var argument);
+                        exOut = Expression.Equal(leftOperand, argument);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
-
-                            var nextvalue = Expression.Call(someValues[counter], typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-
-                            exOut = Expression.Or(exOut,
-                                Expression.Equal(
-                                    Expression.Call(propertyExpString ?? propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes)),
-                                    nextvalue));
+                            GetExpressionsOperands(options, property, someValues[counter], out leftOperand, out argument);
+                            exOut = Expression.Or(exOut, Expression.Equal(leftOperand, argument));
                             counter++;
                         }
                     }
@@ -926,14 +932,12 @@ namespace Castle.DynamicLinqQueryBuilder
                     if (type == typeof(string))
                     {
                         Expression propertyExpString = null;
-                        if (IsGuid(propertyExp.Type))
+                        if (ShouldConvertToString(propertyExp.Type))
                         {
                             propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                         }
-
-                        exOut = Expression.Call(propertyExpString ?? propertyExp, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var somevalue = Expression.Call(someValues.First(), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        exOut = Expression.Equal(exOut, somevalue);
+                        GetExpressionsOperands(options, propertyExpString ?? propertyExp, someValues.First(), out exOut, out var argument);
+                        exOut = Expression.Equal(exOut, argument);
                     }
                     else
                     {
@@ -969,6 +973,8 @@ namespace Castle.DynamicLinqQueryBuilder
         }
 
         public static bool IsGuid(this Type o) => o.UnderlyingSystemType.Name == "Guid" || Nullable.GetUnderlyingType(o)?.Name == "Guid";
+
+        public static bool ShouldConvertToString(this Type o) => IsGuid(o) || o == typeof(object); 
 
         private static object GetDefaultValue(this Type type)
         {
