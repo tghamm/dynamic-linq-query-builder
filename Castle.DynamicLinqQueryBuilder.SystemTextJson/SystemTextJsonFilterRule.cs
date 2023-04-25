@@ -80,6 +80,8 @@ namespace Castle.DynamicLinqQueryBuilder.SystemTextJson
                     {
                         if (jsonValue.ValueKind == JsonValueKind.Array)
                         {
+                            if (myType.Name == "DateOnly")
+                                myType = typeof(DateTime);
                             var outList = Array.CreateInstance(myType, jsonValue.GetArrayLength());
                             var enumerator = 0;
 

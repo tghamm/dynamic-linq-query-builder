@@ -349,6 +349,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
         [Test]
         public void SystemTextJsonDateHandling()
         {
+            var options = new BuildExpressionOptions() { CultureInfo = CultureInfo.CurrentCulture };
+
             QueryBuilder.ParseDatesAsUtc = true;
             var contentIdFilter = new SystemTextJsonFilterRule
             {
@@ -368,7 +370,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 }
             };
 
-            var queryable = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter);
+            var queryable = StartingDateQuery.BuildQuery(contentIdFilter, options);
             var contentIdFilteredList = queryable.ToList();
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);
@@ -391,7 +393,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 }
             };
 
-            var queryable2 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter2);
+            var queryable2 = StartingDateQuery.BuildQuery(contentIdFilter2, options);
             var contentIdFilteredList2 = queryable2.ToList();
             Assert.IsTrue(contentIdFilteredList2 != null);
             Assert.IsTrue(contentIdFilteredList2.Count == 1);
@@ -408,13 +410,13 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Id = "LastModified",
                         Input = "NA",
                         Operator = "in",
-                        Type = "datetime",
+                        Type = "date",
                         Value = JsonSerializer.SerializeToElement(new[] { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal) })
                     }
                 }
             };
 
-            var queryable3 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter3);
+            var queryable3 = StartingDateQuery.BuildQuery(contentIdFilter3, options);
             var contentIdFilteredList3 = queryable3.ToList();
             Assert.IsTrue(contentIdFilteredList3 != null);
             Assert.IsTrue(contentIdFilteredList3.Count == 1);
@@ -437,7 +439,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 }
             };
 
-            var queryable4 = StartingDateQuery.BuildQuery<Rules.Tests.ExpressionTreeBuilderTestClass>(contentIdFilter4);
+            var queryable4 = StartingDateQuery.BuildQuery(contentIdFilter4, options);
             var contentIdFilteredList4 = queryable4.ToList();
             Assert.IsTrue(contentIdFilteredList4 != null);
             Assert.IsTrue(contentIdFilteredList4.Count == 1);
@@ -473,6 +475,50 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var contentIdFilteredList = queryable.ToList();
             Assert.IsTrue(contentIdFilteredList != null);
             Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = DateTime.UtcNow.ToString("M/dd/yyyy")
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter);
+            contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableLastModified",
+                        Id = "NullableLastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = "2/23/2016"
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter);
+            contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 0);
 
             contentIdFilter = new SystemTextJsonFilterRule
             {
