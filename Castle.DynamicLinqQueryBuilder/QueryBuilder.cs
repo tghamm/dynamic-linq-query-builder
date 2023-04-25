@@ -2,10 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.SymbolStore;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml.Schema;
 
 namespace Castle.DynamicLinqQueryBuilder
 {
@@ -260,6 +264,8 @@ namespace Castle.DynamicLinqQueryBuilder
                     type = typeof(string);
                     break;
                 case "date":
+                    type = typeof(DateOnly);
+                    break;
                 case "datetime":
                     type = typeof(DateTime);
                     break;
@@ -451,6 +457,8 @@ namespace Castle.DynamicLinqQueryBuilder
 
         public static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
         {
+            if (type == typeof(DateOnly))
+                type = typeof(DateTime);
             if (type == typeof(DateTime) && (options.ParseDatesAsUtc || ParseDatesAsUtc))
             {
                 DateTime tDate;
@@ -742,8 +750,8 @@ namespace Castle.DynamicLinqQueryBuilder
             return Expression.Not(Equals(type, value, propertyExp, options));
         }
 
-
-
+        // Newer .net has this class, so it can be deleted when upgrade.
+        private struct DateOnly { }
         private static Expression Equals(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
             Expression someValue = GetConstants(type, value, false, options).First();
@@ -771,6 +779,24 @@ namespace Castle.DynamicLinqQueryBuilder
                 }
                
                 exOut = Expression.AndAlso(nullCheck, exOut);
+            }
+            else if (type == typeof(DateOnly))
+            {
+                if (Nullable.GetUnderlyingType(propertyExp.Type) != null)
+                {
+                    exOut = Expression.Property(propertyExp, typeof(DateTime?).GetProperty("Value"));
+                    exOut = Expression.Equal(
+                        Expression.Property(exOut, typeof(DateTime).GetProperty("Date")),
+                        Expression.Convert(someValue, typeof(DateTime)));
+
+                    exOut = Expression.AndAlso(GetNullCheckExpression(propertyExp), exOut);
+                }
+                else
+                {
+                    exOut = Expression.Equal(
+                        Expression.Property(propertyExp, typeof(DateTime).GetProperty("Date")),
+                        Expression.Convert(someValue, propertyExp.Type));
+                }
             }
             else
             {
@@ -833,9 +859,25 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, true, options);
-
-
+            if (type.Name == "DateOnly") // value 2 must be increased by 1 day to be inclusive regarding the time portion in the property.
+            {
+                List<string> newValues = new List<string>();
+                int i = 0;
+                foreach (var item in value as IEnumerable<string>)
+                {
+                    if (i == 1)
+                    {
+                        newValues.Add(DateTime.Parse(item).AddDays(1).Date.ToString(options.CultureInfo));
+                        break;
+                    }
+                    else
+                        newValues.Add(item);
+                    i++;
+                }
+                value = newValues;
+            }
+            var someValue = GetConstants(type, value, true, options);            
+            
             Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
             Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
 
@@ -854,29 +896,65 @@ namespace Castle.DynamicLinqQueryBuilder
             var someValues = GetConstants(type, value, true, options);
 
             var nullCheck = GetNullCheckExpression(propertyExp);
-
+            
             if (IsGenericList(propertyExp.Type))
             {
                 var genericType = propertyExp.Type.GetGenericArguments().First();
                 var method = propertyExp.Type.GetMethod("Contains", new[] { genericType });
-                Expression exOut;
+                Expression exOut = default;
+                
+                bool isDtOnly = type == typeof(DateOnly);
+                MethodCallExpression listCallExp = null;
+
+                if (isDtOnly)
+                {
+                    MethodCallExpression whereCallExp = null;
+                    var isNullable = Nullable.GetUnderlyingType(genericType) != null;
+                    
+                    if (isNullable)
+                    {
+                        var paramExp1 = Expression.Parameter(typeof(DateTime?), "d");
+                        var memberExpression1 = GetNullCheckExpression(paramExp1);
+                        var lambdaExp1 = Expression.Lambda(memberExpression1, paramExp1);
+                        whereCallExp = Expression.Call(ReflectionHelpers.WhereMethod.MakeGenericMethod(typeof(DateTime?)), propertyExp, lambdaExp1);
+                    }
+
+                    var paramExp = Expression.Parameter(genericType, "d");
+                    var memberExpression = isNullable
+                        ? Expression.Property(Expression.Property(paramExp, genericType.GetProperty("Value")), typeof(DateTime).GetProperty("Date"))
+                        : Expression.Property(paramExp, genericType.GetProperty("Date"));
+                    var lambdaExp = Expression.Lambda(memberExpression, paramExp);
+
+                    var selectCallExp = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(genericType, typeof(DateTime)), whereCallExp ?? propertyExp, lambdaExp);
+                    listCallExp = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(typeof(DateTime)), selectCallExp);
+                    exOut = Expression.Call(ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)), listCallExp, Expression.Convert(someValues[0], typeof(DateTime)));
+                }
+                else
+                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
 
                 if (someValues.Count > 1)
                 {
-                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
                     var counter = 1;
+
                     while (counter < someValues.Count)
                     {
-                        exOut = Expression.Or(exOut,
-                            Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType)));
+                        MethodCallExpression methodCall = null;
+                        if (isDtOnly)
+                        {
+                            methodCall = Expression.Call(
+                                ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)),
+                                listCallExp,
+                                Expression.Convert(someValues[counter], typeof(DateTime)));
+                        }
+                        else
+                        {
+                            methodCall = Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType));
+                        }
+
+                        exOut = Expression.Or(exOut, methodCall);
                         counter++;
                     }
                 }
-                else
-                {
-                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.First(), genericType));
-                }
-
 
                 return Expression.AndAlso(nullCheck, exOut);
             }
@@ -937,7 +1015,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     }
                     else
                     {
-                        exOut = Expression.Equal(propertyExp, Expression.Convert(someValues.First(), propertyExp.Type));
+                        exOut = Equals(type, someValues.First(), propertyExp, options);
                     }
                 }
 
