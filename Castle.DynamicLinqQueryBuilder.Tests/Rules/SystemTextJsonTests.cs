@@ -482,6 +482,50 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new SystemTextJsonFilterRule
                     {
                         Condition = "and",
+                        Field = "LastModifiedIfPresent",
+                        Id = "LastModifiedIfPresent",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = DateTime.UtcNow.ToString("M/dd/yyyy")
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter);
+            contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 1);
+
+            contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableLastModified",
+                        Id = "NullableLastModified",
+                        Input = "NA",
+                        Operator = "equal",
+                        Type = "date",
+                        Value = "2/23/2016"
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter);
+            contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 0);
+
+            contentIdFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
                         Field = "LastModified",
                         Id = "LastModified",
                         Input = "NA",

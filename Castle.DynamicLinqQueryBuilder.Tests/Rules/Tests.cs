@@ -30,6 +30,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public bool? IsPossiblyNotSetBool { get; set; }
             public DateTime LastModified { get; set; }
             public DateTime? LastModifiedIfPresent { get; set; }
+            public DateTime? NullableLastModified { get { return null; } }
             public double StatValue { get; set; }
             public double? PossiblyEmptyStatValue { get; set; }
             public List<int> IntList { get; set; }

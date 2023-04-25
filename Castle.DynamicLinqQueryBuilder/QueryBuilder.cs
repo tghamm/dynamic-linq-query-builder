@@ -742,11 +742,23 @@ namespace Castle.DynamicLinqQueryBuilder
                 someValue = Expression.Call(someValue, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
                 exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, someValue));
             }
-            else if(type == typeof(DateOnly))
+            else if (type == typeof(DateOnly))
             {
-                exOut = Expression.Equal(
-                    Expression.Property(propertyExp, typeof(DateTime).GetProperty("Date")),
-                    Expression.Convert(someValue, propertyExp.Type));
+                if (Nullable.GetUnderlyingType(propertyExp.Type) != null)
+                {
+                    exOut = Expression.Property(propertyExp, typeof(DateTime?).GetProperty("Value"));
+                    exOut = Expression.Equal(
+                        Expression.Property(exOut, typeof(DateTime).GetProperty("Date")),
+                        Expression.Convert(someValue, typeof(DateTime)));
+
+                    exOut = Expression.AndAlso(GetNullCheckExpression(propertyExp), exOut);
+                }
+                else
+                {
+                    exOut = Expression.Equal(
+                        Expression.Property(propertyExp, typeof(DateTime).GetProperty("Date")),
+                        Expression.Convert(someValue, propertyExp.Type));
+                }
             }
             else
             {
@@ -832,42 +844,53 @@ namespace Castle.DynamicLinqQueryBuilder
             var someValues = GetConstants(type, value, true, options);
 
             var nullCheck = GetNullCheckExpression(propertyExp);
-
             
             if (IsGenericList(propertyExp.Type))
             {
                 var genericType = propertyExp.Type.GetGenericArguments().First();
                 var method = propertyExp.Type.GetMethod("Contains", new[] { genericType });
-                Expression exOut;
+                Expression exOut = default;
+                
+                bool isDtOnly = type == typeof(DateOnly);
+                ParameterExpression paramExp;
+                MemberExpression memberExpression;
+                LambdaExpression lambdaExp;
+                MethodCallExpression selectCallExp, listCallExp = null;
+
+                if (isDtOnly)
+                {
+                    type = typeof(DateTime);
+
+                    paramExp = Expression.Parameter(type, "d");
+                    memberExpression = Expression.Property(paramExp, type.GetProperty("Date"));
+                    lambdaExp = Expression.Lambda(memberExpression, paramExp);
+
+                    selectCallExp = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(type, type), propertyExp, lambdaExp);
+                    listCallExp = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(type), selectCallExp);
+                    exOut = Expression.Call(listCallExp, method, Expression.Convert(someValues[0], genericType));
+                }
+                else
+                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
 
                 if (someValues.Count > 1)
                 {
-                    exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
                     var counter = 1;
+
                     while (counter < someValues.Count)
                     {
-                        exOut = Expression.Or(exOut,
-                            Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType)));
+                        MethodCallExpression methodCall = null;
+                        if (isDtOnly)
+                        {
+                            methodCall = Expression.Call(listCallExp, method, Expression.Convert(someValues[counter], genericType));
+                        }
+                        else
+                        {
+                            methodCall = Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType));
+                        }
+
+                        exOut = Expression.Or(exOut, methodCall);
                         counter++;
                     }
-                }
-                else
-                {
-                    if (type == typeof(DateOnly))
-                    {
-                        type = typeof(DateTime);
-
-                        ParameterExpression parameter = Expression.Parameter(type, "d");
-                        MemberExpression memberExpression =
-                            Expression.Property(parameter, type.GetProperty("Date"));
-                        LambdaExpression lambda = Expression.Lambda(memberExpression, parameter);
-
-                        var select = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(type, type), propertyExp, lambda);
-                        var list = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(type), select);
-                        exOut = Expression.Call(list, method, Expression.Convert(someValues.First(), genericType));
-                    }
-                    else
-                        exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues.First(), genericType));
                 }
 
                 return Expression.AndAlso(nullCheck, exOut);
