@@ -924,7 +924,10 @@ namespace Castle.DynamicLinqQueryBuilder
                         MethodCallExpression methodCall = null;
                         if (isDtOnly)
                         {
-                            methodCall = Expression.Call(listCallExp, method, Expression.Convert(someValues[counter], genericType));
+                            methodCall = Expression.Call(
+                                ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)),
+                                listCallExp,
+                                Expression.Convert(someValues[counter], typeof(DateTime)));
                         }
                         else
                         {

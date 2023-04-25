@@ -87,7 +87,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "in",
                         Type = "date",
-                        Value = new[] { "2/23/2016" }
+                        Value = new[] { "2/23/2016", "2/21/2016" }
                     }
                 }
             };
@@ -110,7 +110,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Input = "NA",
                         Operator = "in",
                         Type = "date",
-                        Value = new[] { "2/23/2016" }
+                        Value = new[] { "2/23/2016", "2/21/2016" }
                     }
                 }
             };
