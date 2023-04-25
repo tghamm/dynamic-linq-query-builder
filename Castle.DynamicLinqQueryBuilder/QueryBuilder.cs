@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Castle.DynamicLinqQueryBuilder
@@ -719,7 +720,7 @@ namespace Castle.DynamicLinqQueryBuilder
             return Expression.Not(Equals(type, value, propertyExp, options));
         }
 
-
+        // Newer .net has this class, so it can be deleted when upgrade.
         private struct DateOnly { }
         private static Expression Equals(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
@@ -960,7 +961,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     }
                     else
                     {
-                        exOut = Expression.Equal(propertyExp, Expression.Convert(someValues.First(), propertyExp.Type));
+                        exOut = Equals(type, someValues.First(), propertyExp, options);
                     }
                 }
 

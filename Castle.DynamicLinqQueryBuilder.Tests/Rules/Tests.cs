@@ -2660,14 +2660,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Id = "LastModified",
                         Input = "NA",
                         Operator = "in",
-                        Type = "datetime",
+                        Type = "date",
                         Value = DateTime.UtcNow.Date.AddDays(-2)
                     }
                 }
             };
             var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter, new BuildExpressionOptions()
             {
-                CultureInfo = CultureInfo.InvariantCulture,
+                CultureInfo = CultureInfo.CurrentCulture,
                 ParseDatesAsUtc = true
             }).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
