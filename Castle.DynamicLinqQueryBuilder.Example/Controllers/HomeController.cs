@@ -33,6 +33,16 @@ namespace Castle.DynamicLinqQueryBuilder.Example.Controllers
             firstName.Values = people.Select(p => p.FirstName).Distinct().ToList();
             firstName.Input = "select";
 
+            var birthday = definitions.First(p => p.Field.ToLower() == "birthday");
+            birthday.Plugin = "datepicker";
+            birthday.Plugin_config = new
+            {
+                format = "mm/dd/yyyy",
+                todayBtn = "linked",
+                todayHighlight = true,
+                autoclose = true
+            };
+
             ViewBag.FilterDefinition =
                 JsonConvert.SerializeObject(definitions, jsonSerializerSettings);
             ViewBag.Model = people;
