@@ -8,11 +8,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Castle.DynamicLinqQueryBuilder</RootNamespace>
     <AssemblyName>Castle.DynamicLinqQueryBuilder</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net6;net45</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <Authors>Grant Hamm</Authors>
     <Company>N/A</Company>
     <Product>Dynamic Linq Query Builder</Product>

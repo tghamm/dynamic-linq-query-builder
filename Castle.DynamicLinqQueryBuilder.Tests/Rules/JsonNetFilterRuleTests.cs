@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using Castle.DynamicLinqQueryBuilder.Tests.CustomOperators;
 using Castle.DynamicLinqQueryBuilder.Tests.Helpers;
 using NUnit.Framework;
 
@@ -14,12 +15,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
     {
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingQuery;
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingDateQuery;
+        BuildExpressionOptions dtOptionCurrentCulture;
 
         [SetUp]
         public void Setup()
         {
             StartingQuery = Tests.GetExpressionTreeData().AsQueryable();
             StartingDateQuery = Tests.GetDateExpressionTreeData().AsQueryable();
+            dtOptionCurrentCulture = new BuildExpressionOptions() { CultureInfo = CultureInfo.CurrentCulture };
         }
 
         #region Wrapper
@@ -292,7 +295,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 4);
             Assert.IsTrue(
@@ -325,7 +328,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
             Assert.IsTrue(
@@ -698,7 +701,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 0);
             Assert.IsTrue(
@@ -731,7 +734,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
             Assert.IsTrue(
@@ -2260,7 +2263,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 4);
             Assert.IsTrue(
@@ -2293,7 +2296,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
             Assert.IsTrue(
@@ -2437,7 +2440,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 0);
             Assert.IsTrue(
@@ -2470,7 +2473,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
             Assert.IsTrue(
