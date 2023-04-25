@@ -810,7 +810,8 @@ namespace Castle.DynamicLinqQueryBuilder
             }
             else
             {
-                exOut = Expression.Equal(propertyExp, Expression.Convert(someValue, propertyExp.Type));
+                PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
+                exOut = Expression.Equal(propertyExp, someValue);
             }
 
             return exOut;
@@ -818,53 +819,39 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression LessThan(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false, options).First();
-
-            Expression exOut = Expression.LessThan(propertyExp, Expression.Convert(someValue, propertyExp.Type));
-
-
+            Expression someValue = GetConstants(type, value, false, options).First();
+            PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
+            Expression exOut = Expression.LessThan(propertyExp, someValue);
+            
             return exOut;
-
-
         }
 
         private static Expression LessThanOrEqual(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false, options).First();
+            Expression someValue = GetConstants(type, value, false, options).First();
+            PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
 
-            Expression exOut = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue, propertyExp.Type));
-
-
+            Expression exOut = Expression.LessThanOrEqual(propertyExp, someValue);
             return exOut;
-
-
         }
 
         private static Expression GreaterThan(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
+            Expression someValue = GetConstants(type, value, false, options).First();
 
-            var someValue = GetConstants(type, value, false, options).First();
-
-
-
-            Expression exOut = Expression.GreaterThan(propertyExp, Expression.Convert(someValue, propertyExp.Type));
-
-
+            PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
+            Expression exOut = Expression.GreaterThan(propertyExp, someValue);
             return exOut;
-
-
         }
+
+   
 
         private static Expression GreaterThanOrEqual(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, false, options).First();
-
-            Expression exOut = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue, propertyExp.Type));
-
-
+            Expression someValue = GetConstants(type, value, false, options).First();
+            PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
+            Expression exOut = Expression.GreaterThanOrEqual(propertyExp, someValue);
             return exOut;
-
-
         }
 
         private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
@@ -888,8 +875,10 @@ namespace Castle.DynamicLinqQueryBuilder
             }
             var someValue = GetConstants(type, value, true, options);            
             
-            Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
-            Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
+            PerformCasting(propertyExp, someValue[0], type, out var castedProperty, out var greaterThanValue);
+            Expression exBelow = Expression.GreaterThanOrEqual(castedProperty, greaterThanValue);
+            PerformCasting(propertyExp, someValue[1], type, out castedProperty, out var lessThanValue);
+            Expression exAbove = Expression.LessThanOrEqual(castedProperty, lessThanValue);
 
             return Expression.And(exBelow, exAbove);
 
@@ -942,29 +931,28 @@ namespace Castle.DynamicLinqQueryBuilder
                 else
                     exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
 
-                if (someValues.Count > 1)
+           
+                var counter = 1;
+
+                while (counter < someValues.Count)
                 {
-                    var counter = 1;
-
-                    while (counter < someValues.Count)
+                    MethodCallExpression methodCall = null;
+                    if (isDtOnly)
                     {
-                        MethodCallExpression methodCall = null;
-                        if (isDtOnly)
-                        {
-                            methodCall = Expression.Call(
-                                ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)),
-                                listCallExp,
-                                Expression.Convert(someValues[counter], typeof(DateTime)));
-                        }
-                        else
-                        {
-                            methodCall = Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType));
-                        }
-
-                        exOut = Expression.Or(exOut, methodCall);
-                        counter++;
+                        methodCall = Expression.Call(
+                            ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)),
+                            listCallExp,
+                            Expression.Convert(someValues[counter], typeof(DateTime)));
                     }
+                    else
+                    {
+                        methodCall = Expression.Call(propertyExp, method, Expression.Convert(someValues[counter], genericType));
+                    }
+
+                    exOut = Expression.Or(exOut, methodCall);
+                    counter++;
                 }
+                
 
                 return Expression.AndAlso(nullCheck, exOut);
             }
@@ -995,12 +983,14 @@ namespace Castle.DynamicLinqQueryBuilder
                     }
                     else
                     {
-                        exOut = Expression.Equal(propertyExp, Expression.Convert(someValues[0], propertyExp.Type));
+                        PerformCasting(propertyExp, someValues[0], type, out var castedProperty, out var someValue);
+                        exOut = Expression.Equal(castedProperty, someValue);
                         var counter = 1;
                         while (counter < someValues.Count)
                         {
+                            PerformCasting(propertyExp, someValues[counter], type, out castedProperty, out someValue);
                             exOut = Expression.Or(exOut,
-                                Expression.Equal(propertyExp, Expression.Convert(someValues[counter], propertyExp.Type)));
+                                Expression.Equal(castedProperty, someValue));
                             counter++;
                         }
                     }
@@ -1057,6 +1047,23 @@ namespace Castle.DynamicLinqQueryBuilder
         private static object GetDefaultValue(this Type type)
         {
             return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
+        }
+        
+        private static void PerformCasting(Expression propertyExp, Expression constant, Type type, out Expression castedProperty, out Expression castedConstant)
+        {
+            castedProperty = propertyExp;
+            castedConstant = constant;
+            // if our type is a super class of the compared type, downcast our type
+            // for example compare object to int
+            if (type.IsSubclassOf(propertyExp.Type))
+            {
+                castedProperty = Expression.Convert(propertyExp, type);
+            }
+            // support nullables
+            else // int is not a subclass of nullable int
+            {
+                castedConstant = Expression.Convert(constant, propertyExp.Type);
+            }
         }
 
     }

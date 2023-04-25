@@ -3635,6 +3635,156 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var resultList = result.ToList();
             Assert.AreEqual(resultList.First().EnumProperty, MyEnum.Test2);
         }
+
+        class ObjectsClass
+        {
+            public List<object> ListTest { get; set; }
+            public object Test { get; set; }
+        }
+        [Test]
+        public void ListObjectsInString_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "ListTest",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"1","2","3","4"}
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                ListTest = new List<object> {$"{counter}"},
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions ());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ListObjectsInInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "ListTest",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = new List<int> {1,2,3,4}
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                ListTest = new List<object> {counter},
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ObjectEqualInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "equal",
+                        Type = "integer",
+                        Value = 5
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = counter,
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+        }
+        
+        [Test]
+        public void ObjectGreaterInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "greater",
+                        Type = "integer",
+                        Value = 5
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = counter,
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ObjectEqualString_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "4"
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = $"{counter}",
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+        }
      
 
        
