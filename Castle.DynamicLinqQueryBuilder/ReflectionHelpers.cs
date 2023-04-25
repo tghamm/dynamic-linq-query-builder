@@ -8,11 +8,15 @@ namespace Castle.DynamicLinqQueryBuilder
     public static class ReflectionHelpers
     {
         public static MethodInfo SelectMethod;
+        public static MethodInfo WhereMethod;
+        public static MethodInfo ContainsMethod;
         public static MethodInfo ToListMethod;
 
         static ReflectionHelpers()
         {
             SelectMethod = GetExtensionMethod(typeof(Enumerable).Assembly, "Select");
+            WhereMethod = GetExtensionMethod(typeof(Enumerable).Assembly, "Where");
+            ContainsMethod = GetExtensionMethod(typeof(Enumerable).Assembly, "Contains");
             ToListMethod = GetExtensionMethod(typeof(Enumerable).Assembly, "ToList");
         }
 

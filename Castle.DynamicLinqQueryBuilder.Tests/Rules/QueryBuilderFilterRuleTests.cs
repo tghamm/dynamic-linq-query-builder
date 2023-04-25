@@ -82,6 +82,29 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new QueryBuilderFilterRule
                     {
                         Condition = "and",
+                        Field = "NullDateList",
+                        Id = "NullDateList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "date",
+                        Value = new[] { "2/23/2016" }
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter);
+            contentIdFilteredList = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList != null);
+            Assert.IsTrue(contentIdFilteredList.Count == 0);
+
+
+            contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
                         Field = "DateList",
                         Id = "DateList",
                         Input = "NA",

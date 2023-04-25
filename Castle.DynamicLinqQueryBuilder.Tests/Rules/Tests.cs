@@ -36,6 +36,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public List<int> IntList { get; set; }
             public List<int?> IntNullList { get; set; }
             public List<DateTime> DateList { get; set; }
+            public List<DateTime?> NullDateList { get { return new List<DateTime?> { null }; } }
             public List<double> DoubleList { get; set; }
             public List<string> StrList { get; set; }
             public List<ChildClass> ChildClasses { get; set; }

@@ -852,22 +852,30 @@ namespace Castle.DynamicLinqQueryBuilder
                 Expression exOut = default;
                 
                 bool isDtOnly = type == typeof(DateOnly);
-                ParameterExpression paramExp;
-                MemberExpression memberExpression;
-                LambdaExpression lambdaExp;
-                MethodCallExpression selectCallExp, listCallExp = null;
+                MethodCallExpression listCallExp = null;
 
                 if (isDtOnly)
                 {
-                    type = typeof(DateTime);
+                    MethodCallExpression whereCallExp = null;
+                    var isNullable = Nullable.GetUnderlyingType(genericType) != null;
+                    
+                    if (isNullable)
+                    {
+                        var paramExp1 = Expression.Parameter(typeof(DateTime?), "d");
+                        var memberExpression1 = GetNullCheckExpression(paramExp1);
+                        var lambdaExp1 = Expression.Lambda(memberExpression1, paramExp1);
+                        whereCallExp = Expression.Call(ReflectionHelpers.WhereMethod.MakeGenericMethod(typeof(DateTime?)), propertyExp, lambdaExp1);
+                    }
 
-                    paramExp = Expression.Parameter(type, "d");
-                    memberExpression = Expression.Property(paramExp, type.GetProperty("Date"));
-                    lambdaExp = Expression.Lambda(memberExpression, paramExp);
+                    var paramExp = Expression.Parameter(genericType, "d");
+                    var memberExpression = isNullable
+                        ? Expression.Property(Expression.Property(paramExp, genericType.GetProperty("Value")), typeof(DateTime).GetProperty("Date"))
+                        : Expression.Property(paramExp, genericType.GetProperty("Date"));
+                    var lambdaExp = Expression.Lambda(memberExpression, paramExp);
 
-                    selectCallExp = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(type, type), propertyExp, lambdaExp);
-                    listCallExp = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(type), selectCallExp);
-                    exOut = Expression.Call(listCallExp, method, Expression.Convert(someValues[0], genericType));
+                    var selectCallExp = Expression.Call(ReflectionHelpers.SelectMethod.MakeGenericMethod(genericType, typeof(DateTime)), whereCallExp ?? propertyExp, lambdaExp);
+                    listCallExp = Expression.Call(ReflectionHelpers.ToListMethod.MakeGenericMethod(typeof(DateTime)), selectCallExp);
+                    exOut = Expression.Call(ReflectionHelpers.ContainsMethod.MakeGenericMethod(typeof(DateTime)), listCallExp, Expression.Convert(someValues[0], typeof(DateTime)));
                 }
                 else
                     exOut = Expression.Call(propertyExp, method, Expression.Convert(someValues[0], genericType));
