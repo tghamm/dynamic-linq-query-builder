@@ -142,6 +142,32 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             });
 
+            contentIdFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LastModified",
+                        Id = "LastModified",
+                        Input = "NA",
+                        Operator = "between",
+                        Type = "date",
+                        Value = new[]
+                            {
+                                DateTime.Parse("2/21/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).ToShortDateString(),
+                                DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).ToShortDateString()
+                        }
+                    }
+                }
+            };
+            queryable = StartingDateQuery.BuildQuery(contentIdFilter, new BuildExpressionOptions() { CultureInfo = CultureInfo.CurrentCulture });
+            contentIdFilteredList2 = queryable.ToList();
+            Assert.IsTrue(contentIdFilteredList2 != null);
+            Assert.IsTrue(contentIdFilteredList2.Count == 1);
+
             QueryBuilder.ParseDatesAsUtc = false;
         }
 

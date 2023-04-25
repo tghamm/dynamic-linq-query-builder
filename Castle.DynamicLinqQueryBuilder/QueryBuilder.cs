@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml.Schema;
 
 namespace Castle.DynamicLinqQueryBuilder
 {
@@ -858,9 +859,25 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            var someValue = GetConstants(type, value, true, options);
-
-
+            if (type.Name == "DateOnly") // value 2 must be increased by 1 day to be inclusive regarding the time portion in the property.
+            {
+                List<string> newValues = new List<string>();
+                int i = 0;
+                foreach (var item in value as IEnumerable<string>)
+                {
+                    if (i == 1)
+                    {
+                        newValues.Add(DateTime.Parse(item).AddDays(1).Date.ToString(options.CultureInfo));
+                        break;
+                    }
+                    else
+                        newValues.Add(item);
+                    i++;
+                }
+                value = newValues;
+            }
+            var someValue = GetConstants(type, value, true, options);            
+            
             Expression exBelow = Expression.GreaterThanOrEqual(propertyExp, Expression.Convert(someValue[0], propertyExp.Type));
             Expression exAbove = Expression.LessThanOrEqual(propertyExp, Expression.Convert(someValue[1], propertyExp.Type));
 
