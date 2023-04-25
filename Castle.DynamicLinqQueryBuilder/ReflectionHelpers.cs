@@ -30,19 +30,5 @@ namespace Castle.DynamicLinqQueryBuilder
 
         public static MethodInfo GetExtensionMethod(Assembly extensionsAssembly, string name)
             => GetExtensionMethods(extensionsAssembly).FirstOrDefault(m => m.Name == name);
-
-        public static MethodInfo GetExtensionMethod(Assembly extensionsAssembly, string name, Type[] types)
-        {
-            var methods = (from m in GetExtensionMethods(extensionsAssembly)
-                           where m.Name == name && m.GetParameters().Count() == types.Length + 1 // + 1 because extension method parameter (this)
-                           select m).ToList();
-
-            if (!methods.Any())
-            {
-                return default;
-            }
-
-            return methods.First(); // Not the best option.
-        }
     }
 }
