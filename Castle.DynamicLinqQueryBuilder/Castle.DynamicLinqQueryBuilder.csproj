@@ -12,12 +12,12 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.9</Version>
+    <Version>1.3.0</Version>
     <Authors>Grant Hamm</Authors>
     <Company>N/A</Company>
     <Product>Dynamic Linq Query Builder</Product>
     <Description>A simple dynamic expression-tree query builder.  You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter to an arbitrary collection.</Description>
-    <Copyright>Copyright Grant Hamm 2022</Copyright>
+    <Copyright>Copyright Grant Hamm 2023</Copyright>
     <PackageLicenseUrl>https://github.com/tghamm/dynamic-linq-query-builder/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/tghamm/dynamic-linq-query-builder/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
