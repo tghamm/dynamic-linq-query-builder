@@ -38,5 +38,10 @@ namespace Castle.DynamicLinqQueryBuilder
         /// Flag to null check CLR objects in nested queries. May Cause ORM queries to fail.
         /// </summary>
         public bool NullCheckNestedCLRObjects { get; set; } = false;
+
+        /// <summary>
+        /// Indicates whether string comparisons are case sensitive or not, utilizing .ToLower() method
+        /// </summary>
+        public bool StringCaseSensitiveComparison { get; set; } = false;
     }
 }

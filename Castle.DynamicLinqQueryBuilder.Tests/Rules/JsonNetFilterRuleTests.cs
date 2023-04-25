@@ -3442,6 +3442,71 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var resultList = result.ToList();
             Assert.AreEqual(resultList[0].DynamicData["test"], "test");
         }
+        
+        [Test]
+        public void ObjectInExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"tEst", "TEST2", "test3"}
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "test2");
+            var d3 = new DictionaryClass();
+            d3.DynamicData.Add("test", "test4");
+
+            var result = new List<DictionaryClass> { d1, d2, d3 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+        [Test]
+        public void CaseSensitiveExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"tEst", "TEST2", "test3", "test4","test13"}
+                    }
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new DictionaryClass
+            {
+                DynamicData = new Dictionary<string, object> { ["test"] = $"test{counter}" }
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+     
 
         [Test]
         public void DictionaryExpression_Test_Fail()
