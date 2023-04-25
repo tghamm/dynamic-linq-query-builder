@@ -3444,6 +3444,40 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
         }
         
         [Test]
+        public void DictionaryExpression_Test_Fail()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "test"
+                    }
+                }
+            };
+            var d1 = new DictionaryClassFail();
+            d1.DynamicData.Add(1, "test");
+            var d2 = new DictionaryClassFail();
+            d2.DynamicData.Add(1, "NotTest");
+
+            
+
+            ExceptionAssert.Throws<NotSupportedException>(() =>
+            {
+                var result = new List<DictionaryClassFail> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                    new BuildExpressionOptions());
+            });
+            
+        }
+        
+        [Test]
         public void ObjectInExpression_Test()
         {
             var rule = new JsonNetFilterRule
@@ -3506,10 +3540,20 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(result.Any());
             Assert.AreEqual(result.Count(), 2);
         }
-     
-
+        
+        private enum MyEnum
+        {
+            Test,
+            Test2,
+            Test3
+        }
+        private class ClassWithEnum
+        {
+            public MyEnum EnumProperty { get; set; }
+        }
+        
         [Test]
-        public void DictionaryExpression_Test_Fail()
+        public void EnumExpression_Test()
         {
             var rule = new JsonNetFilterRule
             {
@@ -3519,27 +3563,77 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new JsonNetFilterRule
                     {
                         Condition = "and",
-                        Field = "DynamicData.test",
+                        Field = "EnumProperty",
                         Id = "Id",
-                        Operator = "equal",
+                        Operator = "in",
                         Type = "string",
-                        Value = "test"
+                        Value = new List<string>{"Test2", "Test3"}
                     }
                 }
             };
-            var d1 = new DictionaryClassFail();
-            d1.DynamicData.Add(1, "test");
-            var d2 = new DictionaryClassFail();
-            d2.DynamicData.Add(1, "NotTest");
 
-            
-
-            ExceptionAssert.Throws<NotSupportedException>(() =>
+            var items = new List<ClassWithEnum>
             {
-                var result = new List<DictionaryClassFail> { d1, d2 }.AsQueryable().BuildQuery(rule,
-                    new BuildExpressionOptions());
-            });
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test
+                },
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test2
+                }
+            }; 
             
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+            
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList.First().EnumProperty, MyEnum.Test2);
+        }
+        
+        [Test]
+        public void EnumExpressionCastedToInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "EnumProperty",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "integer",
+                        Value = "1"
+                    }
+                }
+            };
+
+            var items = new List<ClassWithEnum>
+            {
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test
+                },
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test2
+                }
+            }; 
+            
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+            
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList.First().EnumProperty, MyEnum.Test2);
         }
 
         class ObjectsClass
@@ -3691,6 +3785,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(result.Any());
             Assert.AreEqual(result.Count(), 1);
         }
+     
+
+       
         #endregion
     }
 }
