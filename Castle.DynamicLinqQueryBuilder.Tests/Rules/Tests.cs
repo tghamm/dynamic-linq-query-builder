@@ -30,6 +30,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public bool? IsPossiblyNotSetBool { get; set; }
             public DateTime LastModified { get; set; }
             public DateTime? LastModifiedIfPresent { get; set; }
+            public DateTime? NullableDateTime { get; set; }
             public DateTime? NullableLastModified { get { return null; } }
             public double StatValue { get; set; }
             public double? PossiblyEmptyStatValue { get; set; }
@@ -171,6 +172,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 IsPossiblyNotSetBool = null,
                 IsSelected = true,
                 LastModified = DateTime.UtcNow.Date,
+                NullableDateTime = DateTime.UtcNow.AddDays(-1),
                 LastModifiedIfPresent = null,
                 LongerTextToFilter = "There is something interesting about this text",
                 NullableContentTypeId = 3,
@@ -194,6 +196,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 IsPossiblyNotSetBool = true,
                 IsSelected = true,
                 LastModified = DateTime.UtcNow.Date,
+                NullableDateTime = DateTime.UtcNow,
                 LastModifiedIfPresent = DateTime.UtcNow.Date,
                 LongerTextToFilter = "THERE IS SOMETHING INTERESTING ABOUT THIS TEXT",
                 NullableContentTypeId = null,
