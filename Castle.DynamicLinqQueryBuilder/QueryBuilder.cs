@@ -828,23 +828,31 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression LessThanOrEqual(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
+            var dtOnly = IsDateOnly(type);
+            if (dtOnly)
+                value = ShiftOneDayForDate(value, 0, options.CultureInfo).First();
+
             Expression someValue = GetConstants(type, value, false, options).First();
             PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
 
-            Expression exOut = Expression.LessThanOrEqual(propertyExp, someValue);
-            return exOut;
+            return dtOnly 
+                ? Expression.LessThan(propertyExp, someValue)
+                : Expression.LessThanOrEqual(propertyExp, someValue);
         }
 
         private static Expression GreaterThan(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
+            var dtOnly = IsDateOnly(type);
+            if (dtOnly)
+                value = ShiftOneDayForDate(value, 0, options.CultureInfo).First();
+
             Expression someValue = GetConstants(type, value, false, options).First();
-
             PerformCasting(propertyExp, someValue, type, out propertyExp, out someValue);
-            Expression exOut = Expression.GreaterThan(propertyExp, someValue);
-            return exOut;
-        }
 
-   
+            return dtOnly
+                ? Expression.GreaterThanOrEqual(propertyExp, someValue)
+                : Expression.GreaterThan(propertyExp, someValue);
+        }   
 
         private static Expression GreaterThanOrEqual(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
@@ -856,22 +864,9 @@ namespace Castle.DynamicLinqQueryBuilder
 
         private static Expression Between(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
-            if (type.Name == "DateOnly") // value 2 must be increased by 1 day to be inclusive regarding the time portion in the property.
+            if (IsDateOnly(type)) // value 2 must be increased by 1 day to be inclusive regarding the time portion in the property.
             {
-                List<string> newValues = new List<string>();
-                int i = 0;
-                foreach (var item in value as IEnumerable<string>)
-                {
-                    if (i == 1)
-                    {
-                        newValues.Add(DateTime.Parse(item).AddDays(1).Date.ToString(options.CultureInfo));
-                        break;
-                    }
-                    else
-                        newValues.Add(item);
-                    i++;
-                }
-                value = newValues;
+                value = ShiftOneDayForDate(value, 1, options.CultureInfo);
             }
             var someValue = GetConstants(type, value, true, options);            
             
@@ -1066,5 +1061,26 @@ namespace Castle.DynamicLinqQueryBuilder
             }
         }
 
+        private static bool IsDateOnly(Type type)
+            => type.Name == "DateOnly";
+
+        private static List<string> ShiftOneDayForDate(object value, byte index, CultureInfo cultureInfo)
+        {
+            List<string> newValues = new List<string>();
+            byte i = 0;
+            foreach (var item in value as IEnumerable<string>)
+            {
+                if (i == index)
+                {
+                    newValues.Add(DateTime.Parse(item).AddDays(1).Date.ToString(cultureInfo));
+                    break;
+                }
+                else
+                    newValues.Add(item);
+                i++;
+            }
+
+            return newValues;
+        }
     }
 }

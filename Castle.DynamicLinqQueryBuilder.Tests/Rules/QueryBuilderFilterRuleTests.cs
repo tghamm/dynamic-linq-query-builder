@@ -2868,6 +2868,32 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             });
 
+
+            //expect 1 entries to match for a Date comparison
+            var nullableDateTimeFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableDateTime",
+                        Id = "NullableDateTime",
+                        Input = "NA",
+                        Operator = "greater_or_equal",
+                        Type = "date",
+                        Value = new[] { DateTime.UtcNow.ToShortDateString() }
+                    }
+                }
+            };
+            var nullableDateTimeFilterList = StartingQuery.BuildQuery(nullableDateTimeFilter, new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }).ToList();
+            Assert.IsTrue(nullableDateTimeFilterList != null);
+            Assert.AreEqual(1, nullableDateTimeFilterList.Count);
+            Assert.IsTrue(
+                nullableDateTimeFilterList.Select(p => p.NullableDateTime.Value.Date)
+                    .All(p => p >= DateTime.UtcNow.Date));
+
             //expect 2 entries to match for a nullable boolean field
             var nullableStatValueFilter = new QueryBuilderFilterRule
             {
@@ -2986,6 +3012,32 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
+
+
+            //expect 1 entries to match for a Date comparison
+            var nullableDateTimeFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableDateTime",
+                        Id = "NullableDateTime",
+                        Input = "NA",
+                        Operator = "greater",
+                        Type = "date",
+                        Value = new[] { DateTime.UtcNow.AddDays(-1).ToShortDateString() }
+                    }
+                }
+            };
+            var nullableDateTimeFilterList = StartingQuery.BuildQuery(nullableDateTimeFilter, new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }).ToList();
+            Assert.IsTrue(nullableDateTimeFilterList != null);
+            Assert.AreEqual(1, nullableDateTimeFilterList.Count);
+            Assert.IsTrue(
+                nullableDateTimeFilterList.Select(p => p.NullableDateTime.Value.Date)
+                    .All(p => p > DateTime.UtcNow.AddDays(-1).Date));
 
             //expect 0 entries to match for a possibly empty Date comparison
             var nullableLastModifiedFilter = new QueryBuilderFilterRule
@@ -3157,6 +3209,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 lastModifiedFilterList.Select(p => p.LastModified)
                     .All(p => (p <= DateTime.UtcNow.Date.AddDays(-2))));
 
+
             //expect failure when an invalid date is encountered in date comparison
             ExceptionAssert.Throws<Exception>(() =>
             {
@@ -3164,6 +3217,32 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
+
+
+            //expect 1 entries to match for a Date comparison
+            var nullableDateTimeFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableDateTime",
+                        Id = "NullableDateTime",
+                        Input = "NA",
+                        Operator = "less",
+                        Type = "date",
+                        Value = new[] { DateTime.UtcNow.ToShortDateString() }
+                    }
+                }
+            };
+            var nullableDateTimeFilterList = StartingQuery.BuildQuery(nullableDateTimeFilter, new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }).ToList();
+            Assert.IsTrue(nullableDateTimeFilterList != null);
+            Assert.AreEqual(1, nullableDateTimeFilterList.Count);
+            Assert.IsTrue(
+                nullableDateTimeFilterList.Select(p => p.NullableDateTime.Value.Date)
+                    .All(p => p < DateTime.UtcNow.Date));
 
             //expect 3 entries to match for a possibly empty Date comparison
             var nullableLastModifiedFilter = new QueryBuilderFilterRule
@@ -3342,6 +3421,32 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StartingQuery.BuildQuery(lastModifiedFilter).ToList();
 
             });
+
+
+            //expect 1 entries to match for a Date comparison
+            var nullableDateTimeFilter = new QueryBuilderFilterRule
+            {
+                Condition = "and",
+                Rules = new List<QueryBuilderFilterRule>
+                {
+                    new QueryBuilderFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableDateTime",
+                        Id = "NullableDateTime",
+                        Input = "NA",
+                        Operator = "less_or_equal",
+                        Type = "date",
+                        Value = new[] { DateTime.UtcNow.AddDays(-1).ToShortDateString() }
+                    }
+                }
+            };
+            var nullableDateTimeFilterList = StartingQuery.BuildQuery(nullableDateTimeFilter).ToList();
+            Assert.IsTrue(nullableDateTimeFilterList != null);
+            Assert.AreEqual(1, nullableDateTimeFilterList.Count);
+            Assert.IsTrue(
+                nullableDateTimeFilterList.Select(p => p.NullableDateTime.Value.Date)
+                    .All(p => p <= DateTime.UtcNow.Date.AddDays(-1)));
 
             //expect 3 entries to match for a possibly empty Date comparison
             var nullableLastModifiedFilter = new QueryBuilderFilterRule
