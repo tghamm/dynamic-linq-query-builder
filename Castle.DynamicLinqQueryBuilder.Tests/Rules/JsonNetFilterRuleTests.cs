@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using Castle.DynamicLinqQueryBuilder.Tests.CustomOperators;
 using Castle.DynamicLinqQueryBuilder.Tests.Helpers;
 using NUnit.Framework;
 
@@ -14,12 +15,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
     {
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingQuery;
         IQueryable<Tests.ExpressionTreeBuilderTestClass> StartingDateQuery;
+        BuildExpressionOptions dtOptionCurrentCulture;
 
         [SetUp]
         public void Setup()
         {
             StartingQuery = Tests.GetExpressionTreeData().AsQueryable();
             StartingDateQuery = Tests.GetDateExpressionTreeData().AsQueryable();
+            dtOptionCurrentCulture = new BuildExpressionOptions() { CultureInfo = CultureInfo.CurrentCulture };
         }
 
         #region Wrapper
@@ -292,7 +295,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 4);
             Assert.IsTrue(
@@ -325,7 +328,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
             Assert.IsTrue(
@@ -698,7 +701,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 0);
             Assert.IsTrue(
@@ -731,7 +734,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
             Assert.IsTrue(
@@ -2260,7 +2263,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 4);
             Assert.IsTrue(
@@ -2293,7 +2296,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 3);
             Assert.IsTrue(
@@ -2437,7 +2440,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter).ToList();
+            var lastModifiedFilterList = StartingQuery.BuildQuery(lastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
             Assert.IsTrue(lastModifiedFilterList.Count == 0);
             Assert.IsTrue(
@@ -2470,7 +2473,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
-            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter).ToList();
+            var nullableLastModifiedFilterList = StartingQuery.BuildQuery(nullableLastModifiedFilter, dtOptionCurrentCulture).ToList();
             Assert.IsTrue(nullableLastModifiedFilterList != null);
             Assert.IsTrue(nullableLastModifiedFilterList.Count == 1);
             Assert.IsTrue(
@@ -3439,7 +3442,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var resultList = result.ToList();
             Assert.AreEqual(resultList[0].DynamicData["test"], "test");
         }
-
+        
         [Test]
         public void DictionaryExpression_Test_Fail()
         {
@@ -3473,6 +3476,318 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             });
             
         }
+        
+        [Test]
+        public void ObjectInExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"tEst", "TEST2", "test3"}
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "test2");
+            var d3 = new DictionaryClass();
+            d3.DynamicData.Add("test", "test4");
+
+            var result = new List<DictionaryClass> { d1, d2, d3 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+        [Test]
+        public void CaseSensitiveExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.test",
+                        Id = "Id",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"tEst", "TEST2", "test3", "test4","test13"}
+                    }
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new DictionaryClass
+            {
+                DynamicData = new Dictionary<string, object> { ["test"] = $"test{counter}" }
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+        private enum MyEnum
+        {
+            Test,
+            Test2,
+            Test3
+        }
+        private class ClassWithEnum
+        {
+            public MyEnum EnumProperty { get; set; }
+        }
+        
+        [Test]
+        public void EnumExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "EnumProperty",
+                        Id = "Id",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string>{"Test2", "Test3"}
+                    }
+                }
+            };
+
+            var items = new List<ClassWithEnum>
+            {
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test
+                },
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test2
+                }
+            }; 
+            
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+            
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList.First().EnumProperty, MyEnum.Test2);
+        }
+        
+        [Test]
+        public void EnumExpressionCastedToInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "EnumProperty",
+                        Id = "Id",
+                        Operator = "equal",
+                        Type = "integer",
+                        Value = "1"
+                    }
+                }
+            };
+
+            var items = new List<ClassWithEnum>
+            {
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test
+                },
+                new ClassWithEnum
+                {
+                    EnumProperty = MyEnum.Test2
+                }
+            }; 
+            
+            var result = items.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions {StringCaseSensitiveComparison = true});
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+            
+            var resultList = result.ToList();
+            Assert.AreEqual(resultList.First().EnumProperty, MyEnum.Test2);
+        }
+
+        class ObjectsClass
+        {
+            public List<object> ListTest { get; set; }
+            public object Test { get; set; }
+        }
+        [Test]
+        public void ListObjectsInString_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "ListTest",
+                        Operator = "in",
+                        Type = "string",
+                        Value = new List<string> {"1","2","3","4"}
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                ListTest = new List<object> {$"{counter}"},
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions ());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ListObjectsInInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "ListTest",
+                        Operator = "in",
+                        Type = "integer",
+                        Value = new List<int> {1,2,3,4}
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                ListTest = new List<object> {counter},
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ObjectEqualInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "equal",
+                        Type = "integer",
+                        Value = 5
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = counter,
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+        }
+        
+        [Test]
+        public void ObjectGreaterInteger_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "greater",
+                        Type = "integer",
+                        Value = 5
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = counter,
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 4);
+        }
+        
+        [Test]
+        public void ObjectEqualString_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Test",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "4"
+                    },
+                    
+                }
+            };
+            var items = Enumerable.Range(0, 10).Select(counter => new ObjectsClass
+            {
+                Test = $"{counter}",
+            }).ToList();
+            
+            var result = items.AsQueryable().BuildQuery(rule, new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 1);
+        }
+     
+
+       
         #endregion
     }
 }

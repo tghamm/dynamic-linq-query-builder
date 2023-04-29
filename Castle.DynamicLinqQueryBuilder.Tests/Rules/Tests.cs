@@ -30,11 +30,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public bool? IsPossiblyNotSetBool { get; set; }
             public DateTime LastModified { get; set; }
             public DateTime? LastModifiedIfPresent { get; set; }
+            public DateTime? NullableDateTime { get; set; }
+            public DateTime? NullableLastModified { get { return null; } }
             public double StatValue { get; set; }
             public double? PossiblyEmptyStatValue { get; set; }
             public List<int> IntList { get; set; }
             public List<int?> IntNullList { get; set; }
             public List<DateTime> DateList { get; set; }
+            public List<DateTime?> NullDateList { get { return new List<DateTime?> { null }; } }
             public List<double> DoubleList { get; set; }
             public List<string> StrList { get; set; }
             public List<ChildClass> ChildClasses { get; set; }
@@ -66,7 +69,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 Flags = new List<string>(),
                 IsPossiblyNotSetBool = true,
                 IsSelected = true,
-                LastModified = DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal),
+                LastModified = DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddHours(3),
                 LastModifiedIfPresent = DateTime.UtcNow.Date,
                 LongerTextToFilter = "There is something interesting about this text",
                 NullableContentTypeId = 1,
@@ -74,7 +77,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StatValue = 1.11,
                 IntList = new List<int>() { 1, 3, 5, 7 },
                 StrList = new List<string>() { "Str1", "Str2" },
-                DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal), DateTime.UtcNow.Date.AddDays(-2) },
+                DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddHours(2), DateTime.UtcNow.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
                 IntNullList = new List<int?>() { 3, 4, 5, null }
             };
@@ -169,6 +172,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 IsPossiblyNotSetBool = null,
                 IsSelected = true,
                 LastModified = DateTime.UtcNow.Date,
+                NullableDateTime = DateTime.UtcNow.AddDays(-1),
                 LastModifiedIfPresent = null,
                 LongerTextToFilter = "There is something interesting about this text",
                 NullableContentTypeId = 3,
@@ -192,6 +196,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 IsPossiblyNotSetBool = true,
                 IsSelected = true,
                 LastModified = DateTime.UtcNow.Date,
+                NullableDateTime = DateTime.UtcNow,
                 LastModifiedIfPresent = DateTime.UtcNow.Date,
                 LongerTextToFilter = "THERE IS SOMETHING INTERESTING ABOUT THIS TEXT",
                 NullableContentTypeId = null,
@@ -2658,14 +2663,14 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                         Id = "LastModified",
                         Input = "NA",
                         Operator = "in",
-                        Type = "datetime",
+                        Type = "date",
                         Value = DateTime.UtcNow.Date.AddDays(-2)
                     }
                 }
             };
             var lastModifiedFilterList = startingQuery.BuildQuery(lastModifiedFilter, new BuildExpressionOptions()
             {
-                CultureInfo = CultureInfo.InvariantCulture,
+                CultureInfo = CultureInfo.CurrentCulture,
                 ParseDatesAsUtc = true
             }).ToList();
             Assert.IsTrue(lastModifiedFilterList != null);
