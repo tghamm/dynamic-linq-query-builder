@@ -20,7 +20,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
 #if LOCALTEST
     [TestFixture]
 #endif
-    public class ORMTestsMongo: IDisposable
+    public class ORMTestsMongo : IDisposable
     {
         private readonly IMongoDatabase _db;
         private readonly IMongoCollection<Restaurant> _collection;
@@ -31,48 +31,58 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             var connectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
             if (connectionString == null)
             {
-                Console.WriteLine("You must set your 'MONGODB_URI' environmental variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable");
+                Console.WriteLine(
+                    "You must set your 'MONGODB_URI' environmental variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable");
                 Environment.Exit(0);
             }
+
             var client = new MongoClient(connectionString);
             SetEnumConvention();
             _db = client.GetDatabase("DynamicLinqQueryBuilderTests");
+            _db.DropCollection(CollectionName);
             _db.CreateCollection(CollectionName);
             _collection = _db.GetCollection<Restaurant>(CollectionName);
-            
+
 
             var restaurants = new List<Restaurant>()
             {
-               new Restaurant
-               {
-                   Name = "My restaurant",
-                   RestaurantId = "Id",
-                   Status = Status.Open,
-                   Details = new Dictionary<string, object>
-                   {
-                       ["items_count"] = 30,
-                       ["date_started"] = DateTime.Now - TimeSpan.FromDays(365),
-                       ["address"] = "street23"
-                       
-                   }
-               },
-               new Restaurant
-               {
-                   Name = "My restaurant2",
-                   RestaurantId = "Id2",
-                   Status = Status.Closed,
-                   Details = new Dictionary<string, object>
-                   {
-                       ["items_count"] = 40,
-                       ["date_started"] = DateTime.Now - TimeSpan.FromDays(20),
-                       ["address"] = "street33"
-                       
-                   }
-               }
+                new Restaurant
+                {
+                    Name = "My restaurant",
+                    RestaurantId = "Id",
+                    Status = Status.Open,
+                    Details = new Dictionary<string, object>
+                    {
+                        ["items_count"] = 30,
+                        ["date_started"] = DateTime.Now - TimeSpan.FromDays(365),
+                        ["address"] = "street23"
+                    }
+                },
+                new Restaurant
+                {
+                    Name = "My restaurant2",
+                    RestaurantId = "Id2",
+                    Status = Status.Closed,
+                    Details = new Dictionary<string, object>
+                    {
+                        ["items_count"] = 40,
+                        ["date_started"] = DateTime.Now - TimeSpan.FromDays(20),
+                        ["address"] = "street33"
+                    }
+                },
+                new Restaurant
+                {
+                    Name = "My restaurant3",
+                    RestaurantId = "Id3",
+                    Status = Status.Closed,
+                    Details = new Dictionary<string, object>
+                    {
+                        ["not_any_other_field"] = "value"
+                    }
+                }
             };
-        
-            _collection.InsertMany(restaurants);
 
+            _collection.InsertMany(restaurants);
         }
 
         private void SetEnumConvention()
@@ -86,13 +96,12 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
         }
 
         public void Dispose() => _db.DropCollection(CollectionName);
-        
+
 #if LOCALTEST
         [Test]
 #endif
         public async Task StringEndsWithTest()
         {
-         
             var filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -117,7 +126,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
 #endif
         public async Task EnumTest()
         {
-         
             var filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -136,7 +144,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             var result = await _collection.Find(expression).ToListAsync();
             Assert.IsTrue(result.Count == 1);
             Assert.AreEqual(result.First().RestaurantId, "Id");
-            
+
             filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -151,19 +159,20 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     }
                 }
             };
-            
-            expression = filter.BuildExpressionLambda<Restaurant>(new BuildExpressionOptions { StringCaseSensitiveComparison = true}, out var _);
+
+            expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { StringCaseSensitiveComparison = true }, out var _);
             result = await _collection.Find(expression).ToListAsync();
             Assert.IsTrue(result.Count == 0);
         }
-        
-        
+
+
 #if LOCALTEST
         [Test]
 #endif
         public async Task DictionaryIntegerGreaterThenTest()
         {
-         
             var filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -183,14 +192,13 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
             Assert.IsTrue(result.Count == 1);
             Assert.AreEqual(result.First().RestaurantId, "Id2");
         }
-        
-        
+
+
 #if LOCALTEST
         [Test]
 #endif
         public async Task DictionaryDateTimeGreaterThenTest()
         {
-         
             var filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -205,18 +213,19 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     }
                 }
             };
-            var expression = filter.BuildExpressionLambda<Restaurant>(new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture}, out var _);
+            var expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }, out var _);
             var result = await _collection.Find(expression).ToListAsync();
             Assert.IsTrue(result.Count == 1);
             Assert.AreEqual(result.First().RestaurantId, "Id2");
         }
-      
+
 #if LOCALTEST
         [Test]
 #endif
         public async Task DictionaryStringEndsWithTest()
         {
-         
             var filter = new JsonNetFilterRule()
             {
                 Condition = "and",
@@ -231,11 +240,96 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.ORM
                     }
                 }
             };
-            var expression = filter.BuildExpressionLambda<Restaurant>(new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture}, out var _);
+            var expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }, out var _);
             var result = await _collection.Find(expression).ToListAsync();
             Assert.IsTrue(result.Count == 1);
             Assert.AreEqual(result.First().RestaurantId, "Id");
         }
 
-     }
+
+#if LOCALTEST
+        [Test]
+#endif
+        public async Task DictionaryIsNullTest()
+        {
+            var filter = new JsonNetFilterRule()
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "Details.address",
+                        Operator = "is_null",
+                        Type = "string",
+                    }
+                }
+            };
+            var expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }, out var _);
+            var result = await _collection.Find(expression).ToListAsync();
+            Assert.IsTrue(result.Count == 1);
+            Assert.AreEqual(result.First().RestaurantId, "Id3");
+        }
+
+
+#if LOCALTEST
+        [Test]
+#endif
+        public async Task DictionaryNotEqualTest()
+        {
+            var filter = new JsonNetFilterRule()
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    // mongo supports not_equal even if the the item does not exist in the dictionary
+                    // as oppose to inMemory filtering where it will throw KeyNotFound exception
+                    new JsonNetFilterRule
+                    {
+                        Field = "Details.address",
+                        Operator = "not_equal",
+                        Type = "string",
+                        Value = "a"
+                    }
+                }
+            };
+            var expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }, out var _);
+            var result = await _collection.Find(expression).ToListAsync();
+            Assert.IsTrue(result.Count == 3);
+        }
+        
+#if LOCALTEST
+        [Test]
+#endif
+        public async Task DictionaryNotContainsTest()
+        {
+            var filter = new JsonNetFilterRule()
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    // mongo supports not_equal even if the the item does not exist in the dictionary
+                    // as oppose to inMemory filtering where it will throw KeyNotFound exception
+                    new JsonNetFilterRule
+                    {
+                        Field = "Details",
+                        Operator = "not_contains",
+                        Type = "string",
+                        Value = "address"
+                    }
+                }
+            };
+            var expression =
+                filter.BuildExpressionLambda<Restaurant>(
+                    new BuildExpressionOptions { CultureInfo = CultureInfo.CurrentCulture }, out var _);
+            var result = await _collection.Find(expression).ToListAsync();
+            Assert.IsTrue(result.Count == 1);
+        }
+    }
 }

@@ -3444,6 +3444,139 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
         }
         
         [Test]
+        public void DictionaryContainsExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData",
+                        Id = "Id",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = "existing"
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("existing", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("existing", "NotTest" );
+
+            var result = new List<DictionaryClass> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+        [Test]
+        public void DictionaryNotContainsExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData",
+                        Id = "Id",
+                        Operator = "not_contains",
+                        Type = "string",
+                        Value = "not_existing"
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "NotTest" );
+
+            var result = new List<DictionaryClass> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+             
+        [Test]
+        public void DictionaryNotEqualWithoutContainsCheckExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "DynamicData.not_existing",
+                        Id = "Id",
+                        Operator = "not_equal",
+                        Type = "string",
+                        Value = "test"
+                    }
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "NotTest" );
+
+            ExceptionAssert.Throws<KeyNotFoundException>(() =>
+            {
+                var result = new List<DictionaryClass> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                    new BuildExpressionOptions());
+                result.Any();
+            });
+        }
+        
+        [Test]
+        public void DictionaryNotEqualWithContainsCheckExpression_Test()
+        {
+            var rule = new JsonNetFilterRule
+            {
+                Condition = "or",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Field = "DynamicData",
+                        Id = "Id",
+                        Operator = "not_contains",
+                        Type = "string",
+                        Value = "not_existing"
+                    },
+                    new JsonNetFilterRule
+                    {
+                        Field = "DynamicData.not_existing",
+                        Id = "Id",
+                        Operator = "not_equal",
+                        Type = "string",
+                        Value = "test"
+                    },
+                   
+                }
+            };
+            var d1 = new DictionaryClass();
+            d1.DynamicData.Add("test", "test");
+            var d2 = new DictionaryClass();
+            d2.DynamicData.Add("test", "NotTest" );
+
+            var result = new List<DictionaryClass> { d1, d2 }.AsQueryable().BuildQuery(rule,
+                new BuildExpressionOptions());
+            Assert.IsTrue(result.Any());
+            Assert.AreEqual(result.Count(), 2);
+        }
+        
+        [Test]
         public void DictionaryExpression_Test_Fail()
         {
             var rule = new JsonNetFilterRule
