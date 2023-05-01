@@ -297,14 +297,12 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     var key = propertyCollectionEnumerator.Current;
                     var indexExpr = Expression.Constant(key);
-                    var containsKeyMethod = propertyType.GetMethod("ContainsKey");
-                    var containsKeyExpr = Expression.Call(expression, containsKeyMethod!, indexExpr);
-                    
+
                     var getItemMethod = propertyType.GetMethod("get_Item");
                     expression = Expression.Call(expression, getItemMethod!, indexExpr);
                     // recursively build the body of the lambda expression for the nested properties
                     var body = BuildNestedExpression(expression, propertyCollectionEnumerator, rule, options, type); 
-                    return Expression.AndAlso(containsKeyExpr, body);
+                    return body;
                 }
                 if (propertyType != typeof(string) && enumerable != null)
                 {
@@ -455,7 +453,7 @@ namespace Castle.DynamicLinqQueryBuilder
             return expression;
         }
 
-        public static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
+     public static List<ConstantExpression> GetConstants(Type type, object value, bool isCollection, BuildExpressionOptions options)
         {
             if (type == typeof(DateOnly))
                 type = typeof(DateTime);
@@ -667,8 +665,21 @@ namespace Castle.DynamicLinqQueryBuilder
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
             }
-            var method = (propertyExpString ?? propertyExp).Type.GetMethod("Contains", new[] { type });
-            GetExpressionsOperands(buildExpressionOptions, propertyExpString ?? propertyExp, value, out var exOut, out var argument);
+
+            MethodInfo method;
+            Expression argument;
+            var exOut = propertyExpString ?? propertyExp;
+            if (IsDictionary(propertyExp.Type))
+            {
+                method = exOut.Type.GetMethod("ContainsKey", new[] { type });
+                argument = Expression.Constant(value.ToString(), typeof(string));
+            }
+            else
+            {
+                method = exOut.Type.GetMethod("Contains", new[] { type });
+                GetExpressionsOperands(buildExpressionOptions, exOut, value, out exOut, out argument);
+            }
+
             exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, argument));
 
             return exOut;
