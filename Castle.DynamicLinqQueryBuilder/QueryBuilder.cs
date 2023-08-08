@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -259,6 +259,9 @@ namespace Castle.DynamicLinqQueryBuilder
                     break;
                 case "double":
                     type = typeof(double);
+                    break;
+                case "long":
+                    type = typeof(long);
                     break;
                 case "string":
                     type = typeof(string);
