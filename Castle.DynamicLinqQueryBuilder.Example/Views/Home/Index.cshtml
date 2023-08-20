@@ -90,13 +90,17 @@
         });
         buildTable = function() {
             var tbody = $('#data-table tbody'),
-                props = ["firstName", "lastName", "birthday", "age", "address", "city", "state", "zipCode"];
+                props = ["firstName", "lastName", "birthday", "deceased", "address", "city", "state", "zipCode"];
             tbody.empty();
             $.each(tableData, function(i, reservation) {
                 var tr = $('<tr>');
-                $.each(props, function(i, prop) {
-                    $('<td>').html(reservation[prop]).appendTo(tr);
-                });
+                    $.each(props, function (i, prop) {
+                        var value = reservation[prop];
+                        if (typeof value === "boolean") {
+                            value = String(value); // Convert boolean to string
+                        }
+                        $('<td>').html(value).appendTo(tr);
+                    });
                 tbody.append(tr);
             });
         };
@@ -128,7 +132,7 @@
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Birthday</th>
-                <th>Age</th>
+                <th>Deceased</th>
                 <th>Address</th>
                 <th>City</th>
                 <th>State</th>
