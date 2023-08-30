@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -938,8 +938,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new SystemTextJsonFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
@@ -950,7 +950,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var nullableIntListList = StartingQuery.BuildQuery(nullableIntListFilter).ToList();
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 3);
-            Assert.IsTrue(nullableIntListList.All(p => p.IntNullList.Contains(5)));
+            Assert.IsTrue(nullableIntListList.All(p => p.NullableIntList.Contains(5)));
 
             var multipleWithBlankRule = new SystemTextJsonFilterRule
             {
@@ -1205,12 +1205,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p != 1.112));
 
-
-
-
-
-
-
             //expect 2 entries to match for a List<DateTime> field
             var dateListFilter = new SystemTextJsonFilterRule
             {
@@ -1264,15 +1258,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(strListFilterList != null);
             Assert.IsTrue(strListFilterList.Count == 1);
             Assert.IsTrue(strListFilterList.All(p => !p.StrList.Contains("Str2")));
-
-
-
-
-
-
-
-
-
+            
             //expect 2 entries to match for a List<int> field
             var intListFilter = new SystemTextJsonFilterRule
             {
@@ -1304,7 +1290,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
 
             });
 
-            //expect 2 entries to match for a nullable nullable int field
+            //expect 2 entries to match for a nullable int field
             var nullableIntListFilter = new SystemTextJsonFilterRule
             {
                 Condition = "and",
@@ -1313,8 +1299,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new SystemTextJsonFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
@@ -1326,7 +1312,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 1);
             Assert.IsTrue(
-                nullableIntListList.All(p => !p.IntNullList.Contains(5)));
+                nullableIntListList.All(p => !p.NullableIntList.Contains(5)));
 
             //expect 2 entries to match for a nullable double field
             var nullableWrappedStatValueFilter = new SystemTextJsonFilterRule
@@ -1353,8 +1339,51 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 nullableWrappedStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p != 1.112));
 
-
-
+            //expect 3 entries to match for a List<long> field
+            var longListFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LongList",
+                        Id = "LongList",
+                        Input = "NA",
+                        Operator = "not_in",
+                        Type = "long",
+                        Value = new[] { 7, 20 }
+                    }
+                }
+            };
+            var longListFilterList = StartingQuery.BuildQuery(longListFilter).ToList();
+            Assert.IsTrue(longListFilterList != null);
+            Assert.IsTrue(longListFilterList.Count == 3);
+            Assert.IsTrue(longListFilterList.All(p => !p.LongList.Contains(7) && !p.LongList.Contains(20)));
+            
+            //expect 3 entries to match for a nullable List<long> field
+            var nullableLongListFilter = new SystemTextJsonFilterRule
+            {
+                Condition = "and",
+                Rules = new List<SystemTextJsonFilterRule>
+                {
+                    new SystemTextJsonFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableLongList",
+                        Id = "NullableLongList",
+                        Input = "NA",
+                        Operator = "not_in",
+                        Type = "long",
+                        Value = "5"
+                    }
+                }
+            };
+            var nullableLongListList = StartingQuery.BuildQuery(nullableLongListFilter).ToList();
+            Assert.IsTrue(nullableLongListList != null);
+            Assert.IsTrue(nullableLongListList.Count == 2);
+            Assert.IsTrue(nullableLongListList.All(p => !p.NullableLongList.Contains(5)));
         }
 
         [Test]
