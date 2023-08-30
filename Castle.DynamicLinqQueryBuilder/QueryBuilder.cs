@@ -260,6 +260,9 @@ namespace Castle.DynamicLinqQueryBuilder
                 case "double":
                     type = typeof(double);
                     break;
+                case "long":
+                    type = typeof(long);
+                    break;
                 case "string":
                     type = typeof(string);
                     break;

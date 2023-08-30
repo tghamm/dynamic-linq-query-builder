@@ -488,8 +488,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new JsonNetFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
@@ -500,8 +500,54 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var nullableIntListList = StartingQuery.BuildQuery(nullableIntListFilter).ToList();
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 3);
-            Assert.IsTrue(nullableIntListList.All(p => p.IntNullList.Contains(5)));
+            Assert.IsTrue(nullableIntListList.All(p => p.NullableIntList.Contains(5)));
 
+            //expect 2 entries to match for a List<int> field
+            var longListFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "LongList",
+                        Id = "LongList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "long",
+                        Value = new[] {"1", "3"}
+                    }
+                }
+            };
+            var longListFilterList = StartingQuery.BuildQuery(longListFilter).ToList();
+            Assert.IsTrue(longListFilterList != null);
+            Assert.IsTrue(longListFilterList.Count == 1);
+            Assert.IsTrue(longListFilterList.All(p => p.LongList.Contains(1) || p.LongList.Contains(3)));
+
+            //expect 2 entries to match for a nullable nullable int field
+            var nullableLongListFilter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "NullableLongList",
+                        Id = "NullableLongList",
+                        Input = "NA",
+                        Operator = "in",
+                        Type = "long",
+                        Value = 5
+                    }
+                }
+            };
+            var nullableLongListList = StartingQuery.BuildQuery(nullableLongListFilter).ToList();
+            Assert.IsTrue(nullableLongListList != null);
+            Assert.IsTrue(nullableLongListList.Count == 2);
+            Assert.IsTrue(nullableLongListList.All(p => p.NullableLongList.Contains(5)));
+            
             var multipleWithBlankRule = new JsonNetFilterRule
             {
                 Condition = "and",
@@ -519,6 +565,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     }
                 }
             };
+            
             var multipleWithBlankList = StartingQuery.BuildQuery(multipleWithBlankRule).ToList();
             Assert.IsTrue(multipleWithBlankList != null);
             Assert.IsTrue(multipleWithBlankList.Count == 4);
@@ -908,8 +955,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new JsonNetFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
@@ -921,7 +968,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 1);
             Assert.IsTrue(
-                nullableIntListList.All(p => !p.IntNullList.Contains(5)));
+                nullableIntListList.All(p => !p.NullableIntList.Contains(5)));
 
             //expect 2 entries to match for a nullable double field
             var nullableWrappedStatValueFilter = new JsonNetFilterRule
