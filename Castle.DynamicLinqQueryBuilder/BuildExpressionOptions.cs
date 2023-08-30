@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -43,5 +43,10 @@ namespace Castle.DynamicLinqQueryBuilder
         /// Indicates whether string comparisons are case sensitive or not, utilizing .ToLower() method
         /// </summary>
         public bool StringCaseSensitiveComparison { get; set; } = false;
+        
+        /// <summary>
+        /// Indicates whether to require explicit ToString() conversion for non-string types
+        /// </summary>
+        public bool RequireExplicitToStringConversion { get; set; } = true;
     }
 }

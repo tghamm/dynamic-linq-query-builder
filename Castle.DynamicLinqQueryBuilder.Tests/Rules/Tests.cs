@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -35,7 +35,9 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public double StatValue { get; set; }
             public double? PossiblyEmptyStatValue { get; set; }
             public List<int> IntList { get; set; }
-            public List<int?> IntNullList { get; set; }
+            public List<int?> NullableIntList { get; set; }
+            public List<long> LongList { get; set; }
+            public List<long?> NullableLongList { get; set; }
             public List<DateTime> DateList { get; set; }
             public List<DateTime?> NullDateList { get { return new List<DateTime?> { null }; } }
             public List<double> DoubleList { get; set; }
@@ -43,6 +45,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public List<ChildClass> ChildClasses { get; set; }
             public List<ChildClass> NestedNullObjectChildClasses { get; set; }
 
+            public Dictionary<string, object> Dictionary { get; set; } = new Dictionary<string, object>();
         }
 
         public class ChildClass
@@ -79,7 +82,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.Parse("2/23/2016", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddHours(2), DateTime.UtcNow.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null }
+                NullableIntList = new List<int?>() { 3, 4, 5, null }
             };
             tData.Add(entry1);
 
@@ -107,19 +110,25 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 PossiblyEmptyStatValue = null,
                 StatValue = 1.11,
                 IntList = new List<int>() { 1, 3, 5, 7 },
+                LongList = new List<long>(),
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null },
+                NullableIntList = new List<int?>() { 3, 4, 5, null },
+                NullableLongList = new List<long?>() { null },
                 NestedNullObjectChildClasses = new List<ChildClass>()
                 {
-                    new ChildClass()
+                    new()
                     {
                         ChildSubClass = new ChildSubClass()
                         {
                             ClassName = "ChildSubClass"
                         }
                     }
+                },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Emma",
+                    ["last_name"] = "Watson"
                 }
             };
             tData.Add(entry1);
@@ -141,17 +150,16 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 PossiblyEmptyStatValue = 1.112,
                 StatValue = 1.12,
                 IntList = new List<int>() { 5, 7 },
+                LongList = new List<long>() { 12, 14},
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null },
+                NullableIntList = new List<int?>() { 3, 4, 5, null },
+                NullableLongList = new List<long?>() { 5, 7, 9 },
                 NestedNullObjectChildClasses = new List<ChildClass>()
                 {
-                    new ChildClass()
-                    {
-                        
-                    },
-                    new ChildClass()
+                    new(),
+                    new()
                     {
                         ChildSubClass = new ChildSubClass()
                         {
@@ -179,10 +187,15 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 PossiblyEmptyStatValue = null,
                 StatValue = 1.13,
                 IntList = new List<int>() { 1, 3, 5, 7 },
+                LongList = new List<long>() { 8, 9, 10, 11 },
                 StrList = new List<string>() { "Str1", "" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
-                IntNullList = new List<int?>() { 3, 4, 5, null }
+                NullableIntList = new List<int?>() { 3, 4, 5, null },
+                NullableLongList = new List<long?>() { 3, null, 5 },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Madonna",
+                }
             };
             tData.Add(entry3);
 
@@ -203,10 +216,16 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 PossiblyEmptyStatValue = 1.112,
                 StatValue = 1.11,
                 IntList = new List<int>() { 1, 3, 5, 7 },
+                LongList = new List<long>() { 1, 3, 5, 7 },
                 StrList = new List<string>() { "Str1", "Str2" },
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date },
-                DoubleList = new List<double>() { 1.48, },
-                IntNullList = new List<int?>() { 3, 4, null, null }
+                DoubleList = new List<double>() { 1.48 },
+                NullableIntList = new List<int?>() { 3, 4, null, null },
+                NullableLongList = new List<long?>() { 1, 3, null },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Emma",
+                    ["last_name"] = "Stone"
+                }
             };
             tData.Add(entry4);
 
@@ -533,9 +552,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(
                 nullableContentIdFilteredList.All(p => (new List<int>() { 1, 2 }).Contains(p.NullableContentTypeId.Value)));
 
-
-
-
             //expect 3 entries to match for a case-insensitive string comparison
             var longerTextToFilterFilter = new FilterRule()
             {
@@ -704,12 +720,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p == 1.112));
 
-
-
-
-
-
-
             //expect 2 entries to match for a List<DateTime> field
             var dateListFilter = new FilterRule()
             {
@@ -763,15 +773,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(strListFilterList != null);
             Assert.IsTrue(strListFilterList.Count == 3);
             Assert.IsTrue(strListFilterList.All(p => p.StrList.Contains("Str2")));
-
-
-
-
-
-
-
-
-
+            
             //expect 2 entries to match for a List<int> field
             var intListFilter = new FilterRule()
             {
@@ -812,8 +814,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new FilterRule()
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
@@ -825,7 +827,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 3);
             Assert.IsTrue(
-                nullableIntListList.All(p => p.IntNullList.Contains(5)));
+                nullableIntListList.All(p => p.NullableIntList.Contains(5)));
 
 
             startingQuery = GetExpressionTreeData().AsQueryable();
@@ -1084,12 +1086,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p != 1.112));
 
-
-
-
-
-
-
             //expect 2 entries to match for a List<DateTime> field
             var dateListFilter = new FilterRule()
             {
@@ -1143,15 +1139,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(strListFilterList != null);
             Assert.IsTrue(strListFilterList.Count == 1);
             Assert.IsTrue(strListFilterList.All(p => !p.StrList.Contains("Str2")));
-
-
-
-
-
-
-
-
-
+            
             //expect 2 entries to match for a List<int> field
             var intListFilter = new FilterRule()
             {
@@ -1192,8 +1180,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new FilterRule()
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
@@ -1205,10 +1193,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 1);
             Assert.IsTrue(
-                nullableIntListList.All(p => !p.IntNullList.Contains(5)));
-
-
-
+                nullableIntListList.All(p => !p.NullableIntList.Contains(5)));
         }
 
         [Test]

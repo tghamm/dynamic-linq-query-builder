@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -514,8 +514,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new QueryBuilderFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "in",
                         Type = "integer",
@@ -526,7 +526,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             var nullableIntListList = StartingQuery.BuildQuery(nullableIntListFilter).ToList();
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 3);
-            Assert.IsTrue(nullableIntListList.All(p => p.IntNullList.Contains(5)));
+            Assert.IsTrue(nullableIntListList.All(p => p.NullableIntList.Contains(5)));
 
             var multipleWithBlankRule = new QueryBuilderFilterRule
             {
@@ -941,8 +941,8 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                     new QueryBuilderFilterRule
                     {
                         Condition = "and",
-                        Field = "IntNullList",
-                        Id = "IntNullList",
+                        Field = "NullableIntList",
+                        Id = "NullableIntList",
                         Input = "NA",
                         Operator = "not_in",
                         Type = "integer",
@@ -954,7 +954,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(nullableIntListList != null);
             Assert.IsTrue(nullableIntListList.Count == 1);
             Assert.IsTrue(
-                nullableIntListList.All(p => !p.IntNullList.Contains(5)));
+                nullableIntListList.All(p => !p.NullableIntList.Contains(5)));
 
             //expect 2 entries to match for a nullable double field
             var nullableWrappedStatValueFilter = new QueryBuilderFilterRule
@@ -3531,7 +3531,6 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(
                 nullableStatFilterList.Select(p => p.PossiblyEmptyStatValue)
                     .All(p => p <= 1.113));
-
         }
 
         [Test]
