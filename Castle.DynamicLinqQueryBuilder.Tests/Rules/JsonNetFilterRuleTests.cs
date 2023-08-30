@@ -3551,7 +3551,82 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             Assert.IsTrue(result.Any());
             Assert.AreEqual(result.Count(), 2);
         }
+
+        [Test]
+        public void DictionaryEqualWithRequireExplicitToStringConversionFlagTrue() {
+            var filter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Dictionary",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = "first_name"
+                    },
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Dictionary.first_name",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "Emma"
+                    }
+                }
+            };
+
+            var query = StartingQuery.BuildQuery(filter, new BuildExpressionOptions {
+                RequireExplicitToStringConversion = true,
+                StringCaseSensitiveComparison = true
+            });
+            
+            var results = query.ToList();
+            Assert.AreEqual(results.Count, 2);
+            
+            // Verify that the expression is using ToString() on the value
+            Assert.IsTrue(query.Expression.ToString().Contains("ToString()"));
+        }
         
+        [Test]
+        public void DictionaryEqualWithRequireExplicitToStringConversionFlagFalse() {
+            var filter = new JsonNetFilterRule
+            {
+                Condition = "and",
+                Rules = new List<JsonNetFilterRule>
+                {
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Dictionary",
+                        Operator = "contains",
+                        Type = "string",
+                        Value = "first_name"
+                    },
+                    new JsonNetFilterRule
+                    {
+                        Condition = "and",
+                        Field = "Dictionary.first_name",
+                        Operator = "equal",
+                        Type = "string",
+                        Value = "Emma"
+                    }
+                }
+            };
+            
+            var query = StartingQuery.BuildQuery(filter, new BuildExpressionOptions {
+                RequireExplicitToStringConversion = false,
+                StringCaseSensitiveComparison = true
+            });
+            
+            var results = query.ToList();
+            Assert.AreEqual(results.Count, 2);
+            
+            // Verify that the expression is not using ToString() on the value
+            Assert.IsFalse(query.Expression.ToString().Contains("ToString()"));
+        }
              
         [Test]
         public void DictionaryNotEqualWithoutContainsCheckExpression_Test()

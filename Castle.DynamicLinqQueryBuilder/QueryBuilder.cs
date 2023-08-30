@@ -657,13 +657,13 @@ namespace Castle.DynamicLinqQueryBuilder
                 : Expression.Not(IsEmpty(propertyExp));
 
         private static Expression Contains(Type type, object value, Expression propertyExp,
-            BuildExpressionOptions buildExpressionOptions)
+            BuildExpressionOptions options)
         {
             if (value is Array items) value = items.GetValue(0);
             var nullCheck = GetNullCheckExpression(propertyExp);
             MethodCallExpression propertyExpString = null;
 
-            if (ShouldConvertToString(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type, options))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
@@ -680,7 +680,7 @@ namespace Castle.DynamicLinqQueryBuilder
             else
             {
                 method = exOut.Type.GetMethod("Contains", new[] { type });
-                GetExpressionsOperands(buildExpressionOptions, exOut, value, out exOut, out argument);
+                GetExpressionsOperands(options, exOut, value, out exOut, out argument);
             }
 
             exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method, argument));
@@ -731,7 +731,7 @@ namespace Castle.DynamicLinqQueryBuilder
             var nullCheck = GetNullCheckExpression(propertyExp);
             MethodCallExpression propertyExpString = null;
 
-            if (ShouldConvertToString(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type, options))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
@@ -758,7 +758,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
             MethodCallExpression propertyExpString = null;
 
-            if (ShouldConvertToString(propertyExp.Type))
+            if (ShouldConvertToString(propertyExp.Type, options))
             {
                 propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 type = typeof(string);
@@ -796,7 +796,7 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 MethodCallExpression propertyExpString = null;
 
-                if (ShouldConvertToString(propertyExp.Type))
+                if (ShouldConvertToString(propertyExp.Type, options))
                 {
                     propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                 }
@@ -974,7 +974,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     if (type == typeof(string))
                     {
                         Expression propertyExpString = null;
-                        if (ShouldConvertToString(propertyExp.Type))
+                        if (ShouldConvertToString(propertyExp.Type, options))
                         {
                             propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                         }
@@ -1009,7 +1009,7 @@ namespace Castle.DynamicLinqQueryBuilder
                     if (type == typeof(string))
                     {
                         Expression propertyExpString = null;
-                        if (ShouldConvertToString(propertyExp.Type))
+                        if (ShouldConvertToString(propertyExp.Type, options))
                         {
                             propertyExpString = Expression.Call(propertyExp, propertyExp.Type.GetMethod("ToString", Type.EmptyTypes));
                         }
@@ -1049,9 +1049,12 @@ namespace Castle.DynamicLinqQueryBuilder
             return isGenericList;
         }
 
-        public static bool IsGuid(this Type o) => o.UnderlyingSystemType.Name == "Guid" || Nullable.GetUnderlyingType(o)?.Name == "Guid";
+        private static bool IsGuid(this Type o) => o.UnderlyingSystemType.Name == "Guid" || Nullable.GetUnderlyingType(o)?.Name == "Guid";
 
-        public static bool ShouldConvertToString(this Type o) => IsGuid(o) || o == typeof(object) || o.IsEnum; 
+        private static bool IsTypeFitForToStringConversion(this Type o) => IsGuid(o) || o == typeof(object) || o.IsEnum;
+
+        private static bool ShouldConvertToString(this Type o, BuildExpressionOptions options) =>
+            IsTypeFitForToStringConversion(o) && options.RequireExplicitToStringConversion;
 
         private static object GetDefaultValue(this Type type)
         {

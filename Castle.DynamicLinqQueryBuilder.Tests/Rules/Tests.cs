@@ -45,6 +45,7 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
             public List<ChildClass> ChildClasses { get; set; }
             public List<ChildClass> NestedNullObjectChildClasses { get; set; }
 
+            public Dictionary<string, object> Dictionary { get; set; } = new Dictionary<string, object>();
         }
 
         public class ChildClass
@@ -124,6 +125,10 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                             ClassName = "ChildSubClass"
                         }
                     }
+                },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Emma",
+                    ["last_name"] = "Watson"
                 }
             };
             tData.Add(entry1);
@@ -187,7 +192,10 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(-2) },
                 DoubleList = new List<double>() { 1.48, 1.84, 1.33 },
                 NullableIntList = new List<int?>() { 3, 4, 5, null },
-                NullableLongList = new List<long?>() { 3, null, 5 }
+                NullableLongList = new List<long?>() { 3, null, 5 },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Madonna",
+                }
             };
             tData.Add(entry3);
 
@@ -213,7 +221,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
                 DateList = new List<DateTime>() { DateTime.UtcNow.Date },
                 DoubleList = new List<double>() { 1.48 },
                 NullableIntList = new List<int?>() { 3, 4, null, null },
-                NullableLongList = new List<long?>() { 1, 3, null }
+                NullableLongList = new List<long?>() { 1, 3, null },
+                Dictionary = new Dictionary<string, object> {
+                    ["first_name"] = "Emma",
+                    ["last_name"] = "Stone"
+                }
             };
             tData.Add(entry4);
 
