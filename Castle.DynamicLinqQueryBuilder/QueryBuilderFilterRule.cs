@@ -52,7 +52,7 @@ namespace Castle.DynamicLinqQueryBuilder
         /// </value>
         public List<QueryBuilderFilterRule> Rules { get; set; }
         /// <summary>
-        /// Gets or sets the type. Supported values are "integer", "double", "string", "date", "datetime", and "boolean".
+        /// Gets or sets the type. Supported values are "integer", "double", "string", "date", "datetime", "guid", and "boolean".
         /// </summary>
         /// <value>
         /// The type.
