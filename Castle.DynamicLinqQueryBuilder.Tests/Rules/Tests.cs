@@ -4187,11 +4187,18 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
         {
             public int Age { get; set; }
             public int? FavoriteNumber { get; set; }
+            public long NumberOfShoes { get; set; }
+            public long? NumberOfSocks { get; set; }
             public string Name { get; set; }
             public DateTime Birthday { get; set; }
             public DateTime? FavoriteBirthday { get; set; }
             public double DollarsInWallet { get; set; }
             public double? DesiredDollarsInWallet { get; set; }
+            public float DollarsInSavings { get; set; }
+            public float? DesiredDollarsInSavings { get; set; }
+            public decimal DollarsInRetirement { get; set; }
+            public decimal? DesiredDollarsInRetirement { get; set; }
+
 #pragma warning disable IDE1006 // Naming Styles
             public string camelCaseField { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
@@ -4207,11 +4214,11 @@ namespace Castle.DynamicLinqQueryBuilder.Tests.Rules
         {
             var result = typeof(ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType();
 
-            Assert.IsTrue(result.Count == 10);
+            Assert.IsTrue(result.Count == 16);
 
             result = typeof(ColumnBuilderTestClass).GetDefaultColumnDefinitionsForType(true);
 
-            Assert.IsTrue(result.Count == 10);
+            Assert.IsTrue(result.Count == 16);
 
         }
 

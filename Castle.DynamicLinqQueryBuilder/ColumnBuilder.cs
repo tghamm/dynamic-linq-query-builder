@@ -24,7 +24,7 @@ namespace Castle.DynamicLinqQueryBuilder
             var id = 1;
             foreach (var prop in dataType.GetProperties())
             {
-                if (prop.GetCustomAttribute(typeof (IgnoreDataMemberAttribute)) != null) continue;
+                if (prop.GetCustomAttribute(typeof(IgnoreDataMemberAttribute)) != null) continue;
 
                 var name = camelCase ? prop.Name.ToCamelCase() : prop.Name;
 
@@ -32,11 +32,14 @@ namespace Castle.DynamicLinqQueryBuilder
 
                 var type = string.Empty;
 
-                if ((prop.PropertyType == typeof (double)) || (prop.PropertyType == typeof (double?)))
+                if ((prop.PropertyType == typeof(double)) || (prop.PropertyType == typeof(double?))
+                    || (prop.PropertyType == typeof(float)) || (prop.PropertyType == typeof(float?))
+                    || (prop.PropertyType == typeof(decimal)) || (prop.PropertyType == typeof(decimal?)))
                 {
                     type = "double";
                 }
-                else if ((prop.PropertyType == typeof (int)) || (prop.PropertyType == typeof (int?)))
+                else if ((prop.PropertyType == typeof(int)) || (prop.PropertyType == typeof(int?)) 
+                    || (prop.PropertyType == typeof(long)) || (prop.PropertyType == typeof(long?)))
                 {
                     type = "integer";
                 }
@@ -90,7 +93,7 @@ namespace Castle.DynamicLinqQueryBuilder
                             Type = type,
                             Id = id.ToString()
                         });
-                        break;                    
+                        break;
                     case "boolean":
                         itemBankColumnDefinitions.Add(new ColumnDefinition()
                         {
