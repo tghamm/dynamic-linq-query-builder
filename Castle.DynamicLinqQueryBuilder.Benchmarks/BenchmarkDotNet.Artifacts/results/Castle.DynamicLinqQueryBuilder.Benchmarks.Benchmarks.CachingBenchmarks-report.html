@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.CachingBenchmarks-20260119-221930</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.7623)
+Intel Core i9-14900KF, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 9.0.306
+  [Host]   : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method               </th><th>Mean       </th><th>Error      </th><th>StdDev   </th><th>Median     </th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Build_Simple_Once</td><td>588.4580 ns</td><td>349.6347 ns</td><td>19.1647 ns</td><td>579.9361 ns</td><td>1.001</td><td>0.04</td><td>0.0830</td><td>-</td><td>1568 B</td><td>1.00</td>
+</tr><tr><td>UseCached_Simple_Once</td><td>0.0078 ns</td><td>0.1624 ns</td><td>0.0089 ns</td><td>0.0059 ns</td><td>0.000</td><td>0.00</td><td>-</td><td>-</td><td>-</td><td>0.00</td>
+</tr><tr><td>Build_Simple_10x</td><td>5,807.4214 ns</td><td>702.3963 ns</td><td>38.5007 ns</td><td>5,789.3227 ns</td><td>9.876</td><td>0.28</td><td>0.8316</td><td>-</td><td>15680 B</td><td>10.00</td>
+</tr><tr><td>Build_Simple_100x</td><td>61,761.2081 ns</td><td>49,264.2840 ns</td><td>2,700.3417 ns</td><td>60,926.4832 ns</td><td>105.027</td><td>4.93</td><td>8.3008</td><td>-</td><td>156802 B</td><td>100.00</td>
+</tr><tr><td>Build_Simple_1000x</td><td>608,186.3281 ns</td><td>763,774.8967 ns</td><td>41,865.0795 ns</td><td>587,133.2031 ns</td><td>1,034.244</td><td>68.02</td><td>82.0313</td><td>-</td><td>1568022 B</td><td>1,000.01</td>
+</tr><tr><td>Build_Medium_Once</td><td>2,361.5847 ns</td><td>1,133.1967 ns</td><td>62.1143 ns</td><td>2,389.6538 ns</td><td>4.016</td><td>0.14</td><td>0.1984</td><td>-</td><td>3872 B</td><td>2.47</td>
+</tr><tr><td>Build_Medium_10x</td><td>21,131.6447 ns</td><td>20,235.3399 ns</td><td>1,109.1673 ns</td><td>20,702.3438 ns</td><td>35.935</td><td>1.91</td><td>1.9531</td><td>-</td><td>38722 B</td><td>24.70</td>
+</tr><tr><td>Build_Medium_100x</td><td>205,683.1055 ns</td><td>155,615.2095 ns</td><td>8,529.7948 ns</td><td>202,589.0625 ns</td><td>349.772</td><td>15.87</td><td>20.5078</td><td>-</td><td>387218 B</td><td>246.95</td>
+</tr><tr><td>Build_Complex_Once</td><td>6,178.6255 ns</td><td>7,362.2224 ns</td><td>403.5483 ns</td><td>6,283.8593 ns</td><td>10.507</td><td>0.66</td><td>0.5493</td><td>-</td><td>10409 B</td><td>6.64</td>
+</tr><tr><td>Build_Complex_10x</td><td>57,768.9535 ns</td><td>53,016.0440 ns</td><td>2,905.9883 ns</td><td>58,278.0273 ns</td><td>98.238</td><td>5.07</td><td>5.3711</td><td>-</td><td>104086 B</td><td>66.38</td>
+</tr><tr><td>Build_Complex_100x</td><td>635,556.3802 ns</td><td>628,102.4090 ns</td><td>34,428.4126 ns</td><td>630,601.5625 ns</td><td>1,080.788</td><td>58.91</td><td>54.6875</td><td>-</td><td>1040865 B</td><td>663.82</td>
+</tr><tr><td>BuildAndExecute_Simple</td><td>192,719.6777 ns</td><td>75,832.8366 ns</td><td>4,156.6537 ns</td><td>192,516.5527 ns</td><td>327.727</td><td>10.96</td><td>0.4883</td><td>-</td><td>15062 B</td><td>9.61</td>
+</tr><tr><td>CachedExecute_Simple</td><td>1,252.3633 ns</td><td>119.7343 ns</td><td>6.5630 ns</td><td>1,253.8887 ns</td><td>2.130</td><td>0.06</td><td>0.0114</td><td>-</td><td>248 B</td><td>0.16</td>
+</tr><tr><td>BuildAndExecute_Complex</td><td>691,972.1191 ns</td><td>102,628.9974 ns</td><td>5,625.4417 ns</td><td>694,938.5254 ns</td><td>1,176.725</td><td>33.66</td><td>3.9063</td><td>1.9531</td><td>79382 B</td><td>50.63</td>
+</tr><tr><td>CachedExecute_Complex</td><td>18,901.4099 ns</td><td>7,374.8778 ns</td><td>404.2419 ns</td><td>18,850.1068 ns</td><td>32.143</td><td>1.07</td><td>2.5635</td><td>-</td><td>48800 B</td><td>31.12</td>
+</tr><tr><td>BuildAndExecute_Simple_10x</td><td>1,954,312.2396 ns</td><td>198,618.8485 ns</td><td>10,886.9693 ns</td><td>1,957,078.5156 ns</td><td>3,323.383</td><td>93.52</td><td>7.8125</td><td>3.9063</td><td>150720 B</td><td>96.12</td>
+</tr><tr><td>CachedExecute_Simple_10x</td><td>13,090.7176 ns</td><td>710.4784 ns</td><td>38.9437 ns</td><td>13,084.1263 ns</td><td>22.261</td><td>0.62</td><td>0.1221</td><td>-</td><td>2480 B</td><td>1.58</td>
+</tr><tr><td>BuildAndExecute_Complex_10x</td><td>7,734,742.4479 ns</td><td>1,564,442.1214 ns</td><td>85,752.3520 ns</td><td>7,744,507.0312 ns</td><td>13,153.228</td><td>385.91</td><td>31.2500</td><td>15.6250</td><td>794848 B</td><td>506.92</td>
+</tr><tr><td>CachedExecute_Complex_10x</td><td>201,478.1250 ns</td><td>196,439.0517 ns</td><td>10,767.4873 ns</td><td>198,804.7607 ns</td><td>342.621</td><td>18.49</td><td>25.8789</td><td>-</td><td>488000 B</td><td>311.22</td>
+</tr><tr><td>BuildAndCompile_Simple</td><td>40,370.5943 ns</td><td>14,169.3408 ns</td><td>776.6694 ns</td><td>39,982.4921 ns</td><td>68.652</td><td>2.22</td><td>0.3052</td><td>0.1831</td><td>5886 B</td><td>3.75</td>
+</tr><tr><td>BuildAndCompile_Complex</td><td>477,628.8574 ns</td><td>635,880.0781 ns</td><td>34,854.7329 ns</td><td>459,442.1387 ns</td><td>812.226</td><td>56.07</td><td>0.9766</td><td>-</td><td>21327 B</td><td>13.60</td>
+</tr><tr><td>BuildAndCompile_Simple_10x</td><td>412,548.5514 ns</td><td>599,095.6999 ns</td><td>32,838.4570 ns</td><td>401,120.8008 ns</td><td>701.555</td><td>52.14</td><td>2.9297</td><td>2.4414</td><td>58866 B</td><td>37.54</td>
+</tr><tr><td>BuildAndCompile_Complex_10x</td><td>4,704,454.9479 ns</td><td>3,204,735.9198 ns</td><td>175,662.3904 ns</td><td>4,713,503.9062 ns</td><td>8,000.107</td><td>340.83</td><td>7.8125</td><td>-</td><td>214105 B</td><td>136.55</td>
+</tr></tbody></table>
+</body>
+</html>
