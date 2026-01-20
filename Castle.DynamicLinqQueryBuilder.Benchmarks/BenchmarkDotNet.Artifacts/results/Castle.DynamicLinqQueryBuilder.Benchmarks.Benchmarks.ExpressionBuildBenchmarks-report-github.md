@@ -12,11 +12,11 @@ WarmupCount=3
 ```
 | Method                             | Mean             | Error            | StdDev           | Ratio      | RatioSD   | Gen0   | Allocated   | Alloc Ratio |
 |----------------------------------- |-----------------:|-----------------:|-----------------:|-----------:|----------:|-------:|------------:|------------:|
-| BuildExpression_SimpleProperty     |         596.3 ns |         197.8 ns |         10.84 ns |       1.00 |      0.02 | 0.0801 |     1.53 KB |        1.00 |
-| BuildExpression_NestedProperty     |       7,119.8 ns |       1,771.3 ns |         97.09 ns |      11.94 |      0.24 | 0.5493 |    10.37 KB |        6.77 |
-| BuildExpression_CollectionProperty |       1,981.1 ns |         319.4 ns |         17.50 ns |       3.32 |      0.06 | 0.1831 |     3.42 KB |        2.23 |
-| BuildExpression_DictionaryAccess   |       2,136.8 ns |         206.0 ns |         11.29 ns |       3.58 |      0.06 | 0.1678 |     3.09 KB |        2.02 |
-| BuildQuery_SimpleProperty          |       2,702.1 ns |         401.2 ns |         21.99 ns |       4.53 |      0.08 | 0.2518 |     4.73 KB |        3.09 |
-| BuildQuery_NestedProperty          |       9,473.8 ns |       1,064.6 ns |         58.36 ns |      15.89 |      0.26 | 0.7324 |    13.68 KB |        8.93 |
-| BuildAndExecute_SimpleProperty     |     190,441.2 ns |      14,347.9 ns |        786.46 ns |     319.46 |      5.16 | 0.4883 |    14.71 KB |        9.61 |
-| BuildAndExecute_NestedProperty     | 313,351,700.0 ns | 226,912,640.4 ns | 12,437,847.55 ns | 525,646.82 | 19,878.40 |      - | 10610.36 KB |    6,929.21 |
+| BuildExpression_SimpleProperty     |         558.3 ns |         454.9 ns |         24.94 ns |       1.00 |      0.05 | 0.0801 |     1.53 KB |        1.00 |
+| BuildExpression_NestedProperty     |       7,740.7 ns |       6,163.8 ns |        337.86 ns |      13.88 |      0.75 | 0.5493 |    10.29 KB |        6.72 |
+| BuildExpression_CollectionProperty |       1,997.6 ns |       2,739.8 ns |        150.18 ns |       3.58 |      0.27 | 0.1755 |      3.3 KB |        2.16 |
+| BuildExpression_DictionaryAccess   |       2,332.7 ns |       4,012.7 ns |        219.95 ns |       4.18 |      0.38 | 0.1755 |      3.3 KB |        2.15 |
+| BuildQuery_SimpleProperty          |       2,610.0 ns |       1,592.0 ns |         87.26 ns |       4.68 |      0.23 | 0.2441 |     4.73 KB |        3.09 |
+| BuildQuery_NestedProperty          |       9,748.5 ns |       5,340.2 ns |        292.72 ns |      17.48 |      0.81 | 0.7324 |    13.64 KB |        8.91 |
+| BuildAndExecute_SimpleProperty     |     191,904.6 ns |      65,142.5 ns |      3,570.68 ns |     344.17 |     14.41 | 0.4883 |    14.71 KB |        9.61 |
+| BuildAndExecute_NestedProperty     | 314,293,633.3 ns | 354,777,146.5 ns | 19,446,532.62 ns | 563,659.76 | 37,248.57 |      - | 10609.05 KB |    6,928.36 |

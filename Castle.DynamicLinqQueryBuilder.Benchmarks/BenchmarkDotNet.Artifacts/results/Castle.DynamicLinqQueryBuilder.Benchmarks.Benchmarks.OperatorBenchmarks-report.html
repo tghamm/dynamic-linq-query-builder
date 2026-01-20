@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.OperatorBenchmarks-20260119-220600</title>
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.OperatorBenchmarks-20260119-225256</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -26,34 +26,34 @@ WarmupCount=3
 <table>
 <thead><tr><th>Method                </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
 </tr>
-</thead><tbody><tr><td>Equal_Integer</td><td>193.6 &mu;s</td><td>7.41 &mu;s</td><td>0.41 &mu;s</td><td>1.00</td><td>0.00</td><td>0.4883</td><td>-</td><td>14.71 KB</td><td>1.00</td>
-</tr><tr><td>NotEqual_Integer</td><td>201.9 &mu;s</td><td>18.80 &mu;s</td><td>1.03 &mu;s</td><td>1.04</td><td>0.00</td><td>1.4648</td><td>0.9766</td><td>30.82 KB</td><td>2.10</td>
-</tr><tr><td>Equal_String_CaseInsensitive</td><td>488.4 &mu;s</td><td>12.64 &mu;s</td><td>0.69 &mu;s</td><td>2.52</td><td>0.01</td><td>5.8594</td><td>2.9297</td><td>121.68 KB</td><td>8.27</td>
-</tr><tr><td>Equal_String_CaseSensitive</td><td>295.9 &mu;s</td><td>67.88 &mu;s</td><td>3.72 &mu;s</td><td>1.53</td><td>0.02</td><td>0.4883</td><td>-</td><td>17.86 KB</td><td>1.21</td>
-</tr><tr><td>NotEqual_String</td><td>498.5 &mu;s</td><td>91.21 &mu;s</td><td>5.00 &mu;s</td><td>2.58</td><td>0.02</td><td>6.8359</td><td>2.9297</td><td>135.81 KB</td><td>9.23</td>
-</tr><tr><td>In_5Values</td><td>234.3 &mu;s</td><td>13.68 &mu;s</td><td>0.75 &mu;s</td><td>1.21</td><td>0.00</td><td>0.9766</td><td>0.4883</td><td>19.02 KB</td><td>1.29</td>
-</tr><tr><td>In_50Values</td><td>447.0 &mu;s</td><td>203.93 &mu;s</td><td>11.18 &mu;s</td><td>2.31</td><td>0.05</td><td>2.9297</td><td>1.9531</td><td>62.08 KB</td><td>4.22</td>
-</tr><tr><td>In_500Values</td><td>3,525.2 &mu;s</td><td>1,074.17 &mu;s</td><td>58.88 &mu;s</td><td>18.21</td><td>0.27</td><td>15.6250</td><td>7.8125</td><td>405.41 KB</td><td>27.56</td>
-</tr><tr><td>NotIn_5Values</td><td>245.3 &mu;s</td><td>65.54 &mu;s</td><td>3.59 &mu;s</td><td>1.27</td><td>0.02</td><td>1.4648</td><td>0.9766</td><td>34.18 KB</td><td>2.32</td>
-</tr><tr><td>Less</td><td>203.5 &mu;s</td><td>56.69 &mu;s</td><td>3.11 &mu;s</td><td>1.05</td><td>0.01</td><td>0.9766</td><td>0.4883</td><td>22.73 KB</td><td>1.55</td>
-</tr><tr><td>LessOrEqual</td><td>219.8 &mu;s</td><td>56.66 &mu;s</td><td>3.11 &mu;s</td><td>1.14</td><td>0.01</td><td>0.9766</td><td>0.4883</td><td>22.74 KB</td><td>1.55</td>
-</tr><tr><td>Greater</td><td>213.9 &mu;s</td><td>144.21 &mu;s</td><td>7.90 &mu;s</td><td>1.11</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>22.73 KB</td><td>1.55</td>
-</tr><tr><td>GreaterOrEqual</td><td>243.3 &mu;s</td><td>298.06 &mu;s</td><td>16.34 &mu;s</td><td>1.26</td><td>0.07</td><td>0.9766</td><td>0.4883</td><td>22.74 KB</td><td>1.55</td>
-</tr><tr><td>Between</td><td>246.4 &mu;s</td><td>258.15 &mu;s</td><td>14.15 &mu;s</td><td>1.27</td><td>0.06</td><td>1.4648</td><td>0.9766</td><td>31.57 KB</td><td>2.15</td>
-</tr><tr><td>NotBetween</td><td>242.0 &mu;s</td><td>149.20 &mu;s</td><td>8.18 &mu;s</td><td>1.25</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>19.58 KB</td><td>1.33</td>
-</tr><tr><td>BeginsWith_CaseInsensitive</td><td>413.2 &mu;s</td><td>612.69 &mu;s</td><td>33.58 &mu;s</td><td>2.13</td><td>0.15</td><td>2.9297</td><td>0.9766</td><td>68.69 KB</td><td>4.67</td>
-</tr><tr><td>BeginsWith_CaseSensitive</td><td>300.1 &mu;s</td><td>143.91 &mu;s</td><td>7.89 &mu;s</td><td>1.55</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>19.95 KB</td><td>1.36</td>
-</tr><tr><td>NotBeginsWith</td><td>415.8 &mu;s</td><td>169.33 &mu;s</td><td>9.28 &mu;s</td><td>2.15</td><td>0.04</td><td>4.3945</td><td>-</td><td>80.92 KB</td><td>5.50</td>
-</tr><tr><td>Contains_CaseInsensitive</td><td>448.8 &mu;s</td><td>472.09 &mu;s</td><td>25.88 &mu;s</td><td>2.32</td><td>0.12</td><td>2.9297</td><td>0.9766</td><td>66.68 KB</td><td>4.53</td>
-</tr><tr><td>Contains_CaseSensitive</td><td>321.0 &mu;s</td><td>377.64 &mu;s</td><td>20.70 &mu;s</td><td>1.66</td><td>0.09</td><td>0.4883</td><td>-</td><td>17.91 KB</td><td>1.22</td>
-</tr><tr><td>NotContains</td><td>402.5 &mu;s</td><td>476.14 &mu;s</td><td>26.10 &mu;s</td><td>2.08</td><td>0.12</td><td>3.9063</td><td>1.9531</td><td>81.08 KB</td><td>5.51</td>
-</tr><tr><td>EndsWith_CaseInsensitive</td><td>394.9 &mu;s</td><td>313.50 &mu;s</td><td>17.18 &mu;s</td><td>2.04</td><td>0.08</td><td>2.9297</td><td>0.9766</td><td>66.67 KB</td><td>4.53</td>
-</tr><tr><td>EndsWith_CaseSensitive</td><td>282.3 &mu;s</td><td>77.52 &mu;s</td><td>4.25 &mu;s</td><td>1.46</td><td>0.02</td><td>0.4883</td><td>-</td><td>17.91 KB</td><td>1.22</td>
-</tr><tr><td>NotEndsWith</td><td>384.4 &mu;s</td><td>131.50 &mu;s</td><td>7.21 &mu;s</td><td>1.99</td><td>0.03</td><td>4.3945</td><td>1.9531</td><td>80.93 KB</td><td>5.50</td>
-</tr><tr><td>IsNull</td><td>225.2 &mu;s</td><td>67.95 &mu;s</td><td>3.72 &mu;s</td><td>1.16</td><td>0.02</td><td>0.9766</td><td>0.4883</td><td>18.76 KB</td><td>1.28</td>
-</tr><tr><td>IsNotNull</td><td>238.1 &mu;s</td><td>54.66 &mu;s</td><td>3.00 &mu;s</td><td>1.23</td><td>0.01</td><td>1.4648</td><td>0.9766</td><td>30.86 KB</td><td>2.10</td>
-</tr><tr><td>IsEmpty</td><td>256.6 &mu;s</td><td>178.28 &mu;s</td><td>9.77 &mu;s</td><td>1.33</td><td>0.04</td><td>0.4883</td><td>-</td><td>15.48 KB</td><td>1.05</td>
-</tr><tr><td>IsNotEmpty</td><td>255.7 &mu;s</td><td>23.16 &mu;s</td><td>1.27 &mu;s</td><td>1.32</td><td>0.01</td><td>1.4648</td><td>0.9766</td><td>31.74 KB</td><td>2.16</td>
+</thead><tbody><tr><td>Equal_Integer</td><td>212.3 &mu;s</td><td>153.95 &mu;s</td><td>8.44 &mu;s</td><td>1.00</td><td>0.05</td><td>0.4883</td><td>-</td><td>14.71 KB</td><td>1.00</td>
+</tr><tr><td>NotEqual_Integer</td><td>217.0 &mu;s</td><td>178.55 &mu;s</td><td>9.79 &mu;s</td><td>1.02</td><td>0.05</td><td>1.4648</td><td>0.9766</td><td>30.83 KB</td><td>2.10</td>
+</tr><tr><td>Equal_String_CaseInsensitive</td><td>520.3 &mu;s</td><td>101.83 &mu;s</td><td>5.58 &mu;s</td><td>2.45</td><td>0.09</td><td>5.8594</td><td>2.9297</td><td>121.68 KB</td><td>8.27</td>
+</tr><tr><td>Equal_String_CaseSensitive</td><td>310.7 &mu;s</td><td>46.86 &mu;s</td><td>2.57 &mu;s</td><td>1.47</td><td>0.05</td><td>0.4883</td><td>-</td><td>17.86 KB</td><td>1.21</td>
+</tr><tr><td>NotEqual_String</td><td>522.6 &mu;s</td><td>113.25 &mu;s</td><td>6.21 &mu;s</td><td>2.46</td><td>0.09</td><td>6.8359</td><td>2.9297</td><td>135.81 KB</td><td>9.23</td>
+</tr><tr><td>In_5Values</td><td>255.9 &mu;s</td><td>113.46 &mu;s</td><td>6.22 &mu;s</td><td>1.21</td><td>0.05</td><td>0.9766</td><td>0.4883</td><td>18.98 KB</td><td>1.29</td>
+</tr><tr><td>In_50Values</td><td>335.6 &mu;s</td><td>68.17 &mu;s</td><td>3.74 &mu;s</td><td>1.58</td><td>0.06</td><td>1.4648</td><td>0.9766</td><td>33.74 KB</td><td>2.29</td>
+</tr><tr><td>In_500Values</td><td>420.9 &mu;s</td><td>412.62 &mu;s</td><td>22.62 &mu;s</td><td>1.98</td><td>0.12</td><td>5.8594</td><td>2.9297</td><td>122.54 KB</td><td>8.33</td>
+</tr><tr><td>NotIn_5Values</td><td>245.6 &mu;s</td><td>48.72 &mu;s</td><td>2.67 &mu;s</td><td>1.16</td><td>0.04</td><td>1.4648</td><td>0.9766</td><td>34.13 KB</td><td>2.32</td>
+</tr><tr><td>Less</td><td>205.0 &mu;s</td><td>59.32 &mu;s</td><td>3.25 &mu;s</td><td>0.97</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>22.73 KB</td><td>1.55</td>
+</tr><tr><td>LessOrEqual</td><td>217.0 &mu;s</td><td>134.59 &mu;s</td><td>7.38 &mu;s</td><td>1.02</td><td>0.05</td><td>0.9766</td><td>0.4883</td><td>22.74 KB</td><td>1.55</td>
+</tr><tr><td>Greater</td><td>206.9 &mu;s</td><td>137.70 &mu;s</td><td>7.55 &mu;s</td><td>0.98</td><td>0.05</td><td>0.9766</td><td>0.4883</td><td>22.73 KB</td><td>1.55</td>
+</tr><tr><td>GreaterOrEqual</td><td>197.8 &mu;s</td><td>34.52 &mu;s</td><td>1.89 &mu;s</td><td>0.93</td><td>0.03</td><td>0.9766</td><td>0.4883</td><td>22.9 KB</td><td>1.56</td>
+</tr><tr><td>Between</td><td>216.2 &mu;s</td><td>67.08 &mu;s</td><td>3.68 &mu;s</td><td>1.02</td><td>0.04</td><td>1.4648</td><td>0.9766</td><td>31.72 KB</td><td>2.16</td>
+</tr><tr><td>NotBetween</td><td>222.4 &mu;s</td><td>73.43 &mu;s</td><td>4.03 &mu;s</td><td>1.05</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>19.58 KB</td><td>1.33</td>
+</tr><tr><td>BeginsWith_CaseInsensitive</td><td>375.0 &mu;s</td><td>198.44 &mu;s</td><td>10.88 &mu;s</td><td>1.77</td><td>0.08</td><td>3.4180</td><td>1.4648</td><td>68.77 KB</td><td>4.68</td>
+</tr><tr><td>BeginsWith_CaseSensitive</td><td>311.9 &mu;s</td><td>298.73 &mu;s</td><td>16.37 &mu;s</td><td>1.47</td><td>0.08</td><td>0.9766</td><td>0.4883</td><td>19.79 KB</td><td>1.35</td>
+</tr><tr><td>NotBeginsWith</td><td>423.0 &mu;s</td><td>473.55 &mu;s</td><td>25.96 &mu;s</td><td>2.00</td><td>0.13</td><td>3.9063</td><td>1.9531</td><td>80.64 KB</td><td>5.48</td>
+</tr><tr><td>Contains_CaseInsensitive</td><td>393.8 &mu;s</td><td>475.38 &mu;s</td><td>26.06 &mu;s</td><td>1.86</td><td>0.12</td><td>2.9297</td><td>0.9766</td><td>66.64 KB</td><td>4.53</td>
+</tr><tr><td>Contains_CaseSensitive</td><td>316.8 &mu;s</td><td>158.06 &mu;s</td><td>8.66 &mu;s</td><td>1.49</td><td>0.06</td><td>0.4883</td><td>-</td><td>17.87 KB</td><td>1.21</td>
+</tr><tr><td>NotContains</td><td>406.1 &mu;s</td><td>386.86 &mu;s</td><td>21.21 &mu;s</td><td>1.92</td><td>0.11</td><td>3.9063</td><td>1.9531</td><td>80.65 KB</td><td>5.48</td>
+</tr><tr><td>EndsWith_CaseInsensitive</td><td>417.7 &mu;s</td><td>481.72 &mu;s</td><td>26.40 &mu;s</td><td>1.97</td><td>0.13</td><td>2.9297</td><td>0.9766</td><td>66.52 KB</td><td>4.52</td>
+</tr><tr><td>EndsWith_CaseSensitive</td><td>301.9 &mu;s</td><td>223.51 &mu;s</td><td>12.25 &mu;s</td><td>1.42</td><td>0.07</td><td>0.4883</td><td>-</td><td>17.86 KB</td><td>1.21</td>
+</tr><tr><td>NotEndsWith</td><td>425.1 &mu;s</td><td>419.86 &mu;s</td><td>23.01 &mu;s</td><td>2.00</td><td>0.12</td><td>3.9063</td><td>1.9531</td><td>80.76 KB</td><td>5.49</td>
+</tr><tr><td>IsNull</td><td>232.4 &mu;s</td><td>84.51 &mu;s</td><td>4.63 &mu;s</td><td>1.10</td><td>0.04</td><td>0.9766</td><td>0.4883</td><td>18.98 KB</td><td>1.29</td>
+</tr><tr><td>IsNotNull</td><td>236.5 &mu;s</td><td>194.44 &mu;s</td><td>10.66 &mu;s</td><td>1.12</td><td>0.06</td><td>1.4648</td><td>0.9766</td><td>30.94 KB</td><td>2.10</td>
+</tr><tr><td>IsEmpty</td><td>250.2 &mu;s</td><td>93.57 &mu;s</td><td>5.13 &mu;s</td><td>1.18</td><td>0.05</td><td>0.4883</td><td>-</td><td>15.43 KB</td><td>1.05</td>
+</tr><tr><td>IsNotEmpty</td><td>258.4 &mu;s</td><td>83.79 &mu;s</td><td>4.59 &mu;s</td><td>1.22</td><td>0.05</td><td>1.4648</td><td>0.9766</td><td>31.69 KB</td><td>2.15</td>
 </tr></tbody></table>
 </body>
 </html>
