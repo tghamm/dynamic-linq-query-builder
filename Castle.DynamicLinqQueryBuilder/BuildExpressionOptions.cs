@@ -47,9 +47,16 @@ namespace Castle.DynamicLinqQueryBuilder
 
         /// <summary>
         /// Indicates whether string comparisons are case sensitive or not.
-        /// When false (default), uses StringComparison.OrdinalIgnoreCase for efficient case-insensitive comparison.
+        /// When false (default), case-insensitive comparison is used.
         /// </summary>
         public bool StringCaseSensitiveComparison { get; set; } = false;
+
+        /// <summary>
+        /// When true and StringCaseSensitiveComparison is false, uses StringComparison.OrdinalIgnoreCase
+        /// instead of ToLower() for case-insensitive comparisons. This is more efficient but incompatible
+        /// with ORM query translation (e.g., EF Core). Default is false for ORM compatibility.
+        /// </summary>
+        public bool UseOrdinalStringComparison { get; set; } = false;
         
         /// <summary>
         /// Indicates whether to require explicit ToString() conversion for non-string types

@@ -291,6 +291,7 @@ namespace Castle.DynamicLinqQueryBuilder
             
             // Options that affect expression generation
             sb.Append(options.StringCaseSensitiveComparison ? '1' : '0');
+            sb.Append(options.UseOrdinalStringComparison ? '1' : '0');
             sb.Append(options.ParseDatesAsUtc || ParseDatesAsUtc ? '1' : '0');
             sb.Append(options.NullCheckNestedCLRObjects ? '1' : '0');
             sb.Append(options.UseIndexedProperty ? '1' : '0');
@@ -825,27 +826,39 @@ namespace Castle.DynamicLinqQueryBuilder
                 type = typeof(string);
             }
 
-            MethodInfo? method;
-            Expression argument;
-            var exOut = (Expression?)propertyExpString ?? propertyExp;
+            var targetExpr = (Expression?)propertyExpString ?? propertyExp;
+            Expression exOut;
+
             if (IsDictionary(propertyExp.Type))
             {
-                method = ReflectionHelpers.GetCachedMethod(exOut.Type, "ContainsKey", new[] { type });
-                argument = Expression.Constant(value.ToString(), typeof(string));
+                var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "ContainsKey", new[] { type });
+                var argument = Expression.Constant(value.ToString(), typeof(string));
+                exOut = Expression.AndAlso(nullCheck, Expression.Call(targetExpr, method!, argument));
+            }
+            else if (ShouldUseOrdinalComparison(options) && type == typeof(string))
+            {
+                // Use Contains(value, StringComparison.OrdinalIgnoreCase)
+                var strValue = Expression.Constant(value.ToString(), typeof(string));
+                exOut = Expression.Call(
+                    targetExpr,
+                    ReflectionHelpers.StringContainsWithComparisonMethod,
+                    strValue,
+                    OrdinalIgnoreCaseConstant);
+                exOut = Expression.AndAlso(nullCheck, exOut);
             }
             else
             {
-                method = ReflectionHelpers.GetCachedMethod(exOut.Type, "Contains", new[] { type });
-                GetExpressionsOperands(options, exOut, value, out exOut, out argument);
+                var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "Contains", new[] { type });
+                GetExpressionsOperands(options, targetExpr, value, out exOut, out var argument);
+                exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
             }
-
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
 
             return exOut;
         }
 
         // Helper methods for string operations with case sensitivity support
-        // Note: Uses ToLower() approach for ORM (EF Core) compatibility
+        // When UseOrdinalStringComparison is true, operands are returned unchanged
+        // and callers use StringComparison overloads. Otherwise uses ToLower() for ORM compatibility.
         
         private static void GetExpressionsOperands(BuildExpressionOptions options, Expression property,
             object value, out Expression operand, out Expression argument)
@@ -853,7 +866,8 @@ namespace Castle.DynamicLinqQueryBuilder
             var strValue = value.ToString()!;
             operand = property;
             
-            if (!options.StringCaseSensitiveComparison)
+            // If case-insensitive and NOT using ordinal comparison, apply ToLower()
+            if (!options.StringCaseSensitiveComparison && !options.UseOrdinalStringComparison)
             {
                 strValue = strValue.ToLower();
                 operand = Expression.Call(property, ReflectionHelpers.StringToLowerMethod);
@@ -867,13 +881,22 @@ namespace Castle.DynamicLinqQueryBuilder
         {
             operand = property;
             
-            if (!options.StringCaseSensitiveComparison)
+            // If case-insensitive and NOT using ordinal comparison, apply ToLower()
+            if (!options.StringCaseSensitiveComparison && !options.UseOrdinalStringComparison)
             {
                 value = Expression.Call(value, ReflectionHelpers.StringToLowerMethod);
                 operand = Expression.Call(property, ReflectionHelpers.StringToLowerMethod);
             }
 
             argument = value;
+        }
+        
+        /// <summary>
+        /// Determines if we should use StringComparison.OrdinalIgnoreCase for string operations.
+        /// </summary>
+        private static bool ShouldUseOrdinalComparison(BuildExpressionOptions options)
+        {
+            return !options.StringCaseSensitiveComparison && options.UseOrdinalStringComparison;
         }
 
         private static Expression NotContains(Type type, object value, Expression propertyExp,
@@ -896,10 +919,25 @@ namespace Castle.DynamicLinqQueryBuilder
                 type = typeof(string);
             }
             var targetExpr = (Expression?)propertyExpString ?? propertyExp;
-            var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "EndsWith", new[] { type });
 
-            GetExpressionsOperands(options, targetExpr, value, out var exOut, out var argument);
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
+            Expression exOut;
+            if (ShouldUseOrdinalComparison(options))
+            {
+                // Use EndsWith(value, StringComparison.OrdinalIgnoreCase)
+                var strValue = Expression.Constant(value.ToString(), typeof(string));
+                exOut = Expression.Call(
+                    targetExpr,
+                    ReflectionHelpers.StringEndsWithComparisonMethod,
+                    strValue,
+                    OrdinalIgnoreCaseConstant);
+                exOut = Expression.AndAlso(nullCheck, exOut);
+            }
+            else
+            {
+                var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "EndsWith", new[] { type });
+                GetExpressionsOperands(options, targetExpr, value, out exOut, out var argument);
+                exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
+            }
             return exOut;
         }
 
@@ -924,10 +962,25 @@ namespace Castle.DynamicLinqQueryBuilder
                 type = typeof(string);
             }
             var targetExpr = (Expression?)propertyExpString ?? propertyExp;
-            var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "StartsWith", new[] { type });
 
-            GetExpressionsOperands(options, targetExpr, value, out var exOut, out var argument);
-            exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
+            Expression exOut;
+            if (ShouldUseOrdinalComparison(options))
+            {
+                // Use StartsWith(value, StringComparison.OrdinalIgnoreCase)
+                var strValue = Expression.Constant(value.ToString(), typeof(string));
+                exOut = Expression.Call(
+                    targetExpr,
+                    ReflectionHelpers.StringStartsWithComparisonMethod,
+                    strValue,
+                    OrdinalIgnoreCaseConstant);
+                exOut = Expression.AndAlso(nullCheck, exOut);
+            }
+            else
+            {
+                var method = ReflectionHelpers.GetCachedMethod(targetExpr.Type, "StartsWith", new[] { type });
+                GetExpressionsOperands(options, targetExpr, value, out exOut, out var argument);
+                exOut = Expression.AndAlso(nullCheck, Expression.Call(exOut, method!, argument));
+            }
             return exOut;
         }
 
@@ -945,6 +998,10 @@ namespace Castle.DynamicLinqQueryBuilder
         }
 
         // Using System.DateOnly available in .NET 6+
+        // Cached constant for StringComparison.OrdinalIgnoreCase
+        private static readonly ConstantExpression OrdinalIgnoreCaseConstant = 
+            Expression.Constant(StringComparison.OrdinalIgnoreCase, typeof(StringComparison));
+
         private static Expression Equals(Type type, object value, Expression propertyExp, BuildExpressionOptions options)
         {
             Expression someValue = GetConstants(type, value, false, options).First();
@@ -960,9 +1017,24 @@ namespace Castle.DynamicLinqQueryBuilder
                 {
                     propertyExpString = Expression.Call(propertyExp, ReflectionHelpers.GetCachedMethod(propertyExp.Type, "ToString", Type.EmptyTypes)!);
                 }
+
+                var targetProperty = (Expression?)propertyExpString ?? propertyExp;
                 
-                GetExpressionsOperands(options, (Expression?)propertyExpString ?? propertyExp, someValue, out exOut, out var argument);
-                exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, argument));
+                if (ShouldUseOrdinalComparison(options))
+                {
+                    // Use String.Equals(property, value, StringComparison.OrdinalIgnoreCase)
+                    exOut = Expression.Call(
+                        ReflectionHelpers.StringEqualsStaticMethod,
+                        targetProperty,
+                        someValue,
+                        OrdinalIgnoreCaseConstant);
+                    exOut = Expression.AndAlso(nullCheck, exOut);
+                }
+                else
+                {
+                    GetExpressionsOperands(options, targetProperty, someValue, out exOut, out var argument);
+                    exOut = Expression.AndAlso(nullCheck, Expression.Equal(exOut, argument));
+                }
             }
             else if (type == typeof(System.DateOnly))
             {
@@ -1145,15 +1217,38 @@ namespace Castle.DynamicLinqQueryBuilder
 
                         var property = propertyExpString ?? propertyExp;
                         
-                        // For strings, need to handle case sensitivity, so use chained Or
-                        GetExpressionsOperands(options, property, someValues[0], out var leftOperand, out var argument);
-                        exOut = Expression.Equal(leftOperand, argument);
-                        var counter = 1;
-                        while (counter < someValues.Count)
+                        if (ShouldUseOrdinalComparison(options))
                         {
-                            GetExpressionsOperands(options, property, someValues[counter], out leftOperand, out argument);
-                            exOut = Expression.Or(exOut, Expression.Equal(leftOperand, argument));
-                            counter++;
+                            // Use String.Equals with StringComparison.OrdinalIgnoreCase
+                            exOut = Expression.Call(
+                                ReflectionHelpers.StringEqualsStaticMethod,
+                                property,
+                                someValues[0],
+                                OrdinalIgnoreCaseConstant);
+                            var counter = 1;
+                            while (counter < someValues.Count)
+                            {
+                                var equalsExpr = Expression.Call(
+                                    ReflectionHelpers.StringEqualsStaticMethod,
+                                    property,
+                                    someValues[counter],
+                                    OrdinalIgnoreCaseConstant);
+                                exOut = Expression.Or(exOut, equalsExpr);
+                                counter++;
+                            }
+                        }
+                        else
+                        {
+                            // Use ToLower() approach for ORM compatibility
+                            GetExpressionsOperands(options, property, someValues[0], out var leftOperand, out var argument);
+                            exOut = Expression.Equal(leftOperand, argument);
+                            var counter = 1;
+                            while (counter < someValues.Count)
+                            {
+                                GetExpressionsOperands(options, property, someValues[counter], out leftOperand, out argument);
+                                exOut = Expression.Or(exOut, Expression.Equal(leftOperand, argument));
+                                counter++;
+                            }
                         }
                     }
                     else if (someValues.Count >= HashSetThreshold)
@@ -1185,8 +1280,22 @@ namespace Castle.DynamicLinqQueryBuilder
                         {
                             propertyExpString = Expression.Call(propertyExp, ReflectionHelpers.GetCachedMethod(propertyExp.Type, "ToString", Type.EmptyTypes)!);
                         }
-                        GetExpressionsOperands(options, propertyExpString ?? propertyExp, someValues.First(), out exOut, out var argument);
-                        exOut = Expression.Equal(exOut, argument);
+                        var property = propertyExpString ?? propertyExp;
+                        
+                        if (ShouldUseOrdinalComparison(options))
+                        {
+                            // Use String.Equals with StringComparison.OrdinalIgnoreCase
+                            exOut = Expression.Call(
+                                ReflectionHelpers.StringEqualsStaticMethod,
+                                property,
+                                someValues.First(),
+                                OrdinalIgnoreCaseConstant);
+                        }
+                        else
+                        {
+                            GetExpressionsOperands(options, property, someValues.First(), out exOut, out var argument);
+                            exOut = Expression.Equal(exOut, argument);
+                        }
                     }
                     else
                     {
