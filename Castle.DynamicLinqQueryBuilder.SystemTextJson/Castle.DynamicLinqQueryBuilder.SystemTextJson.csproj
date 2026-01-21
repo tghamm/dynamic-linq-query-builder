@@ -1,51 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	  <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-	  <ProjectGuid>{22861CF7-71BB-44AF-9630-AC3A59F36838}</ProjectGuid>
-	  <OutputType>Library</OutputType>
-	  <AppDesignerFolder>Properties</AppDesignerFolder>
-	  <RootNamespace>Castle.DynamicLinqQueryBuilder.SystemTextJson</RootNamespace>
-	  <AssemblyName>Castle.DynamicLinqQueryBuilder.SystemTextJson</AssemblyName>
-	  <TargetFramework>netstandard2.0</TargetFramework>
-	  <FileAlignment>512</FileAlignment>
-	  <TargetFrameworkProfile />
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <Version>1.3.4</Version>
-	  <AssemblyVersion>1.3.4.0</AssemblyVersion>
-	  <FileVersion>1.3.4.0</FileVersion>
-	  <Authors>Grant Hamm</Authors>
-	  <Company>N/A</Company>
-	  <Product>Dynamic Linq Query Builder - System.Text.Json Extension</Product>
-	  <Description>A companion package for those using System.Text.Json</Description>
-	  <Copyright>This library is licensed MIT, in the public domain</Copyright>
-	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <PackageProjectUrl>https://github.com/tghamm/dynamic-linq-query-builder/</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
-	  <RepositoryType>Git</RepositoryType>
-	  <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-	  <PackageReleaseNotes>Minor Enhancements</PackageReleaseNotes>
-	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <PublishRepositoryUrl>true</PublishRepositoryUrl>
-	  <IncludeSymbols>true</IncludeSymbols>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-	  <LangVersion>latest</LangVersion>
-	  <Configurations>Debug;Release;LocalTest</Configurations>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Configurations>Debug;Release;LocalTest</Configurations>
+    
+    <!-- Package metadata -->
+    <PackageId>Castle.DynamicLinqQueryBuilder.SystemTextJson</PackageId>
+    <Version>2.0.0</Version>
+    <Authors>Grant Hamm</Authors>
+    <Product>Dynamic Linq Query Builder - System.Text.Json Extension</Product>
+    <Description>A companion package for those using System.Text.Json</Description>
+    <Copyright>This library is licensed MIT, in the public domain</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/tghamm/dynamic-linq-query-builder/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
+    <PackageReleaseNotes>v2.0.0 - Major performance improvements, .NET 8 only</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Build options -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="6.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Castle.DynamicLinqQueryBuilder\Castle.DynamicLinqQueryBuilder.csproj" />
   </ItemGroup>
-	<ItemGroup>
-		<None Include="..\README.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.6" />
+  </ItemGroup>
+
 </Project>

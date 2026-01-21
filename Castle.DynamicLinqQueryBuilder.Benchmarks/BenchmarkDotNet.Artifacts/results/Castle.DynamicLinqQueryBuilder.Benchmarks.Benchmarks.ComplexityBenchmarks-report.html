@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.ComplexityBenchmarks-20260119-221101</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.7623)
+Intel Core i9-14900KF, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 9.0.306
+  [Host]   : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method              </th><th>Mean  </th><th>Error </th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Flat_1Rule</td><td>215,166.7 ns</td><td>421,569.7 ns</td><td>23,107.66 ns</td><td>1.007</td><td>0.13</td><td>0.4883</td><td>-</td><td>14.83 KB</td><td>1.00</td>
+</tr><tr><td>Flat_5Rules</td><td>267,391.3 ns</td><td>110,531.3 ns</td><td>6,058.60 ns</td><td>1.252</td><td>0.11</td><td>0.9766</td><td>0.4883</td><td>18.42 KB</td><td>1.24</td>
+</tr><tr><td>Flat_10Rules</td><td>271,565.9 ns</td><td>221,538.2 ns</td><td>12,143.26 ns</td><td>1.271</td><td>0.12</td><td>0.9766</td><td>0.4883</td><td>23.31 KB</td><td>1.57</td>
+</tr><tr><td>Flat_20Rules</td><td>349,326.0 ns</td><td>414,243.8 ns</td><td>22,706.10 ns</td><td>1.635</td><td>0.17</td><td>1.4648</td><td>0.9766</td><td>35.01 KB</td><td>2.36</td>
+</tr><tr><td>FlatOr_5Rules</td><td>252,465.3 ns</td><td>144,543.5 ns</td><td>7,922.92 ns</td><td>1.182</td><td>0.11</td><td>0.9766</td><td>0.4883</td><td>19.5 KB</td><td>1.32</td>
+</tr><tr><td>FlatOr_10Rules</td><td>271,282.1 ns</td><td>49,216.1 ns</td><td>2,697.70 ns</td><td>1.270</td><td>0.11</td><td>0.9766</td><td>0.4883</td><td>25.39 KB</td><td>1.71</td>
+</tr><tr><td>FlatOr_20Rules</td><td>326,553.6 ns</td><td>150,205.9 ns</td><td>8,233.29 ns</td><td>1.529</td><td>0.14</td><td>1.9531</td><td>1.4648</td><td>37.05 KB</td><td>2.50</td>
+</tr><tr><td>Nested_2Levels</td><td>239,059.5 ns</td><td>205,413.6 ns</td><td>11,259.41 ns</td><td>1.119</td><td>0.11</td><td>0.4883</td><td>-</td><td>15.97 KB</td><td>1.08</td>
+</tr><tr><td>Nested_3Levels</td><td>231,602.5 ns</td><td>71,177.1 ns</td><td>3,901.46 ns</td><td>1.084</td><td>0.10</td><td>0.4883</td><td>-</td><td>17.41 KB</td><td>1.17</td>
+</tr><tr><td>Nested_5Levels</td><td>236,345.8 ns</td><td>71,445.0 ns</td><td>3,916.14 ns</td><td>1.107</td><td>0.10</td><td>0.9766</td><td>0.4883</td><td>19.65 KB</td><td>1.32</td>
+</tr><tr><td>Nested_10Levels</td><td>267,758.2 ns</td><td>249,353.1 ns</td><td>13,667.88 ns</td><td>1.254</td><td>0.12</td><td>0.9766</td><td>0.4883</td><td>26.03 KB</td><td>1.76</td>
+</tr><tr><td>Mixed_2x2</td><td>480,152.7 ns</td><td>262,195.0 ns</td><td>14,371.79 ns</td><td>2.248</td><td>0.21</td><td>0.9766</td><td>-</td><td>22.82 KB</td><td>1.54</td>
+</tr><tr><td>Mixed_3x3</td><td>554,315.7 ns</td><td>112,392.3 ns</td><td>6,160.60 ns</td><td>2.595</td><td>0.23</td><td>0.9766</td><td>-</td><td>27.05 KB</td><td>1.82</td>
+</tr><tr><td>Mixed_5x5</td><td>720,207.2 ns</td><td>595,077.3 ns</td><td>32,618.19 ns</td><td>3.372</td><td>0.33</td><td>1.9531</td><td>0.9766</td><td>36.21 KB</td><td>2.44</td>
+</tr><tr><td>ComplexRealWorld</td><td>622,816.1 ns</td><td>178,034.4 ns</td><td>9,758.67 ns</td><td>2.916</td><td>0.26</td><td>3.9063</td><td>1.9531</td><td>72.86 KB</td><td>4.91</td>
+</tr><tr><td>BuildOnly_Flat_1Rule</td><td>632.9 ns</td><td>241.7 ns</td><td>13.25 ns</td><td>0.003</td><td>0.00</td><td>0.0830</td><td>-</td><td>1.53 KB</td><td>0.10</td>
+</tr><tr><td>BuildOnly_Flat_20Rules</td><td>7,901.9 ns</td><td>4,531.4 ns</td><td>248.38 ns</td><td>0.037</td><td>0.00</td><td>0.9155</td><td>0.0153</td><td>16.83 KB</td><td>1.13</td>
+</tr><tr><td>BuildOnly_Nested_10Levels</td><td>4,848.8 ns</td><td>2,433.7 ns</td><td>133.40 ns</td><td>0.023</td><td>0.00</td><td>0.5722</td><td>-</td><td>10.57 KB</td><td>0.71</td>
+</tr><tr><td>BuildOnly_ComplexRealWorld</td><td>4,896.5 ns</td><td>3,663.2 ns</td><td>200.79 ns</td><td>0.023</td><td>0.00</td><td>0.3967</td><td>-</td><td>7.8 KB</td><td>0.53</td>
+</tr></tbody></table>
+</body>
+</html>

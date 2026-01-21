@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.CachingBenchmarks-20260119-230240</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.7623)
+Intel Core i9-14900KF, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 9.0.306
+  [Host]   : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method               </th><th>Mean       </th><th>Error      </th><th>StdDev   </th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Build_Simple_Once</td><td>542.4664 ns</td><td>304.6652 ns</td><td>16.6997 ns</td><td>1.001</td><td>0.04</td><td>0.0830</td><td>-</td><td>1568 B</td><td>1.00</td>
+</tr><tr><td>UseCached_Simple_Once</td><td>0.0000 ns</td><td>0.0000 ns</td><td>0.0000 ns</td><td>0.000</td><td>0.00</td><td>-</td><td>-</td><td>-</td><td>0.00</td>
+</tr><tr><td>Build_Simple_10x</td><td>5,439.1157 ns</td><td>2,984.7030 ns</td><td>163.6016 ns</td><td>10.033</td><td>0.37</td><td>0.8316</td><td>-</td><td>15680 B</td><td>10.00</td>
+</tr><tr><td>Build_Simple_100x</td><td>57,433.5917 ns</td><td>36,367.1106 ns</td><td>1,993.4041 ns</td><td>105.941</td><td>4.23</td><td>8.3008</td><td>-</td><td>156802 B</td><td>100.00</td>
+</tr><tr><td>Build_Simple_1000x</td><td>561,820.5729 ns</td><td>302,537.8471 ns</td><td>16,583.1203 ns</td><td>1,036.323</td><td>37.98</td><td>83.0078</td><td>-</td><td>1568021 B</td><td>1,000.01</td>
+</tr><tr><td>Build_Medium_Once</td><td>2,151.0485 ns</td><td>2,568.7210 ns</td><td>140.8003 ns</td><td>3.968</td><td>0.25</td><td>0.1984</td><td>-</td><td>3792 B</td><td>2.42</td>
+</tr><tr><td>Build_Medium_10x</td><td>23,004.9215 ns</td><td>71,620.1845 ns</td><td>3,925.7440 ns</td><td>42.434</td><td>6.37</td><td>1.9531</td><td>-</td><td>37922 B</td><td>24.18</td>
+</tr><tr><td>Build_Medium_100x</td><td>220,857.9590 ns</td><td>363,684.6706 ns</td><td>19,934.7841 ns</td><td>407.390</td><td>33.60</td><td>19.5313</td><td>-</td><td>379215 B</td><td>241.85</td>
+</tr><tr><td>Build_Complex_Once</td><td>6,344.1671 ns</td><td>10,975.9875 ns</td><td>601.6309 ns</td><td>11.702</td><td>1.01</td><td>0.5493</td><td>-</td><td>10401 B</td><td>6.63</td>
+</tr><tr><td>Build_Complex_10x</td><td>60,612.0361 ns</td><td>25,602.9778 ns</td><td>1,403.3856 ns</td><td>111.804</td><td>3.69</td><td>5.3711</td><td>-</td><td>102805 B</td><td>65.56</td>
+</tr><tr><td>Build_Complex_100x</td><td>672,138.9323 ns</td><td>2,129,876.7196 ns</td><td>116,745.7304 ns</td><td>1,239.814</td><td>189.37</td><td>50.7813</td><td>-</td><td>1028052 B</td><td>655.65</td>
+</tr><tr><td>BuildAndExecute_Simple</td><td>209,677.6530 ns</td><td>107,292.0180 ns</td><td>5,881.0376 ns</td><td>386.767</td><td>13.83</td><td>0.4883</td><td>-</td><td>15063 B</td><td>9.61</td>
+</tr><tr><td>CachedExecute_Simple</td><td>1,413.1051 ns</td><td>849.8924 ns</td><td>46.5855 ns</td><td>2.607</td><td>0.10</td><td>0.0114</td><td>-</td><td>248 B</td><td>0.16</td>
+</tr><tr><td>BuildAndExecute_Complex</td><td>725,312.3047 ns</td><td>361,205.2218 ns</td><td>19,798.8771 ns</td><td>1,337.896</td><td>47.27</td><td>3.9063</td><td>1.9531</td><td>79493 B</td><td>50.70</td>
+</tr><tr><td>CachedExecute_Complex</td><td>19,883.2326 ns</td><td>14,278.5825 ns</td><td>782.6573 ns</td><td>36.676</td><td>1.58</td><td>2.5635</td><td>-</td><td>48800 B</td><td>31.12</td>
+</tr><tr><td>BuildAndExecute_Simple_10x</td><td>2,102,141.1458 ns</td><td>690,510.3417 ns</td><td>37,849.2020 ns</td><td>3,877.567</td><td>118.39</td><td>7.8125</td><td>3.9063</td><td>151999 B</td><td>96.94</td>
+</tr><tr><td>CachedExecute_Simple_10x</td><td>13,489.2822 ns</td><td>9,940.7249 ns</td><td>544.8847 ns</td><td>24.882</td><td>1.09</td><td>0.1221</td><td>-</td><td>2480 B</td><td>1.58</td>
+</tr><tr><td>BuildAndExecute_Complex_10x</td><td>7,691,740.1042 ns</td><td>7,097,960.9091 ns</td><td>389,063.1900 ns</td><td>14,188.027</td><td>724.71</td><td>31.2500</td><td>15.6250</td><td>795967 B</td><td>507.63</td>
+</tr><tr><td>CachedExecute_Complex_10x</td><td>206,522.5342 ns</td><td>238,925.6255 ns</td><td>13,096.3198 ns</td><td>380.947</td><td>23.19</td><td>25.8789</td><td>-</td><td>488000 B</td><td>311.22</td>
+</tr><tr><td>BuildAndCompile_Simple</td><td>34,115.8610 ns</td><td>30,564.4077 ns</td><td>1,675.3383 ns</td><td>62.929</td><td>3.15</td><td>0.3052</td><td>0.1831</td><td>5885 B</td><td>3.75</td>
+</tr><tr><td>BuildAndCompile_Complex</td><td>459,646.9727 ns</td><td>389,686.8401 ns</td><td>21,360.0507 ns</td><td>847.855</td><td>40.75</td><td>0.9766</td><td>-</td><td>21279 B</td><td>13.57</td>
+</tr><tr><td>BuildAndCompile_Simple_10x</td><td>373,898.3887 ns</td><td>639,000.4406 ns</td><td>35,025.7705 ns</td><td>689.685</td><td>58.82</td><td>2.9297</td><td>2.4414</td><td>58866 B</td><td>37.54</td>
+</tr><tr><td>BuildAndCompile_Complex_10x</td><td>4,632,821.0938 ns</td><td>3,966,346.4994 ns</td><td>217,408.8363 ns</td><td>8,545.608</td><td>413.53</td><td>7.8125</td><td>-</td><td>212027 B</td><td>135.22</td>
+</tr></tbody></table>
+</body>
+</html>

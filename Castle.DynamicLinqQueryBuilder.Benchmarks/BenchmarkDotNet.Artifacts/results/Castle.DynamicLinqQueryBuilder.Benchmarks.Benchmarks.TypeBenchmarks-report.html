@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.TypeBenchmarks-20260119-220849</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.7623)
+Intel Core i9-14900KF, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 9.0.306
+  [Host]   : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                        </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Type_Integer</td><td>194.4 &mu;s</td><td>71.77 &mu;s</td><td>3.93 &mu;s</td><td>1.00</td><td>0.02</td><td>0.4883</td><td>-</td><td>14.72 KB</td><td>1.00</td>
+</tr><tr><td>Type_Long</td><td>202.9 &mu;s</td><td>44.23 &mu;s</td><td>2.42 &mu;s</td><td>1.04</td><td>0.02</td><td>0.4883</td><td>-</td><td>14.63 KB</td><td>0.99</td>
+</tr><tr><td>Type_Double</td><td>213.6 &mu;s</td><td>82.30 &mu;s</td><td>4.51 &mu;s</td><td>1.10</td><td>0.03</td><td>0.4883</td><td>-</td><td>14.6 KB</td><td>0.99</td>
+</tr><tr><td>Type_String</td><td>523.1 &mu;s</td><td>246.02 &mu;s</td><td>13.48 &mu;s</td><td>2.69</td><td>0.08</td><td>5.8594</td><td>2.9297</td><td>121.68 KB</td><td>8.27</td>
+</tr><tr><td>Type_Date</td><td>329.2 &mu;s</td><td>198.01 &mu;s</td><td>10.85 &mu;s</td><td>1.69</td><td>0.06</td><td>0.4883</td><td>-</td><td>16.07 KB</td><td>1.09</td>
+</tr><tr><td>Type_DateTime_Local</td><td>333.9 &mu;s</td><td>227.94 &mu;s</td><td>12.49 &mu;s</td><td>1.72</td><td>0.06</td><td>0.4883</td><td>-</td><td>15.71 KB</td><td>1.07</td>
+</tr><tr><td>Type_DateTime_UTC</td><td>328.5 &mu;s</td><td>137.89 &mu;s</td><td>7.56 &mu;s</td><td>1.69</td><td>0.04</td><td>0.4883</td><td>-</td><td>15.74 KB</td><td>1.07</td>
+</tr><tr><td>Type_Boolean</td><td>221.3 &mu;s</td><td>33.68 &mu;s</td><td>1.85 &mu;s</td><td>1.14</td><td>0.02</td><td>1.4648</td><td>0.9766</td><td>30.89 KB</td><td>2.10</td>
+</tr><tr><td>Type_Guid</td><td>340.4 &mu;s</td><td>70.10 &mu;s</td><td>3.84 &mu;s</td><td>1.75</td><td>0.03</td><td>0.4883</td><td>-</td><td>15.97 KB</td><td>1.09</td>
+</tr><tr><td>Type_NullableInteger</td><td>255.5 &mu;s</td><td>52.56 &mu;s</td><td>2.88 &mu;s</td><td>1.32</td><td>0.03</td><td>0.4883</td><td>-</td><td>15.52 KB</td><td>1.05</td>
+</tr><tr><td>Type_NullableLong</td><td>255.4 &mu;s</td><td>106.32 &mu;s</td><td>5.83 &mu;s</td><td>1.31</td><td>0.03</td><td>0.4883</td><td>-</td><td>15.52 KB</td><td>1.05</td>
+</tr><tr><td>Type_NullableDouble</td><td>253.3 &mu;s</td><td>117.04 &mu;s</td><td>6.42 &mu;s</td><td>1.30</td><td>0.04</td><td>0.4883</td><td>-</td><td>15.51 KB</td><td>1.05</td>
+</tr><tr><td>Type_NullableDateTime</td><td>430.8 &mu;s</td><td>838.34 &mu;s</td><td>45.95 &mu;s</td><td>2.22</td><td>0.21</td><td>0.9766</td><td>-</td><td>18.11 KB</td><td>1.23</td>
+</tr><tr><td>Type_NullableBoolean</td><td>258.8 &mu;s</td><td>72.17 &mu;s</td><td>3.96 &mu;s</td><td>1.33</td><td>0.03</td><td>0.9766</td><td>0.4883</td><td>23.66 KB</td><td>1.61</td>
+</tr><tr><td>Type_NullableGuid</td><td>467.9 &mu;s</td><td>620.79 &mu;s</td><td>34.03 &mu;s</td><td>2.41</td><td>0.16</td><td>0.9766</td><td>-</td><td>18.23 KB</td><td>1.24</td>
+</tr><tr><td>TypeCollection_Integer_10Values</td><td>315.7 &mu;s</td><td>318.96 &mu;s</td><td>17.48 &mu;s</td><td>1.62</td><td>0.08</td><td>0.9766</td><td>0.4883</td><td>23.61 KB</td><td>1.60</td>
+</tr><tr><td>TypeCollection_String_10Values</td><td>1,621.3 &mu;s</td><td>714.20 &mu;s</td><td>39.15 &mu;s</td><td>8.34</td><td>0.23</td><td>46.8750</td><td>11.7188</td><td>906.25 KB</td><td>61.58</td>
+</tr><tr><td>TypeCollection_DateTime_10Values</td><td>574.3 &mu;s</td><td>347.26 &mu;s</td><td>19.03 &mu;s</td><td>2.96</td><td>0.10</td><td>0.9766</td><td>-</td><td>30.75 KB</td><td>2.09</td>
+</tr><tr><td>TypeCollection_DateTime_10Values_UTC</td><td>628.3 &mu;s</td><td>281.93 &mu;s</td><td>15.45 &mu;s</td><td>3.23</td><td>0.09</td><td>0.9766</td><td>-</td><td>30.72 KB</td><td>2.09</td>
+</tr><tr><td>TypeCollection_Guid_10Values</td><td>745.5 &mu;s</td><td>468.33 &mu;s</td><td>25.67 &mu;s</td><td>3.84</td><td>0.13</td><td>0.9766</td><td>-</td><td>31.42 KB</td><td>2.13</td>
+</tr></tbody></table>
+</body>
+</html>

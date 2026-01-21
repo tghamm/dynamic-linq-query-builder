@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Castle.DynamicLinqQueryBuilder.Benchmarks.Benchmarks.ExpressionBuildBenchmarks-20260119-225209</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.7623)
+Intel Core i9-14900KF, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 9.0.306
+  [Host]   : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.21 (8.0.2125.47513), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                      </th><th>Mean      </th><th>Error     </th><th>StdDev    </th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>BuildExpression_SimpleProperty</td><td>558.3 ns</td><td>454.9 ns</td><td>24.94 ns</td><td>1.00</td><td>0.05</td><td>0.0801</td><td>1.53 KB</td><td>1.00</td>
+</tr><tr><td>BuildExpression_NestedProperty</td><td>7,740.7 ns</td><td>6,163.8 ns</td><td>337.86 ns</td><td>13.88</td><td>0.75</td><td>0.5493</td><td>10.29 KB</td><td>6.72</td>
+</tr><tr><td>BuildExpression_CollectionProperty</td><td>1,997.6 ns</td><td>2,739.8 ns</td><td>150.18 ns</td><td>3.58</td><td>0.27</td><td>0.1755</td><td>3.3 KB</td><td>2.16</td>
+</tr><tr><td>BuildExpression_DictionaryAccess</td><td>2,332.7 ns</td><td>4,012.7 ns</td><td>219.95 ns</td><td>4.18</td><td>0.38</td><td>0.1755</td><td>3.3 KB</td><td>2.15</td>
+</tr><tr><td>BuildQuery_SimpleProperty</td><td>2,610.0 ns</td><td>1,592.0 ns</td><td>87.26 ns</td><td>4.68</td><td>0.23</td><td>0.2441</td><td>4.73 KB</td><td>3.09</td>
+</tr><tr><td>BuildQuery_NestedProperty</td><td>9,748.5 ns</td><td>5,340.2 ns</td><td>292.72 ns</td><td>17.48</td><td>0.81</td><td>0.7324</td><td>13.64 KB</td><td>8.91</td>
+</tr><tr><td>BuildAndExecute_SimpleProperty</td><td>191,904.6 ns</td><td>65,142.5 ns</td><td>3,570.68 ns</td><td>344.17</td><td>14.41</td><td>0.4883</td><td>14.71 KB</td><td>9.61</td>
+</tr><tr><td>BuildAndExecute_NestedProperty</td><td>314,293,633.3 ns</td><td>354,777,146.5 ns</td><td>19,446,532.62 ns</td><td>563,659.76</td><td>37,248.57</td><td>-</td><td>10609.05 KB</td><td>6,928.36</td>
+</tr></tbody></table>
+</body>
+</html>
