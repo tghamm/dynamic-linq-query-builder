@@ -459,6 +459,36 @@ namespace Castle.DynamicLinqQueryBuilder
                 case "guid":
                     type = typeof(Guid);
                     break;
+                // Additional numeric types
+                case "short":
+                case "int16":
+                    type = typeof(short);
+                    break;
+                case "ushort":
+                case "uint16":
+                    type = typeof(ushort);
+                    break;
+                case "uint":
+                case "uint32":
+                    type = typeof(uint);
+                    break;
+                case "ulong":
+                case "uint64":
+                    type = typeof(ulong);
+                    break;
+                case "byte":
+                    type = typeof(byte);
+                    break;
+                case "sbyte":
+                    type = typeof(sbyte);
+                    break;
+                case "float":
+                case "single":
+                    type = typeof(float);
+                    break;
+                case "decimal":
+                    type = typeof(decimal);
+                    break;
                 default:
                     throw new Exception($"Unexpected data type {typeName}");
             }
@@ -1336,7 +1366,11 @@ namespace Castle.DynamicLinqQueryBuilder
             foreach (var v in values)
             {
                 if (v != null)
-                    addMethod.Invoke(hashSet, new[] { v });
+                {
+                    // Convert value to target type to handle type mismatches (e.g., Int32 filter value -> UInt16 property)
+                    var convertedValue = Convert.ChangeType(v, underlyingType);
+                    addMethod.Invoke(hashSet, new[] { convertedValue });
+                }
             }
             
             // Create a constant expression for the HashSet
