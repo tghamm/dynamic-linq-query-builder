@@ -9,7 +9,7 @@
     
     <!-- Package metadata -->
     <PackageId>Castle.DynamicLinqQueryBuilder</PackageId>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Authors>Grant Hamm</Authors>
     <Product>Dynamic Linq Query Builder</Product>
     <Description>A simple dynamic expression-tree query builder. You pass it a nested collection of filters for an object, and it materializes a query capable of acting as the filter to an arbitrary collection.</Description>
@@ -19,7 +19,7 @@
     <RepositoryUrl>https://github.com/tghamm/dynamic-linq-query-builder/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>jquery-query-builder generic query generator linq javascript</PackageTags>
-    <PackageReleaseNotes>v2.0.0 - Major performance improvements, .NET 8 only</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.0.1 - Major performance improvements, .NET 8 only; additional types</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     
     <!-- Build options -->
