@@ -9,7 +9,7 @@
     
     <!-- Package metadata -->
     <PackageId>Castle.DynamicLinqQueryBuilder.SystemTextJson</PackageId>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Authors>Grant Hamm</Authors>
     <Product>Dynamic Linq Query Builder - System.Text.Json Extension</Product>
     <Description>A companion package for those using System.Text.Json</Description>
